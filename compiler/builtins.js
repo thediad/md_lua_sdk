@@ -262,6 +262,18 @@ export const CURATED_BUILTINS = {
   // add(bullets, {x=1, y=2}), `for b in all(bullets)`, del(bullets, b).
   // Field set is frozen by the first add(); #pool = live count.
   pool: { params: [["int", false]], ret: "pool", special: "pool" },
+
+  // Allocation-free PICO-8 compatibility provided by the shared compiler.
+  // String operations are restricted to values known at compile time.
+  count: { params: [], ret: "int", special: "count" },
+  ord:   { params: [], ret: "int", special: "ord" },
+  chr:   { params: [], ret: "str", special: "chr" },
+  sub:   { params: [], ret: "str", special: "sub" },
+  tonum: { params: [], ret: "same", special: "tonum" },
+  tostr: { params: [], ret: "str", special: "tostr" },
+  type:  { params: [], ret: "str", special: "type" },
+  split: { params: [], ret: "array", special: "split" },
+
   print: { params: [], ret: "int", special: "print" },
   add:  { params: [], ret: "void", special: "add" },
   del:  { params: [], ret: "void", special: "del" },

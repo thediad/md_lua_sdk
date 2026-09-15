@@ -44,7 +44,7 @@ void md_spr_pal(int bank);
 void md_spr_prio(int p);
 
 // tilemap (plane B)
-void md_map(const unsigned char *m, int mapw, int cx, int cy, int sx, int sy, int cw, int ch);
+void md_map(const unsigned char *m, int mapw, int cx, int cy, int sx, int sy, int cw, int ch, int layers);
 void md_map_show(int layer);
 int  md_mget(int layer, int col, int row);
 void md_mset(int layer, int col, int row, int tile);

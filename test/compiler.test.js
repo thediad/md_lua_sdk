@@ -62,7 +62,7 @@ test("flr(rnd(n)) emits md_rnd_int (the raw-template name is remapped)", () => {
 
 test("abs/sgn emit md_* helpers; fixed mid calls md_midf (int mid inlines)", () => {
   const c = cOf("local a = -3\nlocal b = 0\nfunction _update60()\n  b = abs(a) + sgn(a)\nend\n" + "function _draw()\nend\n");
-  assert.match(c, /md_absi\(/);
+  assert.match(c, /md_absf\(/);
   assert.match(c, /md_sgni\(/);
   const cf = cOf("local a = 1.5\nlocal b = 0.0\nfunction _update60()\n  b = mid(0.5, a, 2.5)\nend\n" + "function _draw()\nend\n");
   assert.match(cf, /md_midf\(/);
@@ -130,7 +130,7 @@ test("spr flips pack into one arg (bit0 X, bit1 Y)", () => {
 test("map() special routes the __p8map hexdata array to md_map", () => {
   const src = 'local __p8map = hexdata("0102")\n' + "function _update60()\nend\nfunction _draw()\n  map(0, 0, 0, 0, 2, 1)\nend\n";
   const c = cOf(src);
-  assert.match(c, /md_map\(lcl___p8map, 128, 0, 0, 0, 0, 2, 1\)/);
+  assert.match(c, /md_map\(lcl___p8map, 128, 0, 0, 0, 0, 2, 1, -1\)/);
 });
 
 test("btn/btnp with player arg", () => {
@@ -276,4 +276,52 @@ test("SGDK pointer-handle params cast to void* (Sprite* under -Werror)", () => {
     "function _update60()\n  s = SPR_addSprite(0, 0, 0, 0)\n  SPR_setPosition(s, 10, 20)\nend\nfunction _draw()\nend\n"
   );
   assert.match(c, /SPR_setPosition\(\(void\*\)\(/);   // handle -> void*
+});
+
+test("shared static string and numeric operations compile for Genesis", () => {
+  const c = cOf(
+    'local code=ord(chr(64,65),2)\n' +
+    'local decimal=tonum("12"..".5")\n' +
+    'local nested=tonum(tostr(-3.5))\n' +
+    'local length=#("mega".."drive")\n' +
+    'local sublength=#sub(chr(97,98,99,100,101),2,5)\n' +
+    'local values=split("10,"..tostr(20.5)..","..sub("x-3",2))\n' +
+    'function _update60() end\n' +
+    'function _draw()\n' +
+    ' print(sub(chr(104,101,108,108,111),2,4),0,0,7)\n' +
+    ' print(tostr(-3.5),0,8,7)\n' +
+    ' print("mega".."drive",0,16,7)\n' +
+    ' print(type(values),0,24,7)\n' +
+    'end\n'
+  );
+
+  assert.match(c, /int lcl_code = 65;/);
+  assert.match(c, /long lcl_decimal = 819200L/);
+  assert.match(c, /long lcl_nested = -229376L/);
+  assert.match(c, /int lcl_length = 9;/);
+  assert.match(c, /int lcl_sublength = 4;/);
+  assert.match(c, /long lcl_values\[3\]/);
+
+  assert.ok(c.includes('md_print("ell"'));
+  assert.ok(c.includes('md_print("-3.5"'));
+  assert.ok(c.includes('md_print("megadrive"'));
+  assert.ok(c.includes('md_print("table"'));
+});
+
+test("abs uses fixed-point helper for 16.16 minimum saturation", () => {
+  const c = cOf(
+    'local edge=abs(-32768)\n' +
+    'local runtime=-32768\n' +
+    'function _init() runtime=abs(runtime) end\n' +
+    'function _draw() end\n'
+  );
+
+  // -32768 has no positive counterpart in signed 16.16, so constant
+  // folding saturates it to the largest representable positive value.
+  assert.match(c, /long lcl_edge = 2147483647L/);
+
+  // Runtime integer values are promoted to 16.16 before the saturating
+  // fixed-point abs helper is called.
+  assert.match(c, /lcl_runtime = md_absf\(\(\(long\)lcl_runtime << 16\)\)/);
+  assert.doesNotMatch(c, /md_absi\(lcl_runtime\)/);
 });

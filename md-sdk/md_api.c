@@ -261,7 +261,8 @@ void md_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int
 }
 
 // ---- tilemap: plane B ------------------------------------------------------------
-void md_map(const unsigned char *m, int mapw, int cx, int cy, int sx, int sy, int cw, int ch) {
+void md_map(const unsigned char *m, int mapw, int cx, int cy, int sx, int sy, int cw, int ch, int layers) {
+    (void)layers;  // single PICO-style map plane; layer mask reserved for compatibility
     int i, j;
     if (cw < 0) cw = 16;
     if (ch < 0) ch = 14;

@@ -524,8 +524,12 @@ void md_cls(int color) {
 }
 
 // ---- misc hardware ------------------------------------------------------------
-long md_realframes(void) { return (long)md_ticks(); }
-long md_realsecs(void)   { return (long)(((unsigned long long)md_ticks() << 16) / 60); }
+static u32 real_frame_origin;
+long md_realframes(void) { return (long)(vtimer - real_frame_origin); }
+long md_realsecs(void) {
+    u32 frames = vtimer - real_frame_origin;
+    return (long)(((unsigned long long)frames << 16) / (IS_PAL_SYSTEM ? 50 : 60));
+}
 void md_run(void) { SYS_hardReset(); }
 
 // ---- audio ----------------------------------------------------------------------
@@ -620,6 +624,7 @@ int md_demo_sprite(void) { return (int)&md_ds_def; }
 // ---- frame harness ------------------------------------------------------------
 void md_init(void) {
     u16 i;
+    real_frame_origin = vtimer;
     VDP_setScreenWidth320();
     for (i = 0; i < 64; i++) cram_shadow[i] = 0;
     for (i = 0; i < 16; i++) { cram_shadow[i] = RGB24_TO_VDPCOLOR(P8_RGB[i]); PAL_setColor(i, cram_shadow[i]); }

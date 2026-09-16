@@ -349,8 +349,8 @@ end
 | Call | What |
 |---|---|
 | `t()` / `time()` | seconds since boot (16.16), advanced each frame |
-| `realframes()` | frames since boot - drive effects off it |
-| `realsecs()` | seconds since boot as `realframes()/60` (16.16) |
+| `realframes()` | video interrupts since runtime initialization, independent of game-loop speed |
+| `realsecs()` | elapsed nominal seconds: video interrupts / 60 NTSC or / 50 PAL (16.16) |
 | `run()` / `reset()` | restart the cart from power-on (full hardware reset) |
 
 ---

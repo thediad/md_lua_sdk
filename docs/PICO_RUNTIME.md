@@ -49,6 +49,20 @@ Draw static hardware text once, as the number-print diagnostic does.
 
 ## Numbers and clipping
 
+`realframes()` counts video interrupts since runtime initialization, rather
+than completed game loops. `realsecs()` converts that count to 16.16 seconds
+using nominal 60 Hz on NTSC and 50 Hz on PAL. Actual refresh rates differ
+slightly from those nominal rates. These clocks continue advancing while a
+slow bitmap draw spans multiple video frames; they are not an external clock
+and cannot count interrupts suppressed by application code.
+
+`t()`/`time()` retain their existing simulation-clock behavior: exactly 1/60
+second per completed game loop, even on PAL or during slow rendering. Use
+`realsecs()` when an effect should follow elapsed time instead of loop count.
+The `clock_check` diagnostic shows a green bar after checking both clocks
+during slow bitmap drawing; numeric rows show elapsed video frames, elapsed
+seconds, simulation seconds, and the selected nominal video rate.
+
 Numeric `print` preserves fractions with up to four rounded decimal places,
 trims trailing zeros, and avoids displaying negative zero. The same formatter
 serves explicit-position and cursor printing.

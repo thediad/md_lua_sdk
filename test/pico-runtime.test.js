@@ -193,6 +193,31 @@ test("animated bitmap flips remain complete in NTSC and PAL", async () => {
   }
 });
 
+test("real clocks track video interrupts during slow NTSC and PAL drawing", async () => {
+  const work=await mkdtemp(path.join(tmpdir(),"mdlua-clocks-"));
+  const original=path.join(work,"clock.bin");
+  await buildMd(fileURLToPath(new URL("../examples/clock_check/main.lua",import.meta.url)),original);
+  for(const [region,min,max] of [["U",59,61],["E",49,51]]) {
+    const bytes=await readFile(original);
+    bytes.fill(32,0x1f0,0x200); bytes[0x1f0]=region.charCodeAt(0);
+    const rom=path.join(work,`${region}.bin`);
+    await writeFile(rom,bytes);
+    const host=new LibretroHost({saveDir:work});
+    try {
+      await host.loadCore(core.jsPath,core.wasmPath);
+      await host.loadMedia({platform:"genesis",path:rom});
+      host.stepFrames(240);
+      const fps=host.getStatus().coreFps;
+      assert.ok(fps>min && fps<max,`${region} video timing`);
+      const {width,height,rgba}=host.screenshotRgba();
+      const ox=(width-256)/2,oy=(height-160)/2;
+      const pixel=(x,y)=>Array.from(rgba.slice(((y+oy)*width+x+ox)*4,((y+oy)*width+x+ox)*4+3));
+      assert.notDeepEqual(pixel(8,8),pixel(24,8));
+      assert.deepEqual(pixel(60,50),pixel(8,8),`${region}: slow-loop clock checks must report green`);
+    } finally { host.unloadMedia(); }
+  }
+});
+
 test("pre-scaled variants render exact pixels, transparency and flips", async () => {
   const work = await mkdtemp(path.join(tmpdir(), "mdlua-scaled-"));
   const rom = path.join(work, "scaled.bin");

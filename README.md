@@ -179,6 +179,9 @@ The reason this target is fun:
 For declared sprite sizes, see [pre-scaled sprites](docs/PRESCALED_SPRITES.md).
 `--sprite-variants variants.json` generates palette-preserving variants from
 `--sheet`, reports their memory cost, and draws each with one hardware sprite.
+`--gff sprites.gff` imports exactly 256 raw sprite-flag bytes, compatible with
+GameTank's flag assets, for `fget`, `fset`, and PICO map layer filtering.
+See [PICO_RUNTIME.md](docs/PICO_RUNTIME.md) for the format and an example.
 
 `--sheet sprites.png` imports a sprite sheet (8×8 cells, row-major, up to 15
 opaque colors + transparent), `--map level.png` a tilemap (deduped tiles),

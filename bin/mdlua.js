@@ -10,7 +10,7 @@ import { compile, formatDiagnostics } from "../compiler/index.js";
 const [cmd, ...rest] = process.argv.slice(2);
 const fail = (m) => { console.error(m); process.exit(1); };
 
-// asset flags shared by build + run: --sheet/--map take one path,
+// asset flags shared by build + run: --sheet/--map/--gff take one path,
 // --sfx/--music take comma-separated lists (bank order = sfx(n)/music(n) n).
 const flag = (name) => { const i = rest.indexOf(name); return i >= 0 ? rest[i + 1] : undefined; };
 const list = (name) => { const v = flag(name); return v ? v.split(",") : undefined; };
@@ -18,6 +18,7 @@ const assetOpts = () => ({
   sheetPath: flag("--sheet"),
   spriteVariantsPath: flag("--sprite-variants"),
   mapPath: flag("--map"),
+  gffPath: flag("--gff"),
   sfxPaths: list("--sfx"),
   musicPaths: list("--music"),
 });
@@ -59,5 +60,5 @@ if (cmd === "build") {
   if (!res.ok) fail(formatDiagnostics(res.diagnostics.filter((d) => d.severity === "error")));
   process.stdout.write(res.c + "\n");
 } else {
-  fail("usage: mdlua build <main.lua> [--sheet s.png] [--map m.png] [--sfx a.wav,b.wav] [--music a.vgm,b.vgm] [-o game.bin]\n       mdlua run   <main.lua|game.bin>\n       mdlua c <main.lua>");
+  fail("usage: mdlua build <main.lua> [--sheet s.png] [--sprite-variants variants.json] [--gff sprites.gff] [--map m.png] [--sfx a.wav,b.wav] [--music a.vgm,b.vgm] [-o game.bin]\n       mdlua run   <main.lua|game.bin> [same asset flags]\n       mdlua c <main.lua>");
 }

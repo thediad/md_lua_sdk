@@ -14,8 +14,12 @@ with zero; bytes beyond 8192 are ignored. Map coordinates are zero-based.
 - `fget(sprite)` reads a flag byte; `fget(sprite,bit)` returns zero or one.
 - `fset(sprite,flags)` replaces the byte; `fset(sprite,bit,on)` changes one bit.
 - Sprites are 0-255 and bits are 0-7. Invalid indices read zero or do nothing.
-- Flags initially contain zero and are set from Lua. Importing a PICO flag
-  asset is not implemented yet.
+- Flags initially contain zero, or the bytes supplied by `--gff sprites.gff`.
+  The file must contain exactly 256 raw bytes, one byte per sprite ID, using
+  the same binary format as GameTank's `.gff` assets. This is not the textual
+  `__gff__` section of a `.p8` cartridge; export that section to binary first.
+  Imported flags are available before Lua `_init` and remain mutable via
+  `fset`. No sprite sheet is required to import or query flags.
 - `map(cx,cy,sx,sy,cw,ch[,layers])` stamps 8x8 sheet tiles onto plane B.
   Defaults are `0,0,0,0,128,64`; an omitted mask draws every nonzero tile.
   A supplied mask draws tiles sharing any flag bit; zero draws none.
@@ -27,6 +31,21 @@ needs about 41 KiB, so test combined bitmap/map games for memory pressure.
 PICO map state is separate from the `--map` asset and `tget`/`tset` plane APIs.
 Only one PICO cart map is supported. Destination positions are tile-aligned;
 plane scrolling remains subject to Genesis hardware behavior.
+
+Both `build` and `run` accept `--gff`; programmatic `buildMd` callers pass
+`gffPath`. For example:
+
+```powershell
+node bin/mdlua.js build examples/imported_flags/main.lua --gff examples/imported_flags/sprites.gff -o flags.bin
+```
+
+The import adds 256 initialized bytes in ROM and uses the existing 256-byte
+mutable flags array in RAM. It does not allocate a second runtime copy.
+In hardware-text mode, `cls` waits for its plane-clear DMA to finish before
+returning, so subsequent text and map writes can safely access the VDP.
+Hardware plane updates are immediate and are not double-buffered: clearing
+and redrawing a large text screen every frame can expose partial redraws.
+Draw static hardware text once, as the number-print diagnostic does.
 
 ## Numbers and clipping
 
@@ -58,6 +77,8 @@ setter; it does not use the reversed getter in the pinned SGDK source.
 - `pico_map_flags`: expect `RAM AND BOUNDS PASS`; ALL has four cells,
   MASK 1 has cells 1 and 3, MASK 2 has cells 2, 3, and 4, MASK 0 is empty.
 - `number_print`: each numeric row must match the expected string below it.
+- `imported_flags` (build with its `sprites.gff`): expect `FLAGS IMPORT PASS`;
+  ALL has three cells, MASK 1 has cells 1 and 3, MASK 2 has cells 2 and 3.
 - `bitmap_clip`: expect a red square with its lower-right quarter green,
   two adjacent colored pixels near the bitmap's top-left, and a green status
   bar below. A red status bar indicates failure.

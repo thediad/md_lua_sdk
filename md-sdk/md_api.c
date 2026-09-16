@@ -286,7 +286,11 @@ void md_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int
 // PICO map state is independent of the SGDK hardware-plane shadow below.
 // One 128x64 cart map; short source arrays are zero-filled, never over-read.
 static unsigned char p8_map_ram[128 * 64];
-static unsigned char p8_flags[256];
+#ifndef MD_P8_FLAGS_INITIALIZER
+#define MD_P8_FLAGS_INITIALIZER {0}
+#endif
+// Initialized by C startup before Lua _init; mutable for fset/map filtering.
+static unsigned char p8_flags[256] = MD_P8_FLAGS_INITIALIZER;
 static const unsigned char *p8_map_source;
 static void p8_map_bind(const unsigned char *source, unsigned int size) {
     unsigned int i;
@@ -499,7 +503,8 @@ void md_cls(int color) {
     u16 c = (color < 0) ? 0 : (u16)(color & 15);
     VDP_setBackgroundColor((u8)c);
     if (bmp_on) BMP_clear();
-    else VDP_clearPlane(BG_A, FALSE);
+    // Later text/map writes must not access the VDP until the fill DMA ends.
+    else VDP_clearPlane(BG_A, TRUE);
     cur_col_t = 0; cur_row_t = 0;
 }
 

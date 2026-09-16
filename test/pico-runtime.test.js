@@ -51,16 +51,48 @@ test("fixed-point text matches rounded decimal strings in the emulator", async (
     await host.loadMedia({ platform: "genesis", path: rom });
     host.stepFrames(120);
     const { width, rgba } = host.screenshotRgba();
+    let visibleText = false;
     for (const y of [24, 64, 104, 144, 184]) {
       for (let row = 0; row < 8; row++) {
         const start = ((y + row) * width + 8) * 4;
         const expected = ((y + 16 + row) * width + 8) * 4;
         assert.deepEqual(rgba.slice(start, start + 96 * 4), rgba.slice(expected, expected + 96 * 4), `text pair at y=${y}`);
+        for (let x = 0; x < 96; x++) if (rgba[start + x * 4] || rgba[start + x * 4 + 1] || rgba[start + x * 4 + 2]) visibleText = true;
       }
     }
+    assert.ok(visibleText, "numeric text must be visible, not two matching blank regions");
   } finally {
     host.unloadMedia();
   }
+});
+
+test("imported sprite flags are ready in _init and remain mutable for map filtering", async () => {
+  const work = await mkdtemp(path.join(tmpdir(), "mdlua-import-flags-"));
+  const rom = path.join(work,"flags.bin");
+  const example = new URL("../examples/imported_flags/",import.meta.url);
+  await buildMd(fileURLToPath(new URL("main.lua",example)),rom,{
+    gffPath:fileURLToPath(new URL("sprites.gff",example)),
+  });
+  const host = new LibretroHost({saveDir:work});
+  try {
+    await host.loadCore(core.jsPath,core.wasmPath);
+    await host.loadMedia({platform:"genesis",path:rom});
+    host.stepFrames(120);
+    const {width,rgba}=host.screenshotRgba();
+    const pixel=(x,y)=>Array.from(rgba.slice((y*width+x)*4,(y*width+x)*4+3));
+    const blank=pixel(300,200);
+    let passText=false;
+    for(let y=24;y<32;y++) for(let x=48;x<144;x++) {
+      if(pixel(x,y).some((v,i)=>v!==blank[i])) passText=true;
+    }
+    assert.ok(passText,"imported byte/bit and mutation checks must reach PASS");
+    for(let i=0;i<3;i++) {
+      const x=112+i*8;
+      assert.notDeepEqual(pixel(x,48),blank);
+      assert.deepEqual(pixel(x,72),i!==1?pixel(x,48):blank);
+      assert.deepEqual(pixel(x,96),i!==0?pixel(x,48):blank);
+    }
+  } finally { host.unloadMedia(); }
 });
 
 test("bitmap clipping resets, intersects, and preserves an empty rectangle", async () => {

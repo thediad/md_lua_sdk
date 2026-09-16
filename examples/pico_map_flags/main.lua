@@ -3,6 +3,7 @@ local __p8map=hexdata("01020301")
 local passed=0
 
 function _init()
+  if fget(0)~=0 or fget(1)~=0 or fget(255)~=0 then return end
   fset(1,1)
   fset(2,2)
   fset(3,3)

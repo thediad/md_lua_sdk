@@ -3,6 +3,12 @@
 import { pngToSheet, pngToTilemap } from "./png-tiles.mjs";
 import { spriteVariants } from "./sprite-variants.mjs";
 
+// Same raw 256-byte sprite-flag format as GameTank's --gff asset.
+export function flagsAssetHeader(bytes) {
+  if (bytes.length !== 256) throw new Error(`--gff expects exactly 256 sprite-flag bytes; got ${bytes.length}`);
+  return `#define MD_P8_FLAGS_INITIALIZER {${Array.from(bytes).join(",")}}\n`;
+}
+
 export function scaledSheetAssets(pngBytes, manifest) {
   const sheet = pngToSheet(pngBytes);
   const result = spriteVariants(sheet, manifest);

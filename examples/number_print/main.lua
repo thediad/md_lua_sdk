@@ -1,7 +1,9 @@
 function _update60()
 end
 
-function _draw()
+-- Static hardware text only needs drawing once. Repeated full-plane clears
+-- can expose partial redraws during active display on the Genesis.
+function _init()
   cls(0)
   print("NUMERIC / EXPECTED",8,8,7)
   print(12.5,8,24,7)
@@ -14,4 +16,7 @@ function _draw()
   print("2",8,160,7)
   print(0.00001,8,184,7)
   print("0",8,200,7)
+end
+
+function _draw()
 end

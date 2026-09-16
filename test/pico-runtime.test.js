@@ -117,6 +117,28 @@ test("bitmap clipping resets, intersects, and preserves an empty rectangle", asy
   }
 });
 
+test("colored bitmap clears fill RAM and ignore clipping without changing it", async () => {
+  const work=await mkdtemp(path.join(tmpdir(),"mdlua-clear-"));
+  const rom=path.join(work,"clear.bin");
+  await buildMd(fileURLToPath(new URL("../examples/bitmap_clear/main.lua",import.meta.url)),rom);
+  const host=new LibretroHost({saveDir:work});
+  try {
+    await host.loadCore(core.jsPath,core.wasmPath);
+    await host.loadMedia({platform:"genesis",path:rom});
+    host.stepFrames(120);
+    const {width,rgba}=host.screenshotRgba();
+    const pixel=(x,y)=>Array.from(rgba.slice(((y+32)*width+x+32)*4,((y+32)*width+x+32)*4+3));
+    const green=pixel(240,8),blue=pixel(240,24);
+    assert.notDeepEqual(green,blue);
+    assert.deepEqual(pixel(8,8),green,"all initialization/pget/clip checks passed");
+    assert.deepEqual(pixel(0,0),blue);
+    assert.deepEqual(pixel(255,159),blue);
+    assert.deepEqual(pixel(31,32),blue);
+    assert.notDeepEqual(pixel(32,32),blue);
+    assert.deepEqual(pixel(40,32),blue);
+  } finally {host.unloadMedia();}
+});
+
 test("bitmap fills bound huge rectangles and preserve packed edge pixels", async () => {
   const work = await mkdtemp(path.join(tmpdir(), "mdlua-fill-"));
   const rom = path.join(work,"fill.bin");

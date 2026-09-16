@@ -60,6 +60,7 @@ static u16 spr_palbank = PAL1, spr_priority = 1;
 static s16 hs_table[224];
 static u16 hs_dirty = 0, hs_mode_on = 0;
 static u16 bmp_on = 0;               // BMP engine active (bitmap verbs used)
+static u16 bitmap_clear_color = 0;
 static u16 cur_color = 7;            // color() state for optional color args
 static u16 cur_col_t, cur_row_t;     // print cursor (tile coords)
 static s16 clip_x0 = 0, clip_y0 = 0, clip_x1 = 319, clip_y1 = 223;
@@ -149,6 +150,7 @@ void md_screen_on(void)  { VDP_setEnable(TRUE); }
 static void bmp_ensure(void) {
     if (bmp_on) return;
     BMP_init(TRUE, BG_A, PAL0, FALSE);
+    if (bitmap_clear_color) memset(BMP_getWritePointer(0, 0), (u8)(bitmap_clear_color * 17), BMP_PITCH * BMP_HEIGHT);
     bmp_on = 1;
 }
 static void plot_clip(int x, int y, u16 col) {
@@ -517,7 +519,12 @@ void md_print_cur_num(long v, int color) { char b[18]; ftoa16(v, b); md_print_cu
 void md_cls(int color) {
     u16 c = (color < 0) ? 0 : (u16)(color & 15);
     VDP_setBackgroundColor((u8)c);
-    if (bmp_on) BMP_clear();
+    bitmap_clear_color = c;
+    if (bmp_on) {
+        // Clear the actual pixel buffer, independent of the drawing clip.
+        if (c) memset(BMP_getWritePointer(0, 0), (u8)(c * 17), BMP_PITCH * BMP_HEIGHT);
+        else BMP_clear();
+    }
     // Later text/map writes must not access the VDP until the fill DMA ends.
     else VDP_clearPlane(BG_A, TRUE);
     cur_col_t = 0; cur_row_t = 0;

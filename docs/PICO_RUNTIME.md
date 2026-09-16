@@ -3,6 +3,11 @@
 The shared compiler supplies Lua semantics. These APIs use Genesis-owned
 descriptors and runtime code on `luacretro-sync-test`.
 
+The goal is Genesis-native development with convenient PICO-style Lua functions,
+not PICO-8 cartridge compatibility. Hardware capabilities, predictable costs,
+and emulator-tested behavior take priority. Persistence uses `save`/`load`;
+`cartdata`/`dget`/`dset` are not planned, and all 128 save slots remain available.
+
 ## Maps and flags
 
 Declare `local __p8map = hexdata("...")` for the initial map bytes. The runtime
@@ -106,6 +111,12 @@ from the bundled SGDK font with `node scripts/generate-bitmap-font.mjs`.
 The `pget` wrapper reads even and odd pixel nibbles consistently with SGDK's
 setter; it does not use the reversed getter in the pinned SGDK source.
 
+In bitmap mode, `cls(color)` fills all 256x160 pixels with the selected palette
+index, so `pget` observes the clear color. Clearing ignores the drawing clip
+but does not change it. A colored clear before the first bitmap draw is retained
+when bitmap mode starts. Hardware-plane mode continues to clear plane A and
+select the VDP backdrop color.
+
 `rectfill` intersects its rectangle with the clip region and bitmap bounds
 before iterating, then fills packed pixel bytes while preserving neighboring
 edge pixels. Huge offscreen rectangles therefore cost no more than a visible
@@ -124,6 +135,8 @@ full-screen fill. This does not imply a guaranteed bitmap frame rate.
 - `bitmap_text`: red glyphs over green/black backgrounds, cropped glyphs,
   a green rectangle covering an earlier glyph, and matching `1.25` rows.
   The temporary `OLD` label must disappear.
+- `bitmap_clear`: blue background, small white clipped square, and a green
+  status bar confirming clear-color pixels in RAM and preserved clipping.
 - `bitmap_fill`: a red bitmap with a green clipped rectangle, thin colored
   columns, and a green status bar confirming boundary-row pixels are intact
   in RAM. Regression screenshots cover the entire 256x160 bitmap, including

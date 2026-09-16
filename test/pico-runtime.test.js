@@ -117,6 +117,37 @@ test("bitmap clipping resets, intersects, and preserves an empty rectangle", asy
   }
 });
 
+test("bitmap fills bound huge rectangles and preserve packed edge pixels", async () => {
+  const work = await mkdtemp(path.join(tmpdir(), "mdlua-fill-"));
+  const rom = path.join(work,"fill.bin");
+  await buildMd(fileURLToPath(new URL("../examples/bitmap_fill/main.lua",import.meta.url)),rom);
+  const host = new LibretroHost({saveDir:work});
+  try {
+    await host.loadCore(core.jsPath,core.wasmPath);
+    await host.loadMedia({platform:"genesis",path:rom});
+    host.stepFrames(120);
+    const {width,rgba}=host.screenshotRgba();
+    const pixel=(x,y)=>Array.from(rgba.slice(((y+32)*width+x+32)*4,((y+32)*width+x+32)*4+3));
+    const red=pixel(100,100), green=pixel(11,13), white=pixel(41,40), orange=pixel(44,40), blue=pixel(51,40);
+    assert.equal(new Set([red,green,white,orange,blue].map(c=>c.join(","))).size,5,"all five colors must be rendered");
+    assert.deepEqual(pixel(80,8),green,"boundary-row pget checks must pass");
+    // Extended blanking affects the display boundary in this workload.
+    // Keep an 8-pixel vertical margin for screenshot assertions; the Lua
+    // diagnostic checks boundary RAM separately. Hardware timing is pending.
+    for(let y=8;y<152;y++) for(let x=0;x<256;x++) {
+      let expected=red;
+      if(x>=11 && x<=30 && y>=13 && y<=30) expected=green;
+      if(x>=80 && x<=95 && y>=8 && y<=15) expected=green;
+      if(y>=40 && y<=47) {
+        if(x===41) expected=white;
+        if(x===44) expected=orange;
+        if(x>=51 && x<=54) expected=blue;
+      }
+      assert.deepEqual(pixel(x,y),expected,`fill pixel ${x},${y}`);
+    }
+  } finally { host.unloadMedia(); }
+});
+
 test("pre-scaled variants render exact pixels, transparency and flips", async () => {
   const work = await mkdtemp(path.join(tmpdir(), "mdlua-scaled-"));
   const rom = path.join(work, "scaled.bin");

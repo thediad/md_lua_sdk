@@ -209,9 +209,24 @@ void md_rectfill(int x0, int y0, int x1, int y1, int color) {
     bmp_ensure();
     if (x0 > x1) { t = x0; x0 = x1; x1 = t; }
     if (y0 > y1) { t = y0; y0 = y1; y1 = t; }
+    // Bound work to visible pixels before iterating, including huge offscreen
+    // rectangles. Fill packed bytes; preserve the adjacent edge pixel.
+    if (x0 < clip_x0) x0 = clip_x0;
+    if (y0 < clip_y0) y0 = clip_y0;
+    if (x1 > clip_x1) x1 = clip_x1;
+    if (y1 > clip_y1) y1 = clip_y1;
+    if (x0 < 0) x0 = 0;
+    if (y0 < 0) y0 = 0;
+    if (x1 > 255) x1 = 255;
+    if (y1 > 159) y1 = 159;
+    if (x0 > x1 || y0 > y1) return;
     for (y = y0; y <= y1; y++) {
-        int x;
-        for (x = x0; x <= x1; x++) plot_clip(x, y, col);
+        int x = x0;
+        u8 *p = BMP_getWritePointer((u16)x, (u16)y);
+        u8 packed = (u8)((col << 4) | col);
+        if (x & 1) { *p = (*p & 0xF0) | col; p++; x++; }
+        while (x + 1 <= x1) { *p++ = packed; x += 2; }
+        if (x <= x1) *p = (*p & 0x0F) | (col << 4);
     }
 }
 void md_circ(int cx, int cy, int r, int color) {

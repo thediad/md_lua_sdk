@@ -72,6 +72,11 @@ from the bundled SGDK font with `node scripts/generate-bitmap-font.mjs`.
 The `pget` wrapper reads even and odd pixel nibbles consistently with SGDK's
 setter; it does not use the reversed getter in the pinned SGDK source.
 
+`rectfill` intersects its rectangle with the clip region and bitmap bounds
+before iterating, then fills packed pixel bytes while preserving neighboring
+edge pixels. Huge offscreen rectangles therefore cost no more than a visible
+full-screen fill. This does not imply a guaranteed bitmap frame rate.
+
 ## Diagnostic examples
 
 - `pico_map_flags`: expect `RAM AND BOUNDS PASS`; ALL has four cells,
@@ -85,6 +90,12 @@ setter; it does not use the reversed getter in the pinned SGDK source.
 - `bitmap_text`: red glyphs over green/black backgrounds, cropped glyphs,
   a green rectangle covering an earlier glyph, and matching `1.25` rows.
   The temporary `OLD` label must disappear.
+- `bitmap_fill`: a red bitmap with a green clipped rectangle, thin colored
+  columns, and a green status bar confirming boundary-row pixels are intact
+  in RAM. Genesis Plus GX currently blanks parts of the top/bottom visible
+  scanlines in this full-screen workload. Check these edges on hardware or
+  MD.emu; screenshot assertions exclude an 8-pixel vertical margin, while
+  the diagnostic checks selected boundary pixels in RAM separately.
 
 `test/pico-runtime.test.js` builds and runs the diagnostics in Genesis Plus GX and
 checks their framebuffers. Physical-device or MD.emu testing is still useful

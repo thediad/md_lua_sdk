@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, readFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { PNG } from "pngjs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -153,6 +153,44 @@ test("bitmap fills bound huge rectangles and preserve packed edge pixels", async
       }
     }
   } finally { host.unloadMedia(); }
+});
+
+test("animated bitmap flips remain complete in NTSC and PAL", async () => {
+  const work = await mkdtemp(path.join(tmpdir(),"mdlua-bitmap-regions-"));
+  const original=path.join(work,"animation.bin");
+  await buildMd(fileURLToPath(new URL("../examples/bitmap_animation/main.lua",import.meta.url)),original);
+  for (const [region,minFps,maxFps] of [["U",59,61],["E",49,51]]) {
+    const bytes=await readFile(original);
+    // Genesis region field; ROM checksum covers bytes starting at 0x200.
+    bytes.fill(32,0x1f0,0x200);
+    bytes[0x1f0]=region.charCodeAt(0);
+    const rom=path.join(work,`${region}.bin`);
+    await writeFile(rom,bytes);
+    const host=new LibretroHost({saveDir:work});
+    try {
+      await host.loadCore(core.jsPath,core.wasmPath);
+      await host.loadMedia({platform:"genesis",path:rom});
+      host.stepFrames(120);
+      const fps=host.getStatus().coreFps;
+      assert.ok(fps>minFps && fps<maxFps,`${region} must select its real video timing, got ${fps}`);
+      const colors=new Set();
+      for(let frame=0;frame<32;frame++) {
+        host.stepFrames(1);
+        const {width,height,rgba}=host.screenshotRgba();
+        const ox=(width-256)/2, oy=(height-160)/2;
+        const pixel=(x,y)=>Array.from(rgba.slice(((y+oy)*width+x+ox)*4,((y+oy)*width+x+ox)*4+3));
+        const red=pixel(8,8),green=pixel(24,8),background=pixel(100,100);
+        assert.notDeepEqual(red,green,`${region}: reference colors differ`);
+        assert.ok([red,green].some(c=>c.every((v,i)=>v===background[i])),`${region}: valid background`);
+        colors.add(background.join(","));
+        for(let y=0;y<160;y++) for(let x=0;x<256;x++) {
+          const expected=y>=8 && y<16 && x>=8 && x<16 ? red : y>=8 && y<16 && x>=24 && x<32 ? green : background;
+          assert.deepEqual(pixel(x,y),expected,`${region} frame ${frame}, pixel ${x},${y}`);
+        }
+      }
+      assert.equal(colors.size,2,`${region}: animation must display both buffers' colors`);
+    } finally { host.unloadMedia(); }
+  }
 });
 
 test("pre-scaled variants render exact pixels, transparency and flips", async () => {

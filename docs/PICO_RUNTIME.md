@@ -94,6 +94,11 @@ full-screen fill. This does not imply a guaranteed bitmap frame rate.
   columns, and a green status bar confirming boundary-row pixels are intact
   in RAM. Regression screenshots cover the entire 256x160 bitmap, including
   its boundary scanlines.
+- `bitmap_animation`: intentionally alternates the full bitmap between red
+  and green, with two fixed reference squares. Automated tests run this ROM
+  with US and European region headers, verify actual ~60/~50 Hz core timing,
+  and check all pixels across 32 consecutive frames in each region. Both
+  colors must appear, preventing a frozen display from passing.
 
 `test/pico-runtime.test.js` builds and runs the diagnostics in Genesis Plus GX and
 checks their framebuffers. Physical-device or MD.emu testing is still useful
@@ -118,5 +123,8 @@ outward into the border, and transfer batches decrease from 7/10 tile rows to
 6/9 for NTSC/PAL. This retains all 160 bitmap rows but can reduce full-buffer
 refresh throughput (20 tile rows now require four NTSC or three PAL batches).
 The installed toolchain is not modified. Source drift fails the build so the
-adaptation must be reviewed when upgrading SGDK. BlastEm retesting and physical
-hardware/PAL validation remain necessary; automated results use Genesis Plus GX.
+adaptation must be reviewed when upgrading SGDK. The user confirmed the updated
+fill diagnostic has no flicker in BlastEm. Genesis Plus GX regression coverage
+includes animated NTSC and PAL frames with no boundary exclusions. Physical
+hardware validation remains pending; emulator tests provide the current
+regression baseline.

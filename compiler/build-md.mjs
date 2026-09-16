@@ -11,7 +11,8 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildGenesisC, finalizeGenesisRom, parseBuildLog } from "romdev-toolchain-m68k-gcc";
+import { buildGenesisC, finalizeGenesisRom, parseBuildLog, shareDir } from "romdev-toolchain-m68k-gcc";
+import { bitmapTimingSource } from "./bitmap-timing.mjs";
 import { compile, formatDiagnostics } from "./index.js";
 import { sheetAssetsHeader, mapAssetHeader, scaledSheetAssets, flagsAssetHeader } from "./asset-headers.mjs";
 import { ssprEmitter, variantEmitter } from "./sprite-variants.mjs";
@@ -89,6 +90,8 @@ export async function buildMd(entryLua, outPath, opts = {}) {
     "md_font.h": await rd("md_font.h"),
     "md_assets.h": assets.header,
   };
+  // Compile our checked timing adaptation instead of the archive's BMP object.
+  sources["md_bmp.c"] = bitmapTimingSource(await readFile(path.join(shareDir, "lib", "sgdk", "src", "bmp.c"), "utf8"));
 
   // Song bank: --music a.vgm,b.vgm[,c.xgc] -> compiled XGM2 blobs, bank order
   // = music(n) index. .vgm converts via romdev-xgm2 (byte-identical to SGDK's

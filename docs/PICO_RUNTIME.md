@@ -92,10 +92,8 @@ full-screen fill. This does not imply a guaranteed bitmap frame rate.
   The temporary `OLD` label must disappear.
 - `bitmap_fill`: a red bitmap with a green clipped rectangle, thin colored
   columns, and a green status bar confirming boundary-row pixels are intact
-  in RAM. Genesis Plus GX currently blanks parts of the top/bottom visible
-  scanlines in this full-screen workload. Check these edges on hardware or
-  MD.emu; screenshot assertions exclude an 8-pixel vertical margin, while
-  the diagnostic checks selected boundary pixels in RAM separately.
+  in RAM. Regression screenshots cover the entire 256x160 bitmap, including
+  its boundary scanlines.
 
 `test/pico-runtime.test.js` builds and runs the diagnostics in Genesis Plus GX and
 checks their framebuffers. Physical-device or MD.emu testing is still useful
@@ -110,3 +108,15 @@ is not implemented.
 Bitmap text composition has pixel-level emulator coverage; physical-device
 timing remains unverified. Palette transparency is constrained by tile/sprite
 color-zero transparency and is not a general PICO `palt` implementation.
+
+## Bitmap border timing
+
+The original SGDK bitmap blanking produced top/bottom edge flicker in Genesis
+Plus GX and in a user test with BlastEm. The SDK now compiles a checked
+adaptation of the pinned SGDK `bmp.c`: display transitions move four scanlines
+outward into the border, and transfer batches decrease from 7/10 tile rows to
+6/9 for NTSC/PAL. This retains all 160 bitmap rows but can reduce full-buffer
+refresh throughput (20 tile rows now require four NTSC or three PAL batches).
+The installed toolchain is not modified. Source drift fails the build so the
+adaptation must be reviewed when upgrading SGDK. BlastEm retesting and physical
+hardware/PAL validation remain necessary; automated results use Genesis Plus GX.

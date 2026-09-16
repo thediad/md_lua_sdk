@@ -131,10 +131,7 @@ test("bitmap fills bound huge rectangles and preserve packed edge pixels", async
     const red=pixel(100,100), green=pixel(11,13), white=pixel(41,40), orange=pixel(44,40), blue=pixel(51,40);
     assert.equal(new Set([red,green,white,orange,blue].map(c=>c.join(","))).size,5,"all five colors must be rendered");
     assert.deepEqual(pixel(80,8),green,"boundary-row pget checks must pass");
-    // Extended blanking affects the display boundary in this workload.
-    // Keep an 8-pixel vertical margin for screenshot assertions; the Lua
-    // diagnostic checks boundary RAM separately. Hardware timing is pending.
-    for(let y=8;y<152;y++) for(let x=0;x<256;x++) {
+    for(let y=0;y<160;y++) for(let x=0;x<256;x++) {
       let expected=red;
       if(x>=11 && x<=30 && y>=13 && y<=30) expected=green;
       if(x>=80 && x<=95 && y>=8 && y<=15) expected=green;
@@ -144,6 +141,16 @@ test("bitmap fills bound huge rectangles and preserve packed edge pixels", async
         if(x>=51 && x<=54) expected=blue;
       }
       assert.deepEqual(pixel(x,y),expected,`fill pixel ${x},${y}`);
+    }
+    const reference = rgba.slice();
+    // Cover several complete transfer cycles, including display edge timing.
+    for (let frame=0; frame<12; frame++) {
+      host.stepFrames(1);
+      const next = host.screenshotRgba().rgba;
+      for (let y=0; y<160; y++) {
+        const offset=((y+32)*width+32)*4;
+        assert.deepEqual(next.slice(offset,offset+256*4),reference.slice(offset,offset+256*4),`stable bitmap row ${y}, frame ${frame}`);
+      }
     }
   } finally { host.unloadMedia(); }
 });

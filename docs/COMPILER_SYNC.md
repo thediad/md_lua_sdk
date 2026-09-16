@@ -15,10 +15,10 @@ On PowerShell, use `npm.cmd`. The installed compiler is linked to the sibling
 checkout, so edits there take effect without a transplant or loader override.
 Keep the SDK's builtins, target descriptor, and C runtime in this repository.
 
-The shared map special passes a ninth C argument (the layer mask), which
-`md_map` currently ignores. PICO `mget` retains direct array reads; the Genesis
-hardware `md_mget(layer, col, row)` has a different ABI and must not receive a
-PICO map pointer.
+SDK descriptor hooks pass the PICO map pointer and its actual byte length to
+`md_p8_map`, `md_p8_mget`, and `md_p8_mset`. This keeps bounds and mutable map
+storage in the Genesis runtime. The hardware `md_mget(layer, col, row)` API
+remains separate. See `PICO_RUNTIME.md` for limits and diagnostic ROMs.
 
 This is a development dependency. Before publishing, pin a tested release or
 an immutable Git commit accessible to consumers and regenerate the lockfile.

@@ -219,7 +219,7 @@ The `examples/` directory shows each subsystem in use:
 
 Conditions must be boolean (`if x ~= 0 then`, not `if x then` - Lua calls 0
 truthy, C doesn't, and the compiler refuses to guess). No `nil`, closures,
-metatables, Lua coroutines, string concatenation, or `goto` (SGDK's 68k
+metatables, Lua coroutines, runtime string concatenation, or `goto` (SGDK's 68k
 task API - `TSK_userSet` and friends - covers the background-work use case
 natively; see `examples/coroutine`). Every unsupported feature is a
 compile-time error that says what to write instead.

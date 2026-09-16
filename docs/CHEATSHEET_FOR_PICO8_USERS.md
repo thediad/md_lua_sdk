@@ -75,7 +75,7 @@ pad - the Genesis is a two-controller machine.
 |---|:--:|---|
 | `_init()` | ✅ | runs once at startup |
 | `_update60()` | ✅ | logic @ 60 fps - the native rate |
-| `_update()` | 🟡 | accepted; currently also runs once per 60 Hz frame |
+| `_update()` | 🟡 | runs every other native frame (30 Hz at NTSC) |
 | `_draw()` | ✅ | 1× per frame |
 
 Same fixed-timestep model as PICO-8 (no `dt`; move by a constant per frame).
@@ -120,7 +120,7 @@ optimization, never a semantic change.
 | `circfill / circ(x,y,r,c)` | 🟡 | 256×160 bitmap |
 | `line(x0,y0,x1,y1,c)` | 🟡 | 256×160 bitmap |
 | `pset(x,y,[c])` / `pget(x,y)` | 🟡 | 256×160 bitmap |
-| `clip(x,y,w,h)` | 🟡 | bitmap verbs only; `clip()` resets |
+| `clip(x,y,w,h[,previous])` | 🟡 | bitmap verbs only; optional intersection; `clip()` resets |
 | `color(c)` | ✅ | |
 | `camera([x,y])` | 🔷 | **hardware scroll**: moves sprites + the map plane, not bitmap shapes |
 | `pal(c0,c1)` / `pal()` | 🟡🔷 | **live CRAM remap** - recolors the screen, not a draw-palette; no `palt` |
@@ -210,9 +210,10 @@ bug you'll chase.
 
 | Call | | Notes |
 |---|:--:|---|
-| `map(cx,cy,sx,sy,cw,ch)` | 🔷 | stamps cells onto **plane B** (hardware tiles, not blits) from an in-source `hexdata` map |
-| `mget(x,y)` | ✅ | read the in-source map (128 cells wide, like P8) |
-| `mset` | ❌ | use `tset` on the asset map |
+| `map(cx,cy,sx,sy,cw,ch[,layers])` | 🔷 | stamps cells onto **plane B** (hardware tiles, not blits) from an in-source `hexdata` map |
+| `mget(x,y)` | ✅ | read mutable 128x64 map RAM; out-of-bounds returns zero |
+| `mset(x,y,tile)` | ✅ | write mutable PICO map RAM; separate from `tset` |
+| `fget` / `fset` | ✅ | read/write whole sprite flag bytes or individual bits |
 | `map_show(layer)` | ➕ | show the bundled `--map` tilemap on plane B (hardware scroll) |
 | `tget(l,col,row)` / `tset(l,col,row,t)` | ➕ | read / rewrite live plane cells (64×32 area) |
 | `layer_scroll(1,x,y)` | ➕ | scroll plane A directly; plane B belongs to `camera()`/`hscroll()` |

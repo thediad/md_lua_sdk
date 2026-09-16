@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp } from "node:fs/promises";
+import { mkdtemp, readFile } from "node:fs/promises";
+import { PNG } from "pngjs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -111,4 +112,44 @@ test("pre-scaled variants render exact pixels, transparency and flips", async ()
   } finally {
     host.unloadMedia();
   }
+});
+
+test("bitmap text composes colored glyphs with clipping, clearing and draw order", async () => {
+  const work = await mkdtemp(path.join(tmpdir(), "mdlua-bitmap-text-"));
+  const rom = path.join(work, "text.bin");
+  await buildMd(fileURLToPath(new URL("../examples/bitmap_text/main.lua", import.meta.url)), rom);
+  const font = PNG.sync.read(await readFile(new URL("../node_modules/romdev-toolchain-m68k-gcc/share/genesis/lib/sgdk/res/image/font_default.png", import.meta.url)));
+  const host = new LibretroHost({ saveDir: work });
+  try {
+    await host.loadCore(core.jsPath, core.wasmPath);
+    await host.loadMedia({ platform: "genesis", path: rom });
+    host.stepFrames(120);
+    const { width, rgba } = host.screenshotRgba();
+    const pixel = (x,y) => Array.from(rgba.slice(((y+32)*width+x+32)*4,((y+32)*width+x+32)*4+3));
+    const red = pixel(240,0), green = pixel(248,0), black = pixel(200,150);
+    assert.notDeepEqual(red, green);
+    assert.notDeepEqual(red, black);
+    const glyphPixel = (x,y) => {
+      const glyph = 65-32;
+      const offset = (((glyph>>4)*8+y)*font.width+(glyph&15)*8+x)*4;
+      return font.data[offset+3] && font.data.slice(offset,offset+3).some(v=>v);
+    };
+    for (const [dx,dy,bg,clipLeft,clipRight] of [[13,17,green,0,256],[-3,50,black,0,256],[17,75,black,20,24]]) {
+      for (let y=0;y<8;y++) for (let x=0;x<8;x++) {
+        if (dx+x<0) continue;
+        const visible=dx+x>=clipLeft && dx+x<clipRight && glyphPixel(x,y);
+        assert.deepEqual(pixel(dx+x,dy+y),visible?red:bg,`glyph at ${dx},${dy}, pixel ${x},${y}`);
+      }
+    }
+    for (let y=50;y<58;y++) {
+      for (let x=40;x<48;x++) assert.deepEqual(pixel(x,y),green,"later drawing covers text");
+      for (let x=80;x<104;x++) assert.deepEqual(pixel(x,y),black,"cls removes old text from both buffers");
+    }
+    let lit=0;
+    for (let y=0;y<8;y++) for (let x=0;x<32;x++) {
+      assert.deepEqual(pixel(16+x,104+y),pixel(16+x,120+y),"numeric and literal text agree");
+      if (pixel(16+x,104+y).some((v,i)=>v!==black[i])) lit++;
+    }
+    assert.ok(lit>0,"numeric comparison must contain visible text");
+  } finally { host.unloadMedia(); }
 });

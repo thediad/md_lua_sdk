@@ -37,7 +37,18 @@ serves explicit-position and cursor printing.
 `clip()` resets bitmap clipping. `clip(x,y,w,h)` replaces the rectangle;
 `clip(x,y,w,h,true)` intersects it with the previous rectangle. A zero or
 negative width/height creates an empty rectangle. This clips bitmap pixels
-and shapes, not hardware sprites, tilemaps, or text.
+and shapes, including bitmap text, but not hardware sprites, tilemaps, or
+hardware text.
+
+Once a bitmap verb activates bitmap mode, `print` draws the SGDK 8x8 font
+directly into the 256x160 bitmap at pixel coordinates. Glyph backgrounds are
+transparent; the requested color, clipping, `pget`, `cls`, and later drawing
+all apply to its pixels. Text does not apply the camera, matching the existing
+bitmap drawing wrappers. Print after the first bitmap verb: hardware text
+drawn before activation is not converted into bitmap pixels. Control bytes
+and unsupported characters become `?`; newline layout is not implemented.
+The font mask uses 768 ROM bytes and no additional RAM buffer. Regenerate it
+from the bundled SGDK font with `node scripts/generate-bitmap-font.mjs`.
 
 The `pget` wrapper reads even and odd pixel nibbles consistently with SGDK's
 setter; it does not use the reversed getter in the pinned SGDK source.
@@ -50,8 +61,11 @@ setter; it does not use the reversed getter in the pinned SGDK source.
 - `bitmap_clip`: expect a red square with its lower-right quarter green,
   two adjacent colored pixels near the bitmap's top-left, and a green status
   bar below. A red status bar indicates failure.
+- `bitmap_text`: red glyphs over green/black backgrounds, cropped glyphs,
+  a green rectangle covering an earlier glyph, and matching `1.25` rows.
+  The temporary `OLD` label must disappear.
 
-`test/pico-runtime.test.js` builds and runs all three in Genesis Plus GX and
+`test/pico-runtime.test.js` builds and runs the diagnostics in Genesis Plus GX and
 checks their framebuffers. Physical-device or MD.emu testing is still useful
 for timing, memory pressure, and display behavior.
 
@@ -61,6 +75,6 @@ for timing, memory pressure, and display behavior.
 at runtime. See [PRESCALED_SPRITES.md](PRESCALED_SPRITES.md) for declarations,
 memory costs, and the initial 8-32 pixel size limits. Dynamic software scaling
 is not implemented.
-Bitmap text composition also needs a separate audit; it is not covered by the
-hardware-text numeric test. Palette transparency is constrained by tile/sprite
+Bitmap text composition has pixel-level emulator coverage; physical-device
+timing remains unverified. Palette transparency is constrained by tile/sprite
 color-zero transparency and is not a general PICO `palt` implementation.

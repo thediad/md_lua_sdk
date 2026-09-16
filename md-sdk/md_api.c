@@ -9,6 +9,7 @@
 //   PAL1 = the sprite-sheet/map palette, PAL2/PAL3 idx15 = print color cache.
 #include "md_api.h"
 #include "md_math.h"
+#include "md_font.h"
 #include "md_assets.h"   // generated per build: sheet/map data or stubs
 
 // ---- PICO-8 palette -> CRAM PAL0 -------------------------------------------
@@ -437,7 +438,23 @@ static u16 text_pal_for(int color) {
 }
 void md_print(const char *s, int x, int y, int color) {
     u16 row = (u16)(y >> 3);
-    if (bmp_on) { BMP_drawText(s, (u16)(x >> 3), row); return; }
+    if (bmp_on) {
+        u16 col = resolve_color(color);
+        // Compose into the write buffer, so flip/cls/clip and drawing order
+        // treat text exactly like bitmap pixels. Glyph backgrounds are clear.
+        while (*s && x < 256) {
+            unsigned char ch = (unsigned char)*s++;
+            int gx, gy;
+            if (ch < 32 || ch > 127) ch = '?';
+            if (x > -8) for (gy = 0; gy < 8; gy++) {
+                unsigned char bits = md_font[ch - 32][gy];
+                for (gx = 0; gx < 8; gx++)
+                    if (bits & (128 >> gx)) plot_clip(x + gx, y + gy, col);
+            }
+            x += 8;
+        }
+        return;
+    }
     VDP_setTextPalette(text_pal_for(color));
     VDP_drawTextBG(hud_rows && row < hud_rows ? WINDOW : BG_A, s, (u16)(x >> 3), row);
 }

@@ -85,6 +85,7 @@ export async function buildMd(entryLua, outPath, opts = {}) {
     "md_api.h": await rd("md_api.h"),
     "md_math.h": await rd("md_math.h"),
     "md_sintab.h": await rd("md_sintab.h"),
+    "md_font.h": await rd("md_font.h"),
     "md_assets.h": assets.header,
   };
 

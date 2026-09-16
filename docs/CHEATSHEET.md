@@ -20,14 +20,16 @@ mdlua build main.lua --sheet gfx.png -o game.bin
 
 ```lua
 function _init()     end   -- runs ONCE at startup
-function _update60() end   -- your game logic, once per 60 Hz frame
+function _update60() end   -- your game logic, once per game loop
 function _draw()     end   -- your drawing, once per frame
 ```
 
 The console calls `_update60()` then `_draw()` over and over. To move
-something, add a little to its position each update - there are no clocks,
-just "how much per frame." (`_update()` is accepted for PICO-8 compatibility
-and currently also runs once per frame.)
+something, add a little to its position each update. `_update60()` runs once
+per loop (normally 60 Hz NTSC or 50 Hz PAL); slow work lowers the rate.
+`_update()`, used instead, runs every other loop. `time()` advances 1/60 second
+per loop; `realsecs()` tracks elapsed video interrupts. See the
+[development guide](DEVELOPMENT_GUIDE.md) for current limits.
 
 ```lua
 local x = 0
@@ -35,8 +37,10 @@ function _update60()
   x += 2
   if x > 319 then x = 0 end
 end
+function _init()
+  cls(1)                       -- static background: clear once
+end
 function _draw()
-  cls(1)                       -- clear to dark blue
   spr(0, x, 104, 2, 2)         -- a 16x16 sprite sliding across
 end
 ```
@@ -113,7 +117,7 @@ offset them - it drives the hardware sprite/plane scroll instead.
   all non-white text that frame.
 - With `hud(rows)` active, text whose row falls inside the strip lands on the
   window plane automatically (a rock-solid unscrolled status bar).
-- In bitmap mode, `print` uses the BMP font and ignores the color argument.
+- In bitmap mode, `print` draws colored glyphs at pixel coordinates and obeys `clip`.
 - There is **no runtime string concatenation** - print a label and a value as
   two calls: `print("score",8,8,7) print(n,56,8,10)`.
 

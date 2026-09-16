@@ -6,6 +6,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Added `mdlua init <new-directory>`: a playable no-assets starter, project
+  configuration, README and build-output ignore file. Existing destinations
+  are refused. Updated the guide and corrected stale cheat-sheet timing/text advice.
+
 - `mdlua run` now shares the build command's project configuration and overrides,
   including asset paths and output location. Passing a `.bin` directly launches
   it without rebuilding or reading project configuration.
@@ -58,8 +62,8 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ### Validation policy
 
-- The project build/run validation passed 90 SDK tests with no skips, including
-  headless emulator regressions. The optional SDL window was not opened.
+- The project creation/build/run validation passed 92 SDK tests with no skips, including
+  headless emulator regressions and starter movement/reset. The optional SDL window was not opened.
 - Run `npm.cmd test` for current results; do not treat historical counts as live status.
 - Physical hardware verification is pending and does not block emulator-focused work.
 - Audio, advanced direct SGDK APIs, and performance under real game workloads

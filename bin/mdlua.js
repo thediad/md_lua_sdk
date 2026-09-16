@@ -8,11 +8,17 @@ import { buildMd } from "../compiler/build-md.mjs";
 import { compile, formatDiagnostics } from "../compiler/index.js";
 import { prepareRun } from "../compiler/run-project.mjs";
 import { resolveBuild } from "../compiler/project.mjs";
+import { initProject } from "../compiler/init-project.mjs";
 
 const [cmd, ...rest] = process.argv.slice(2);
 const fail = (m) => { console.error(m); process.exit(1); };
 
-if (cmd === "build") {
+if (cmd === "init") {
+  try {
+    const directory = await initProject(rest);
+    console.log(`Created ${directory}\nOpen its README.md for build and run instructions.`);
+  } catch (e) { fail(String(e.message ?? e)); }
+} else if (cmd === "build") {
   try {
     const { entry, out, assets } = await resolveBuild(rest);
     const r = await buildMd(entry, out, assets);
@@ -39,5 +45,5 @@ if (cmd === "build") {
   if (!res.ok) fail(formatDiagnostics(res.diagnostics.filter((d) => d.severity === "error")));
   process.stdout.write(res.c + "\n");
 } else {
-  fail("usage: mdlua build [main.lua] [--project mdlua.json] [--sheet s.png] [--sprite-variants variants.json] [--gff sprites.gff] [--map m.png] [--sfx a.wav,b.wav] [--music a.vgm,b.vgm] [-o game.bin]\n       mdlua run [main.lua] [same build flags] | mdlua run game.bin\n       mdlua c <main.lua>");
+  fail("usage: mdlua init <new-directory>\n       mdlua build [main.lua] [--project mdlua.json] [--sheet s.png] [--sprite-variants variants.json] [--gff sprites.gff] [--map m.png] [--sfx a.wav,b.wav] [--music a.vgm,b.vgm] [-o game.bin]\n       mdlua run [main.lua] [same build flags] | mdlua run game.bin\n       mdlua c <main.lua>");
 }

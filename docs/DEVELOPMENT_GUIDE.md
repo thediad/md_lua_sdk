@@ -64,6 +64,27 @@ All build overrides also work with `run`. To launch an existing ROM without
 rebuilding or reading project configuration, use `mdlua.cmd run build/game.bin`
 with no build options.
 
+## Create a new game
+
+With the SDK command installed:
+
+```powershell
+mdlua.cmd init my-game
+Set-Location my-game
+mdlua.cmd build
+mdlua.cmd run
+```
+
+Without a global command, from the SDK checkout use
+`node bin/mdlua-launch.mjs init ../my-game`, then build with
+`node bin/mdlua-launch.mjs build --project ../my-game/mdlua.json`.
+
+The new directory contains `main.lua`, `mdlua.json`, a README, and a `.gitignore`
+for build output. The starter uses an 8x8 fallback sprite: D-pad moves it and B
+resets its position. No asset downloads are needed. Creation requires a new
+directory with an existing parent; existing directories and files are refused.
+If creation fails partway through, the partial directory is retained for inspection.
+
 ## Project configuration
 
 An optional `mdlua.json` in the working directory avoids repeating paths:

@@ -54,8 +54,11 @@ Draw static hardware text once, as the number-print diagnostic does.
 to 254 payload bytes. Existing valid-slot data keeps the same layout. Invalid
 slots no longer wrap around; negative lengths are rejected. `load` returns
 zero for invalid input, an empty slot, or a slot without the expected marker.
-Counts above 254 are capped. The caller must provide an array with capacity
-for the requested count (up to 254); this C API does not know array capacity.
+Lua counts are capped to both 254 and the declared `array8` capacity. Dynamic
+count expressions are evaluated once. Direct C callers of `md_save`/`md_load`
+must still supply a sufficiently large array, or use their `_bounded` variants
+with an explicit capacity. The shared compiler supplies checked array metadata;
+this safety policy is implemented by Genesis-owned descriptors.
 
 The `save_check` diagnostic covers the first/last slots, invalid inputs,
 truncated reads, and empty saves. The emulator test exports SRAM to a file,

@@ -18,6 +18,14 @@
 import { SGDK_BUILTINS } from "./builtins-sgdk.js";
 import { ssprEmitter, variantEmitter } from "./sprite-variants.mjs";
 
+function boundedSram(name) {
+  return (call, { argAt, cName }) => {
+    const capacity = call.args[1]?.sym?.size;
+    if (!Number.isInteger(capacity) || capacity < 1) throw new Error(`${name}: missing checked array capacity`);
+    return `${cName(name)}(${argAt(call, 0, "int", "0")}, ${argAt(call, 1, "array8", "0")}, ${argAt(call, 2, "int", "0")}, ${capacity})`;
+  };
+}
+
 // The HAND-CURATED PICO-8 verbs. Exported on its own so the SGDK generator can
 // exclude exactly these (the verbs that WIN name clashes) WITHOUT importing its
 // own prior output (BUILTINS includes SGDK_BUILTINS - importing that here would
@@ -92,8 +100,8 @@ export const CURATED_BUILTINS = {
   // P8 color c0's CRAM slot to P8 color c1's RGB; pal() resets all 16.
   pal:       { params: [["int", true], ["int", true]], ret: "void", c: "lc_pal", mdOnly: true },
   // SRAM save/load: (slot, array8, count) — battery-backed, the gbalua contract.
-  save:      { params: [["int", false], ["array8", false], ["int", false]], ret: "void", c: "lc_save", mdOnly: true },
-  load:      { params: [["int", false], ["array8", false], ["int", false]], ret: "int",  c: "lc_load", mdOnly: true },
+  save:      { params: [["int", false], ["array8", false], ["int", false]], ret: "void", c: "lc_save", emit: boundedSram("lc_save_bounded"), mdOnly: true },
+  load:      { params: [["int", false], ["array8", false], ["int", false]], ret: "int",  c: "lc_load", emit: boundedSram("lc_load_bounded"), mdOnly: true },
   // the VDP WINDOW plane: hud(rows) claims the top N tile rows as a fixed HUD
   // strip (unscrolled, above plane A); hud(0) releases it.
   hud:       { params: [["int", false]], ret: "void", c: "lc_hud", mdOnly: true },

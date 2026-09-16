@@ -1,5 +1,12 @@
 local data=array8(256)
 local result=array8(256)
+local small=array8(2,77)
+local tiny=array8(1,55)
+local count_calls=0
+function large_count()
+  count_calls+=1
+  return 256
+end
 local frames=0
 local status=0
 function _update60()
@@ -23,6 +30,9 @@ function _update60()
   if load(0,result,256)~=2 or result[2]~=22 then status=3 return end
   save(1,data,0)
   if load(1,result,256)~=0 then status=3 return end
+  save(2,small,large_count())
+  if count_calls~=1 or load(2,result,256)~=2 or result[1]~=77 or result[2]~=77 then status=3 return end
+  if load(2,tiny,large_count())~=1 or tiny[1]~=77 or count_calls~=2 then status=3 return end
   status=1
 end
 function _draw()

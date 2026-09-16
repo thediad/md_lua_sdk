@@ -716,9 +716,18 @@ int md_load(int slot, unsigned char *arr, int n) {
     return len;
 }
 
-// hud(rows): the VDP WINDOW plane replaces plane A for the top N tile rows —
-// a rock-solid unscrolled HUD strip (the classic Genesis status bar). Text
-// lands there automatically when its tile row is inside the strip.
+// Lua descriptors supply the checked array capacity to these wrappers.
+void md_save_bounded(int slot, const unsigned char *arr, int n, int capacity) {
+    if (capacity < 0) return;
+    md_save(slot, arr, n > capacity ? capacity : n);
+}
+int md_load_bounded(int slot, unsigned char *arr, int n, int capacity) {
+    if (capacity < 0) return 0;
+    return md_load(slot, arr, n > capacity ? capacity : n);
+}
+
+// hud(rows): the WINDOW plane replaces plane A above the requested tile row.
+// Text in that region forms an unscrolled HUD strip.
 void md_hud(int rows) {
     if (rows < 0) rows = 0;
     if (rows > 27) rows = 27;

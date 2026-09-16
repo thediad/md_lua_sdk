@@ -99,6 +99,8 @@ int  md_anim_done(int slot);
 // Phase 2
 void md_save(int slot, const unsigned char *arr, int n);
 int  md_load(int slot, unsigned char *arr, int n);
+void md_save_bounded(int slot, const unsigned char *arr, int n, int capacity);
+int md_load_bounded(int slot, unsigned char *arr, int n, int capacity);
 void md_hud(int rows);
 void md_shade_mode(int on);
 void md_fade(long amount, int to_white);

@@ -325,8 +325,8 @@ one clear compile error with the fix.
 | `load(slot,array8,n)` | read them back; returns the count read, or `0` if the slot was never saved |
 
 Slots are 0-127 in the default 32-KiB byte-wide SRAM layout. Invalid slots or
-negative lengths do nothing (`load` returns 0). Counts above 254 are capped;
-the supplied array must hold at least `min(n,254)` bytes. Saving zero bytes
+negative lengths do nothing (`load` returns 0). Lua counts are capped to 254
+and the declared array capacity. Saving zero bytes
 creates an empty slot; loading zero bytes leaves the destination unchanged.
 
 load() returns `0` for a never-written slot (it stamps a magic byte + length on

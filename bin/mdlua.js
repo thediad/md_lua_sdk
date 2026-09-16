@@ -6,6 +6,7 @@ import path from "node:path";
 import { readFile } from "node:fs/promises";
 import { buildMd } from "../compiler/build-md.mjs";
 import { compile, formatDiagnostics } from "../compiler/index.js";
+import { resolveBuild } from "../compiler/project.mjs";
 
 const [cmd, ...rest] = process.argv.slice(2);
 const fail = (m) => { console.error(m); process.exit(1); };
@@ -24,12 +25,9 @@ const assetOpts = () => ({
 });
 
 if (cmd === "build") {
-  const entry = rest.find((a) => !a.startsWith("-"));
-  if (!entry) fail("usage: mdlua build <main.lua> [-o game.bin]");
-  const oi = rest.indexOf("-o");
-  const out = oi >= 0 ? rest[oi + 1] : path.join(path.dirname(entry), "game.bin");
   try {
-    const r = await buildMd(entry, out, assetOpts());
+    const { entry, out, assets } = await resolveBuild(rest);
+    const r = await buildMd(entry, out, assets);
     const { statSync } = await import("node:fs");
     console.log(`${r.outPath} (${statSync(r.outPath).size} bytes)`);
     if (r.spriteVariants.variants.length) {

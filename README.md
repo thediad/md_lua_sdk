@@ -1,5 +1,17 @@
 # Mega Drive Lua SDK (mdlua)
 
+## Current development branch
+
+Start with the **[development guide](docs/DEVELOPMENT_GUIDE.md)** for the current
+Windows workflow, project configuration, working features and limits.
+The **[development changelog](CHANGELOG.md)** tracks ongoing changes.
+
+From this SDK checkout: `npm.cmd run build -- examples/hello/main.lua`.
+For a project, put source/output/assets in `mdlua.json`; a linked CLI can then
+build it with `mdlua.cmd build`. The prepared workstation starter also has a
+one-command `build.cmd`. No manual Windows preload setup is needed with these
+entry points. The guide documents the local compiler dependency and setup.
+
 [![npm version](https://img.shields.io/npm/v/mdlua.svg)](https://www.npmjs.com/package/mdlua)
 
 Make games for the **Sega Mega Drive / Genesis** by writing a

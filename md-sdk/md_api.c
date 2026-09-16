@@ -30,6 +30,15 @@ static const u32 P8_RGB[16] = {
 #define T_MAP    (T_SHEET + SHEET_N)
 #ifdef MD_HAVE_MAP
 #define MAPT_N   map_tiles_count
+#else
+#define MAPT_N   0
+#endif
+#define T_VARIANTS (T_MAP + MAPT_N)
+#ifdef MD_HAVE_SPRITE_VARIANTS
+// Default SGDK plane tables begin at 0xC000. Do not overwrite them.
+#if (T_VARIANTS + sprite_variant_tiles_count) * 32 > 0xC000
+#error "sheet + map + pre-scaled sprites exceed the default tile VRAM region"
+#endif
 #endif
 
 #ifndef MD_HAVE_SHEET
@@ -265,8 +274,8 @@ void md_spr(int n, int x, int y, int w, int h, int flip) {
 void md_spr8(int t, int x, int y, int flip) {
     spr_cell(T_SHEET + t, x - cam_x, y - cam_y, (flip & 1) ? 1 : 0, (flip & 2) ? 1 : 0);
 }
-// sspr: MVP = UNSCALED source-rect blit rounded to cells (plan of record:
-// import-time pre-scale replaces this in Phase 2; documented loudly).
+// Unscaled, aligned sspr calls; scaled requests use md_sspr_variant.
+// The SDK emitter rejects unsupported rectangles before this runtime call.
 void md_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int flip) {
     (void)dw; (void)dh;
     md_spr((sy >> 3) * SHEET_W + (sx >> 3), dx, dy, (sw + 7) >> 3, (sh + 7) >> 3, flip);
@@ -284,6 +293,23 @@ static void p8_map_bind(const unsigned char *source, unsigned int size) {
     if (size > sizeof(p8_map_ram)) size = sizeof(p8_map_ram);
     for (i = 0; i < sizeof(p8_map_ram); i++) p8_map_ram[i] = i < size ? source[i] : 0;
     p8_map_source = source;
+}
+
+int md_sspr_variant(int id, int x, int y, int flipx, int flipy) {
+#ifdef MD_HAVE_SPRITE_VARIANTS
+    int w, h;
+    if ((unsigned)id >= sprite_variant_count || spr_count >= MD_MAX_SPR) return 0;
+    w = sprite_variant_meta[id][1]; h = sprite_variant_meta[id][2];
+    x -= cam_x; y -= cam_y;
+    if (x <= -w * 8 || x >= 320 || y <= -h * 8 || y >= 224) return 0;
+    VDP_setSprite(spr_count, (s16)x, (s16)y, SPRITE_SIZE(w, h),
+        TILE_ATTR_FULL(spr_palbank, spr_priority, flipy != 0, flipx != 0, T_VARIANTS + sprite_variant_meta[id][0]));
+    spr_count++;
+    return 1;
+#else
+    (void)id; (void)x; (void)y; (void)flipx; (void)flipy;
+    return 0;
+#endif
 }
 int md_p8_mget(const unsigned char *source, unsigned int size, int x, int y) {
     if ((unsigned)x >= 128u || (unsigned)y >= 64u) return 0;
@@ -574,6 +600,9 @@ void md_init(void) {
     PAL_setColors(32, (const u16 *)map_pal, 16, DMA);
 #endif
     spr_count = 0; spr_last = 0;
+#ifdef MD_HAVE_SPRITE_VARIANTS
+    VDP_loadTileData(sprite_variant_tiles, T_VARIANTS, sprite_variant_tiles_count, DMA);
+#endif
     joy_cur[0] = joy_cur[1] = joy_prev[0] = joy_prev[1] = 0;
 }
 

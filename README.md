@@ -176,6 +176,10 @@ The reason this target is fun:
 
 ## Assets
 
+For declared sprite sizes, see [pre-scaled sprites](docs/PRESCALED_SPRITES.md).
+`--sprite-variants variants.json` generates palette-preserving variants from
+`--sheet`, reports their memory cost, and draws each with one hardware sprite.
+
 `--sheet sprites.png` imports a sprite sheet (8×8 cells, row-major, up to 15
 opaque colors + transparent), `--map level.png` a tilemap (deduped tiles),
 via a self-contained PNG → VDP-tile converter (`compiler/png-tiles.mjs`).

@@ -16,12 +16,14 @@
 // (fixed args floor); pointers ride opaque int handles. Merged LAST so the
 // curated PICO-8 verbs above always win a name clash.
 import { SGDK_BUILTINS } from "./builtins-sgdk.js";
+import { ssprEmitter, variantEmitter } from "./sprite-variants.mjs";
 
 // The HAND-CURATED PICO-8 verbs. Exported on its own so the SGDK generator can
 // exclude exactly these (the verbs that WIN name clashes) WITHOUT importing its
 // own prior output (BUILTINS includes SGDK_BUILTINS - importing that here would
 // make every generated verb look "already taken" and wipe the table).
 export const CURATED_BUILTINS = {
+  ssprv: { params: [["int", false], ["coord", false], ["coord", false], ["flip", true], ["flip", true]], ret: "bool", c: "lc_sspr_variant", emit: variantEmitter() },
   // ---- graphics -------------------------------------------------------------
   cls:      { params: [["color", true]], ret: "void", c: "lc_cls" },
   camera:   { params: [["coord", true], ["coord", true]], ret: "void", c: "lc_camera" },
@@ -197,11 +199,11 @@ export const CURATED_BUILTINS = {
   run:      { params: [], ret: "void", c: "lc_run" },
   reset:    { params: [], ret: "void", c: "lc_run" },
   // PICO-8 sspr(sx,sy,sw,sh, dx,dy, [dw,dh], [flip_x,flip_y]): scaled sheet blit.
-  // dw/dh default to sw/sh (unscaled). Software nearest-neighbor, rounded to an
-  // integer scale and cached in GRAM (see lc_sspr). flips pack into one arg.
+  // Declared sizes are generated at build time; literal sspr resolves a variant.
+  // Use ssprv for runtime variant selection. Unscaled calls remain tile-aligned.
   sspr:     { params: [["int", false], ["int", false], ["int", false], ["int", false],
                        ["coord", false], ["coord", false], ["int", true], ["int", true],
-                       ["flip", true], ["flip", true]], ret: "void", special: "sspr" },
+                       ["flip", true], ["flip", true]], ret: "void", special: "sspr", emit: ssprEmitter() },
 
   // ---- input ---------------------------------------------------------------
   btn:      { params: [["int", false], ["int", true]], ret: "bool", c: "lc_btn" },

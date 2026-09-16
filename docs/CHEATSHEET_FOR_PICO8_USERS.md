@@ -124,7 +124,7 @@ optimization, never a semantic change.
 | `color(c)` | ✅ | |
 | `camera([x,y])` | 🔷 | **hardware scroll**: moves sprites + the map plane, not bitmap shapes |
 | `pal(c0,c1)` / `pal()` | 🟡🔷 | **live CRAM remap** - recolors the screen, not a draw-palette; no `palt` |
-| `sspr(...)` | 🟡 | unscaled cell-rounded blit; `dw`/`dh` ignored (no scaling hardware; pre-scaled import is the plan) |
+| `sspr(...)` | 🟡 | declared pre-scaled variants; see PRESCALED_SPRITES.md; unsupported sizes are rejected |
 | `sset sget fillp tline palt` | ❌ | not implemented |
 
 The shape verbs share one honest limit: they live in the SGDK BMP engine's
@@ -270,7 +270,7 @@ from PICO-8's 8192-token cap to **ROM size** (4 MB is a lot of Lua) and the
 
 1. **The screen is 320×224**, not 128×128 - coordinates don't transfer.
 2. `spr()` is a **hardware sprite** (80/frame, 20/scanline), not a per-blit
-   CPU cost - and there's no rotation/scaling hardware, so no `sspr` stretch.
+   CPU cost - and there's no rotation/scaling hardware, so `sspr` scaling uses build-generated variants.
 3. The shape verbs (`pset`/`rect`/`circ`/`line`) live in a **256×160 bitmap**
    that costs ~41 KB RAM - sprites + tiles are the real path.
 4. `camera()` moves sprites and the map plane (hardware scroll), **not** the

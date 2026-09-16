@@ -83,3 +83,32 @@ test("bitmap clipping resets, intersects, and preserves an empty rectangle", asy
     host.unloadMedia();
   }
 });
+
+test("pre-scaled variants render exact pixels, transparency and flips", async () => {
+  const work = await mkdtemp(path.join(tmpdir(), "mdlua-scaled-"));
+  const rom = path.join(work, "scaled.bin");
+  const example = new URL("../examples/prescaled/", import.meta.url);
+  const result = await buildMd(fileURLToPath(new URL("main.lua", example)), rom, {
+    sheetPath: fileURLToPath(new URL("sheet.png", example)),
+    spriteVariantsPath: fileURLToPath(new URL("variants.json", example)),
+  });
+  assert.equal(result.spriteVariants.bytes, 1024);
+  assert.equal(result.spriteVariants.sheetBytes, 128);
+  const host = new LibretroHost({ saveDir: work });
+  try {
+    await host.loadCore(core.jsPath, core.wasmPath);
+    await host.loadMedia({ platform: "genesis", path: rom });
+    host.stepFrames(120);
+    const { width, rgba } = host.screenshotRgba();
+    const pixel = (x,y) => Array.from(rgba.slice((y*width+x)*4,(y*width+x)*4+3));
+    assert.notDeepEqual(pixel(180,52), pixel(188,52), "reference sheet colors must differ");
+    for (const [dx,dy,w,h,fx,fy] of [[16,48,8,8,0,0],[48,48,24,24,0,0],[96,48,32,32,0,0],[16,104,32,32,1,0],[64,104,32,32,0,1],[112,104,32,32,1,1],[16,184,24,16,0,0]]) {
+      for (let y=0; y<h; y++) for (let x=0; x<w; x++) {
+        const sx=Math.floor((fx?w-1-x:x)*16/w), sy=Math.floor((fy?h-1-y:y)*16/h);
+        assert.deepEqual(pixel(dx+x,dy+y),pixel(176+sx,48+sy),`sprite at ${dx},${dy}, pixel ${x},${y}`);
+      }
+    }
+  } finally {
+    host.unloadMedia();
+  }
+});

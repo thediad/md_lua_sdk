@@ -16,6 +16,7 @@ const flag = (name) => { const i = rest.indexOf(name); return i >= 0 ? rest[i + 
 const list = (name) => { const v = flag(name); return v ? v.split(",") : undefined; };
 const assetOpts = () => ({
   sheetPath: flag("--sheet"),
+  spriteVariantsPath: flag("--sprite-variants"),
   mapPath: flag("--map"),
   sfxPaths: list("--sfx"),
   musicPaths: list("--music"),
@@ -30,6 +31,10 @@ if (cmd === "build") {
     const r = await buildMd(entry, out, assetOpts());
     const { statSync } = await import("node:fs");
     console.log(`${r.outPath} (${statSync(r.outPath).size} bytes)`);
+    if (r.spriteVariants.variants.length) {
+      console.log(`Pre-scaled sprites: ${r.spriteVariants.bytes} graphics bytes in ROM and VRAM; base sheet ${r.spriteVariants.sheetBytes} bytes; one hardware sprite per draw.`);
+      for (const v of r.spriteVariants.variants) console.log(`  ${v.id}: ${v.source.join(",")} -> ${v.size.join("x")}: ${v.bytes} bytes`);
+    }
   } catch (e) { fail(String(e.message ?? e)); }
 } else if (cmd === "run") {
   const target = rest.find((a) => !a.startsWith("-"));

@@ -57,9 +57,10 @@ for timing, memory pressure, and display behavior.
 
 ## Remaining hardware-dependent work
 
-`sspr` still rounds source rectangles to cells and ignores destination scaling.
-The next design decision is whether to provide pre-scaled assets (predictable
-VRAM use) or dynamic software scaling (more CPU and VRAM-transfer work).
+`sspr` supports explicitly declared pre-scaled variants; `ssprv` selects them
+at runtime. See [PRESCALED_SPRITES.md](PRESCALED_SPRITES.md) for declarations,
+memory costs, and the initial 8-32 pixel size limits. Dynamic software scaling
+is not implemented.
 Bitmap text composition also needs a separate audit; it is not covered by the
 hardware-text numeric test. Palette transparency is constrained by tile/sprite
 color-zero transparency and is not a general PICO `palt` implementation.

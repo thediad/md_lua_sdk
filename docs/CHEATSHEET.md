@@ -130,15 +130,16 @@ queued into a per-frame display list, not CPU-blitted.
 | `spr8(t,x,y,[flip])` | an 8×8 sprite from a raw tile index (bullets, pickups) |
 | `spr_pal(line)` | palette line (0-3) for subsequent sprites; default 1 (the sheet line) |
 | `spr_prio(p)` | 1 = in front of high-priority plane tiles (default), 0 = behind |
-| `sspr(sx,sy,sw,sh,dx,dy,[dw,dh],[fx,fy])` | sheet-rectangle blit - **unscaled** (see below) |
+| `sspr(sx,sy,sw,sh,dx,dy,[dw,dh],[fx,fy])` | aligned unscaled rectangle or declared pre-scaled variant |
+| `ssprv(id,x,y,[fx,fy])` | draw a declared variant; returns false if invalid, offscreen, or sprite list full |
 
 - `n` counts 8×8 cells across the sheet PNG, row-major. A multi-cell `spr()`
   composes `w*h` 1×1 hardware sprites (each costs part of the 80 budget).
 - Hardware limit: **20 sprites per scanline** - stack more on one line and
   the VDP drops the extras.
-- The Genesis has **no sprite scaling/rotation hardware**. `sspr` draws the
-  source rectangle (rounded to whole cells) at 1:1; `dw`/`dh` are accepted
-  but ignored today. The plan of record is pre-scaled frames at import time.
+- The Genesis has **no sprite scaling/rotation hardware**. Declare scaled
+  sizes with `--sprite-variants`; generated 8-32 pixel variants use one hardware
+  sprite each. Unsupported requests are rejected. See [pre-scaled sprites](PRESCALED_SPRITES.md).
 - `camera(x,y)` offsets all sprites (and scrolls the map plane) - hardware
   scrolling, no per-object math.
 

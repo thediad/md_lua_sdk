@@ -41,6 +41,7 @@ void md_circfill(int cx, int cy, int r, int color);
 void md_spr(int n, int x, int y, int w, int h, int flip);
 void md_spr8(int t, int x, int y, int flip);
 void md_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int flip);
+int md_sspr_variant(int id, int x, int y, int flipx, int flipy);
 void md_spr_pal(int bank);
 void md_spr_prio(int p);
 

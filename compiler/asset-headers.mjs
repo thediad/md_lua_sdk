@@ -1,6 +1,21 @@
 // asset-headers.mjs — image bytes -> generated C headers (VDP data).
 // Shared by the CLI build and (later) the web IDE so both emit IDENTICAL text.
 import { pngToSheet, pngToTilemap } from "./png-tiles.mjs";
+import { spriteVariants } from "./sprite-variants.mjs";
+
+export function scaledSheetAssets(pngBytes, manifest) {
+  const sheet = pngToSheet(pngBytes);
+  const result = spriteVariants(sheet, manifest);
+  let header = "";
+  if (result.variants.length) {
+    header += `#define MD_HAVE_SPRITE_VARIANTS 1\n#define sprite_variant_count ${result.variants.length}\n`;
+    header += `#define sprite_variant_tiles_count ${result.words.length / 8}\n`;
+    header += `static const u32 sprite_variant_tiles[] = {${result.words.join(",")}};\n`;
+    header += `static const u16 sprite_variant_meta[][3] = {${result.variants.map(v => `{${v.tileOffset},${v.size[0] / 8},${v.size[1] / 8}}`).join(",")}};\n`;
+  }
+  const { words, ...report } = result;
+  return { header, report: { ...report, sheetBytes: sheet.words.length * 4, sheetWidth: sheet.tilesAcross * 8, sheetHeight: sheet.tilesDown * 8 } };
+}
 
 // sprite sheet: row-major linear VDP tiles + a 16-color CRAM palette.
 export function sheetAssetsHeader(pngBytes, srcName = "sheet.png", varPrefix = "sheet") {

@@ -166,11 +166,30 @@ export const CURATED_BUILTINS = {
   anim_done:     { params: [["int", false]], ret: "int", c: "lc_anim_done", mdOnly: true },
   // PICO-8 tilemap: map(cx,cy, sx,sy, cw,ch) draws a cw x ch block of the cart's
   // __map__ (imported as a byte array) starting at cell (cx,cy) to screen pixel
-  // (sx,sy), one 8x8 sheet sprite per non-zero tile. Software spr()-loop, the
-  // same as PICO-8 (neither machine has tilemap hardware). All six args are
-  // optional in PICO-8 (default 0,0,0,0,128,32-ish); we require none.
-  map:      { params: [["int", true], ["int", true], ["coord", true], ["coord", true], ["int", true], ["int", true]], ret: "void", special: "map" },
-  mget:     { params: [["int", false], ["int", false]], ret: "int", special: "mget" },
+  // (sx,sy), one 8x8 sheet tile per non-zero cell on Genesis plane B.
+  // Defaults are 0,0,0,0,128,64,-1; a supplied mask matches any flag bit.
+  map: {
+    params: [["int", true], ["int", true], ["coord", true], ["coord", true], ["int", true], ["int", true], ["int", true]], ret: "void", special: "map",
+    emit(call, { argAt, cName }) {
+      const defaults = ["0", "0", "0", "0", "128", "64", "-1"];
+      const args = defaults.map((value, i) => argAt(call, i, "int", value));
+      return `${cName("lc_p8_map")}(lcl___p8map, sizeof(lcl___p8map), ${args.join(", ")})`;
+    },
+  },
+  mget: {
+    params: [["int", false], ["int", false]], ret: "int", special: "mget",
+    emit(call, { argAt, cName }) {
+      return `${cName("lc_p8_mget")}(lcl___p8map, sizeof(lcl___p8map), ${argAt(call, 0, "int", "0")}, ${argAt(call, 1, "int", "0")})`;
+    },
+  },
+  mset: {
+    params: [["int", false], ["int", false], ["int", false]], ret: "void", special: "mset",
+    emit(call, { argAt, cName }) {
+      return `${cName("lc_p8_mset")}(lcl___p8map, sizeof(lcl___p8map), ${argAt(call, 0, "int", "0")}, ${argAt(call, 1, "int", "0")}, ${argAt(call, 2, "int", "0")})`;
+    },
+  },
+  fget: { params: [["int", false], ["int", true]], ret: "int", special: "fget" },
+  fset: { params: [["int", false], ["int", false], ["flip", true]], ret: "void", special: "fset" },
   // run()/reset() restart the cart from power-on: a full crt0 reset that reruns
   // copydata (restores every top-level initializer), zeroes BSS, and re-enters
   // main() - not just the game's _init(), which would leave top-level state and

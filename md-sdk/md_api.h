@@ -44,6 +44,11 @@ void md_spr_pal(int bank);
 void md_spr_prio(int p);
 
 // tilemap (plane B)
+int md_p8_mget(const unsigned char *source, unsigned int size, int x, int y);
+void md_p8_mset(const unsigned char *source, unsigned int size, int x, int y, int tile);
+void md_p8_map(const unsigned char *source, unsigned int size, int cx, int cy, int sx, int sy, int cw, int ch, int layers);
+int md_fget(int sprite, int bit);
+void md_fset(int sprite, int bit, int value);
 void md_map(const unsigned char *m, int mapw, int cx, int cy, int sx, int sy, int cw, int ch, int layers);
 void md_map_show(int layer);
 int  md_mget(int layer, int col, int row);

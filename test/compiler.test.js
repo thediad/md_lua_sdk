@@ -127,10 +127,20 @@ test("spr flips pack into one arg (bit0 X, bit1 Y)", () => {
   assert.match(c, /md_spr\(1, 8, 8, 1, 1, .*\| .*<< 1\)/);   // both flips packed into one arg
 });
 
-test("map() special routes the __p8map hexdata array to md_map", () => {
+test("map() passes the PICO source length and layer mask to its own runtime", () => {
   const src = 'local __p8map = hexdata("0102")\n' + "function _update60()\nend\nfunction _draw()\n  map(0, 0, 0, 0, 2, 1)\nend\n";
   const c = cOf(src);
-  assert.match(c, /md_map\(lcl___p8map, 128, 0, 0, 0, 0, 2, 1, -1\)/);
+  assert.match(c, /md_p8_map\(lcl___p8map, sizeof\(lcl___p8map\), 0, 0, 0, 0, 2, 1, -1\)/);
+});
+
+test("PICO mutations and flags remain separate from hardware-plane access", () => {
+  const c = cOf('local __p8map=hexdata("0102") function _draw() local n=mget(0,0) mset(127,63,3) fset(3,1,true) local f=fget(3) map(0,0,0,0,2,1,0) end');
+  assert.match(c, /md_p8_mget\(lcl___p8map, sizeof\(lcl___p8map\), 0, 0\)/);
+  assert.match(c, /md_p8_mset\(lcl___p8map, sizeof\(lcl___p8map\), 127, 63, 3\)/);
+  assert.match(c, /md_fget\(3, -1\)/);
+  assert.match(c, /md_fset\(3, 1,/);
+  assert.match(c, /md_p8_map\(.*2, 1, 0\)/);
+  assert.doesNotMatch(c, /\bmd_mget\(/);
 });
 
 test("btn/btnp with player arg", () => {

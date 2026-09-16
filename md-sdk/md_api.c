@@ -261,6 +261,60 @@ void md_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int
 }
 
 // ---- tilemap: plane B ------------------------------------------------------------
+// PICO map state is independent of the SGDK hardware-plane shadow below.
+// One 128x64 cart map; short source arrays are zero-filled, never over-read.
+static unsigned char p8_map_ram[128 * 64];
+static unsigned char p8_flags[256];
+static const unsigned char *p8_map_source;
+static void p8_map_bind(const unsigned char *source, unsigned int size) {
+    unsigned int i;
+    if (p8_map_source == source) return;
+    if (size > sizeof(p8_map_ram)) size = sizeof(p8_map_ram);
+    for (i = 0; i < sizeof(p8_map_ram); i++) p8_map_ram[i] = i < size ? source[i] : 0;
+    p8_map_source = source;
+}
+int md_p8_mget(const unsigned char *source, unsigned int size, int x, int y) {
+    if ((unsigned)x >= 128u || (unsigned)y >= 64u) return 0;
+    p8_map_bind(source, size);
+    return p8_map_ram[y * 128 + x];
+}
+void md_p8_mset(const unsigned char *source, unsigned int size, int x, int y, int tile) {
+    if ((unsigned)x >= 128u || (unsigned)y >= 64u) return;
+    p8_map_bind(source, size);
+    p8_map_ram[y * 128 + x] = (unsigned char)tile;
+}
+int md_fget(int sprite, int bit) {
+    if ((unsigned)sprite >= 256u) return 0;
+    if (bit == -1) return p8_flags[sprite];
+    if ((unsigned)bit >= 8u) return 0;
+    return (p8_flags[sprite] >> bit) & 1;
+}
+void md_fset(int sprite, int bit, int value) {
+    if ((unsigned)sprite >= 256u) return;
+    if (bit == -1) p8_flags[sprite] = (unsigned char)value;
+    else if ((unsigned)bit < 8u) {
+        if (value) p8_flags[sprite] |= 1u << bit;
+        else p8_flags[sprite] &= ~(1u << bit);
+    }
+}
+void md_p8_map(const unsigned char *source, unsigned int size, int cx, int cy, int sx, int sy, int cw, int ch, int layers) {
+    int i, j, x, y, tile;
+    p8_map_bind(source, size);
+    // Clip source and destination cells before touching RAM or the VDP.
+    for (j = 0; j < ch && j < 64; j++) {
+        y = ((sy - cam_y) >> 3) + j;
+        if (cy + j < 0 || cy + j >= 64 || y < 0 || y >= 32) continue;
+        for (i = 0; i < cw && i < 128; i++) {
+            x = ((sx - cam_x) >> 3) + i;
+            if (cx + i < 0 || cx + i >= 128 || x < 0 || x >= 64) continue;
+            tile = p8_map_ram[(cy + j) * 128 + cx + i];
+            if (!tile || tile >= SHEET_N) continue;
+            if (layers != -1 && !(p8_flags[tile] & layers)) continue;
+            VDP_setTileMapXY(BG_B, TILE_ATTR_FULL(PAL1, 0, 0, 0, T_SHEET + tile), x, y);
+        }
+    }
+}
+
 void md_map(const unsigned char *m, int mapw, int cx, int cy, int sx, int sy, int cw, int ch, int layers) {
     (void)layers;  // single PICO-style map plane; layer mask reserved for compatibility
     int i, j;

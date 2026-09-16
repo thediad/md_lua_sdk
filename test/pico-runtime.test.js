@@ -61,3 +61,25 @@ test("fixed-point text matches rounded decimal strings in the emulator", async (
     host.unloadMedia();
   }
 });
+
+test("bitmap clipping resets, intersects, and preserves an empty rectangle", async () => {
+  const work = await mkdtemp(path.join(tmpdir(), "mdlua-clip-"));
+  const rom = path.join(work, "clip.bin");
+  await buildMd(fileURLToPath(new URL("../examples/bitmap_clip/main.lua", import.meta.url)), rom);
+  const host = new LibretroHost({ saveDir: work });
+  try {
+    await host.loadCore(core.jsPath, core.wasmPath);
+    await host.loadMedia({ platform: "genesis", path: rom });
+    host.stepFrames(120);
+    const { width, rgba } = host.screenshotRgba();
+    // SGDK centers its 256x160 bitmap in the 320x224 display.
+    const pixel = (x, y) => Array.from(rgba.slice(((y + 32) * width + x + 32) * 4, ((y + 32) * width + x + 32) * 4 + 3));
+    assert.notDeepEqual(pixel(20,20), pixel(36,36));
+    assert.deepEqual(pixel(52,52), pixel(100,100));
+    assert.notDeepEqual(pixel(4,4), pixel(100,100));
+    assert.deepEqual(pixel(20,82), pixel(36,36), "the status bar must be green (all pget checks pass)");
+    assert.notDeepEqual(pixel(20,82), pixel(100,100));
+  } finally {
+    host.unloadMedia();
+  }
+});

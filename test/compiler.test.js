@@ -143,6 +143,13 @@ test("PICO mutations and flags remain separate from hardware-plane access", () =
   assert.doesNotMatch(c, /\bmd_mget\(/);
 });
 
+test("bitmap clip uses shared reset/intersection lowering and rejects partial rectangles", () => {
+  const c = cOf('function _draw() clip() clip(1,2,3,4,true) end');
+  assert.match(c, /md_clip_reset\(\)/);
+  assert.match(c, /md_clip\(1, 2, 3, 4,/);
+  assert.ok(errorsOf('function _draw() clip(1,2,3) end').some(message => /takes 0, 4, or 5/.test(message)));
+});
+
 test("btn/btnp with player arg", () => {
   const c = cOf("local x = 0\nfunction _update60()\n  if btn(4) then x += 1 end\n  if btnp(5, 1) then x -= 1 end\nend\n" + "function _draw()\nend\n");
   assert.match(c, /md_btn\(4, 0\)/);

@@ -35,7 +35,7 @@ export const CURATED_BUILTINS = {
   // clip(x,y,w,h): restrict all subsequent bitmap drawing to a rectangle (HUD
   // panels, masked regions). clip() with no args resets to full screen; cls()
   // also resets it. PICO-8 semantics.
-  clip:     { params: [["coord", true], ["coord", true], ["coord", true], ["coord", true]], ret: "void", c: "lc_clip", mdOnly: true },
+  clip:     { params: [["coord", true], ["coord", true], ["coord", true], ["coord", true], ["flip", true]], ret: "void", special: "clip", mdOnly: true },
   // pget(x,y): read a bitmap pixel (color 0..255). sset(x,y,[c]): paint a pixel
   // into the loaded sprite sheet at runtime (0..15). Read-modify-write bitmap /
   // procedural sprite art.

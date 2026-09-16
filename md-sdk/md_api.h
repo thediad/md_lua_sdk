@@ -18,7 +18,8 @@ int md_btnp(int i, int pl);
 // state
 void md_color(int c);
 void md_camera(int cx, int cy);
-void md_clip(int x, int y, int w, int h);
+void md_clip(int x, int y, int w, int h, int previous);
+void md_clip_reset(void);
 
 // palette / screen
 void md_pal(int c0, int c1);

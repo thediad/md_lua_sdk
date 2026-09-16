@@ -154,11 +154,23 @@ void md_pset(int x, int y, int color) { bmp_ensure(); plot_clip(x, y, resolve_co
 int md_pget(int x, int y) {
     if (!bmp_on) return 0;
     if ((unsigned)x >= 256u || (unsigned)y >= 160u) return 0;
-    return (int)(BMP_getPixel((u16)x, (u16)y) & 0x0F);  // back to a 0-15 index
+    // The bundled SGDK getter reverses the setter's nibble order.
+    // Read the write buffer using the VDP order: even x high, odd x low.
+    return (int)((*BMP_getWritePointer((u16)x, (u16)y) >> ((x & 1) ? 0 : 4)) & 0x0F);
 }
-void md_clip(int x, int y, int w, int h) {
-    if (w <= 0 || h <= 0) { clip_x0 = 0; clip_y0 = 0; clip_x1 = 319; clip_y1 = 223; return; }
-    clip_x0 = (s16)x; clip_y0 = (s16)y; clip_x1 = (s16)(x + w - 1); clip_y1 = (s16)(y + h - 1);
+void md_clip_reset(void) {
+    clip_x0 = 0; clip_y0 = 0; clip_x1 = 319; clip_y1 = 223;
+}
+void md_clip(int x, int y, int w, int h, int previous) {
+    int x1 = x + (w > 0 ? w : 0) - 1;
+    int y1 = y + (h > 0 ? h : 0) - 1;
+    if (previous) {
+        if (x < clip_x0) x = clip_x0;
+        if (y < clip_y0) y = clip_y0;
+        if (x1 > clip_x1) x1 = clip_x1;
+        if (y1 > clip_y1) y1 = clip_y1;
+    }
+    clip_x0 = (s16)x; clip_y0 = (s16)y; clip_x1 = (s16)x1; clip_y1 = (s16)y1;
 }
 void md_line(int x0, int y0, int x1, int y1, int color) {
     int dx, sx, dy, sy, err, e2;

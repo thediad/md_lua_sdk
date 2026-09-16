@@ -108,7 +108,7 @@ export const CURATED_BUILTINS = {
   // an array of 160 raw BGR555 colors (fill with rgb()/color numbers, one per line):
   // sunset skies, underwater bands, a fire glow. Pass it once/frame; nil/0 = off.
   // save(slot, array8, n) / load(slot, array8, n): battery SRAM persistence. `slot`
-  // 0..15 (1 KB each); keep game state in an array8 and save/load it. load returns
+  // 0..127 (256 bytes each, 254 payload); keep state in array8. load returns
   // the byte count restored (0 = slot never written -> start fresh).
   // timer_start()/timer_read(): a free-running hardware timer (Timer 3, ~16 kHz) for
   // sub-frame timing + profiling. timer_start resets it; timer_read samples the count

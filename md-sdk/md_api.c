@@ -690,7 +690,10 @@ void md_endframe(void) {
 #define MD_SAVE_MAGIC 0xA5
 void md_save(int slot, const unsigned char *arr, int n) {
     int i;
-    u32 base = (u32)(slot & 0xFF) << 8;
+    u32 base;
+    // Default header maps 64 KiB of addresses to 32 KiB of odd-byte SRAM.
+    if ((unsigned)slot >= 128u || n < 0) return;
+    base = (u32)slot << 8;
     if (n > 254) n = 254;                     // 2 bytes reserved for magic+len
     SRAM_enable();
     SRAM_writeByte(base, MD_SAVE_MAGIC);
@@ -700,7 +703,9 @@ void md_save(int slot, const unsigned char *arr, int n) {
 }
 int md_load(int slot, unsigned char *arr, int n) {
     int i, len;
-    u32 base = (u32)(slot & 0xFF) << 8;
+    u32 base;
+    if ((unsigned)slot >= 128u || n <= 0) return 0;
+    base = (u32)slot << 8;
     SRAM_enableRO();
     if (SRAM_readByte(base) != MD_SAVE_MAGIC) { SRAM_disable(); return 0; }  // never saved
     len = SRAM_readByte(base + 1);

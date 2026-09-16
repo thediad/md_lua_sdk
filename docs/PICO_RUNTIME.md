@@ -47,7 +47,24 @@ Hardware plane updates are immediate and are not double-buffered: clearing
 and redrawing a large text screen every frame can expose partial redraws.
 Draw static hardware text once, as the number-print diagnostic does.
 
-## Numbers and clipping
+## Save slots
+
+`save(slot,array8,n)` and `load(slot,array8,n)` use slots 0-127 in the default
+32-KiB byte-wide SRAM mapping. Each 256-byte slot has two header bytes and up
+to 254 payload bytes. Existing valid-slot data keeps the same layout. Invalid
+slots no longer wrap around; negative lengths are rejected. `load` returns
+zero for invalid input, an empty slot, or a slot without the expected marker.
+Counts above 254 are capped. The caller must provide an array with capacity
+for the requested count (up to 254); this C API does not know array capacity.
+
+The `save_check` diagnostic covers the first/last slots, invalid inputs,
+truncated reads, and empty saves. The emulator test exports SRAM to a file,
+loads it into a fresh core instance, and verifies the saved payload. This
+tests SRAM persistence through explicit export/import, not a frontend's
+automatic save-file policy. The format does not provide checksums or atomic
+recovery after interruption during a write.
+
+## Numbers, clocks, and clipping
 
 `realframes()` counts video interrupts since runtime initialization, rather
 than completed game loops. `realsecs()` converts that count to 16.16 seconds

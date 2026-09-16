@@ -218,6 +218,44 @@ test("real clocks track video interrupts during slow NTSC and PAL drawing", asyn
   }
 });
 
+test("SRAM bounds and exported saves survive a fresh emulator load", async () => {
+  const work=await mkdtemp(path.join(tmpdir(),"mdlua-sram-"));
+  const rom=path.join(work,"save.bin"), saveFile=path.join(work,"save.srm");
+  await buildMd(fileURLToPath(new URL("../examples/save_check/main.lua",import.meta.url)),rom);
+  for(let session=0;session<2;session++) {
+    const host=new LibretroHost({saveDir:work});
+    try {
+      await host.loadCore(core.jsPath,core.wasmPath);
+      await host.loadMedia({platform:"genesis",path:rom});
+      assert.ok(host.getStatus().settleFramesUsed<20,"inject SRAM before diagnostic runs");
+      // GPGX reports the used SRAM size (zero for erased RAM) after the
+      // host's settle frames. Its libretro data pointer still exposes the
+      // 64-KiB backing store. Load the exported bytes before Lua tests run.
+      // https://github.com/ekeeke/Genesis-Plus-GX/blob/master/libretro/libretro.c
+      const ptr=host.mod._retro_get_memory_data(0); // RETRO_MEMORY_SAVE_RAM
+      assert.ok(ptr>0,"ROM must advertise battery SRAM");
+      const data=session ? await readFile(saveFile) : new Uint8Array(0x10000).fill(255);
+      assert.ok(data.length<=0x10000);
+      host.mod.HEAPU8.set(data,ptr);
+      host.stepFrames(120);
+      const {width,rgba}=host.screenshotRgba();
+      let lit=false;
+      for(let y=0;y<8;y++) {
+        const actual=((24+y)*width+8)*4;
+        const expected=(((session?56:40)+y)*width+8)*4;
+        assert.deepEqual(rgba.slice(actual,actual+96*4),rgba.slice(expected,expected+96*4),`session ${session} status row ${y}`);
+        for(let x=0;x<96;x++) if(rgba[actual+x*4]) lit=true;
+      }
+      assert.ok(lit,"status must contain visible text");
+      if(!session) {
+        const size=host.regionSize("save_ram");
+        assert.ok(size>0,"save data must be exposed for export");
+        await writeFile(saveFile,host.readMemory("save_ram",0,size));
+      }
+    } finally {host.unloadMedia();}
+  }
+});
+
 test("pre-scaled variants render exact pixels, transparency and flips", async () => {
   const work = await mkdtemp(path.join(tmpdir(), "mdlua-scaled-"));
   const rom = path.join(work, "scaled.bin");

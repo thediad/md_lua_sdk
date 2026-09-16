@@ -226,7 +226,7 @@ the plane scrolls in hardware, for free.
 
 | Call | | Notes |
 |---|:--:|---|
-| `save(slot, array8, n)` | ➕ | write up to 256 bytes to **battery SRAM** (256-byte slots) |
+| `save(slot, array8, n)` | ➕ | write up to 254 payload bytes to **battery SRAM** (256-byte slots, IDs 0-127) |
 | `load(slot, array8, n)` | ➕ | read back; returns count read, or 0 for a never-saved slot (magic byte handled for you) |
 | `cartdata dset dget` | ❌ | `save`/`load` are the replacement |
 

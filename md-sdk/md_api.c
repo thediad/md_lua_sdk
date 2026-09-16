@@ -411,13 +411,33 @@ static void itoa10(int v, char *out) {
     out[j] = 0;
 }
 void md_print_int(int v, int x, int y, int color) { char b[12]; itoa10(v, b); md_print(b, x, y, color); }
-void md_print_num(long v, int x, int y, int color) { md_print_int((int)(v >> 16), x, y, color); }
+// Four rounded decimal places, trimmed; unsigned magnitude handles -32768.
+static void ftoa16(long v, char *out) {
+    unsigned long magnitude = v < 0 ? 0UL - (unsigned long)v : (unsigned long)v;
+    unsigned int whole = (unsigned int)(magnitude >> 16);
+    unsigned int fraction = (unsigned int)(((magnitude & 65535UL) * 10000UL + 32768UL) >> 16);
+    unsigned int divisor;
+    char *start = out;
+    if (fraction == 10000u) { whole++; fraction = 0; }
+    if (v < 0 && (whole || fraction)) *out++ = '-';
+    itoa10((int)whole, out);
+    while (*out) out++;
+    if (!fraction) return;
+    *out++ = '.';
+    for (divisor = 1000; divisor; divisor /= 10) {
+        *out++ = '0' + fraction / divisor;
+        fraction %= divisor;
+    }
+    while (out > start && out[-1] == '0') out--;
+    *out = 0;
+}
+void md_print_num(long v, int x, int y, int color) { char b[18]; ftoa16(v, b); md_print(b, x, y, color); }
 void md_print_cur_str(const char *s, int color) {
     md_print(s, cur_col_t << 3, cur_row_t << 3, color);
     cur_row_t++; if (cur_row_t > 27) cur_row_t = 0;
 }
 void md_print_cur_int(int v, int color) { char b[12]; itoa10(v, b); md_print_cur_str(b, color); }
-void md_print_cur_num(long v, int color) { md_print_cur_int((int)(v >> 16), color); }
+void md_print_cur_num(long v, int color) { char b[18]; ftoa16(v, b); md_print_cur_str(b, color); }
 
 // ---- cls / frame ------------------------------------------------------------
 void md_cls(int color) {

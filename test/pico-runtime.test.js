@@ -39,3 +39,25 @@ test("PICO map RAM, flags, and layer filtering run correctly in Genesis", async 
     host.unloadMedia();
   }
 });
+
+test("fixed-point text matches rounded decimal strings in the emulator", async () => {
+  const work = await mkdtemp(path.join(tmpdir(), "mdlua-numbers-"));
+  const rom = path.join(work, "numbers.bin");
+  await buildMd(fileURLToPath(new URL("../examples/number_print/main.lua", import.meta.url)), rom);
+  const host = new LibretroHost({ saveDir: work });
+  try {
+    await host.loadCore(core.jsPath, core.wasmPath);
+    await host.loadMedia({ platform: "genesis", path: rom });
+    host.stepFrames(120);
+    const { width, rgba } = host.screenshotRgba();
+    for (const y of [24, 64, 104, 144, 184]) {
+      for (let row = 0; row < 8; row++) {
+        const start = ((y + row) * width + 8) * 4;
+        const expected = ((y + 16 + row) * width + 8) * 4;
+        assert.deepEqual(rgba.slice(start, start + 96 * 4), rgba.slice(expected, expected + 96 * 4), `text pair at y=${y}`);
+      }
+    }
+  } finally {
+    host.unloadMedia();
+  }
+});

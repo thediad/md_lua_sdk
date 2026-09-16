@@ -269,6 +269,9 @@ the frame clock (frame-rate independent of your update structure).
 **Two players are real**: `pl` 0 (default) or 1 reads the second pad -
 `btn(4, 1)` is player 2's B button.
 
+Invalid player/button IDs return false. `btnp` fires once per press, with no
+automatic repeat. X/Y/Z/Mode require a six-button controller.
+
 ---
 
 ## Math

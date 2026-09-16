@@ -96,10 +96,14 @@ static u16 p8_mask(int i) {
         default: return 0;
     }
 }
-int md_btn(int i, int pl)  { u16 p = (pl == 1) ? 1 : 0; return (joy_cur[p] & p8_mask(i)) != 0; }
+int md_btn(int i, int pl) {
+    if ((unsigned)pl >= 2u) return 0;
+    return (joy_cur[pl] & p8_mask(i)) != 0;
+}
 int md_btnp(int i, int pl) {
-    u16 p = (pl == 1) ? 1 : 0; u16 m = p8_mask(i);
-    return (joy_cur[p] & m) && !(joy_prev[p] & m);
+    u16 m = p8_mask(i);
+    if ((unsigned)pl >= 2u) return 0;
+    return (joy_cur[pl] & m) && !(joy_prev[pl] & m);
 }
 
 // ---- color helpers -------------------------------------------------------------

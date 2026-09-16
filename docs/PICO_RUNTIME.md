@@ -8,6 +8,18 @@ not PICO-8 cartridge compatibility. Hardware capabilities, predictable costs,
 and emulator-tested behavior take priority. Persistence uses `save`/`load`;
 `cartdata`/`dget`/`dset` are not planned, and all 128 save slots remain available.
 
+## Controllers
+
+`btn(button,player)` reports held state; `btnp(button,player)` reports a new
+press on the current game loop and does not auto-repeat. The optional player
+is 0 or 1; invalid players/buttons return false. IDs 0-3 are left/right/up/down,
+4-7 are B/C/A/Start, and 8-11 are X/Y/Z/Mode on a six-button pad. Three-button
+pads leave the extra buttons inactive. Input is sampled at game-loop boundaries;
+a press entirely between samples can be missed during slow drawing.
+
+Emulator regressions exercise both ports, every button, held/released states,
+and repeated press edges with three- and six-button pads in NTSC and PAL.
+
 ## Maps and flags
 
 Declare `local __p8map = hexdata("...")` for the initial map bytes. The runtime

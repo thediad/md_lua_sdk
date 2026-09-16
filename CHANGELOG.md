@@ -6,6 +6,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- `mdlua run` now shares the build command's project configuration and overrides,
+  including asset paths and output location. Passing a `.bin` directly launches
+  it without rebuilding or reading project configuration.
+
 ### Build workflow and documentation
 
 - Added optional `mdlua.json` project configuration: entry, output, sprite sheet,
@@ -54,8 +58,8 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ### Validation policy
 
-- The completed project-build validation run passed 88 SDK tests with no skips;
-  final parser checks also passed after adding empty-list-path validation.
+- The project build/run validation passed 90 SDK tests with no skips, including
+  headless emulator regressions. The optional SDL window was not opened.
 - Run `npm.cmd test` for current results; do not treat historical counts as live status.
 - Physical hardware verification is pending and does not block emulator-focused work.
 - Audio, advanced direct SGDK APIs, and performance under real game workloads

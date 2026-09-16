@@ -43,3 +43,36 @@ test("CLI builds a project without an external Windows preload or asset argument
   assert.ok(rom.length>=0x200);
   assert.match(rom.toString("ascii",0x100,0x110),/SEGA/);
 });
+
+
+test("run builds configured assets and launches the returned output path",async()=>{
+  const {prepareRun}=await import("../compiler/run-project.mjs");
+  const cwd=await mkdtemp(path.join(tmpdir(),"mdlua-run project-"));
+  await writeFile(path.join(cwd,"mdlua.json"),JSON.stringify({entry:"main.lua",out:"build/game.bin",sheet:"art.png"}));
+  let calls=0;
+  const build=async(entry,out,assets)=>{
+    calls++;
+    assert.equal(entry,path.join(cwd,"main.lua"));
+    assert.equal(out,path.join(cwd,"custom.bin"));
+    assert.equal(assets.sheetPath,path.join(cwd,"override.png"));
+    return {outPath:out};
+  };
+  assert.equal(await prepareRun(["--sheet","override.png","-o","custom.bin"],cwd,build),path.join(cwd,"custom.bin"));
+  assert.equal(calls,1);
+  await writeFile(path.join(cwd,"main.lua"),"function _draw() end");
+  await writeFile(path.join(cwd,"mdlua.json"),JSON.stringify({entry:"main.lua",out:"build/game.bin"}));
+  const rom=await prepareRun([],cwd);
+  assert.equal(rom,path.join(cwd,"build/game.bin"));
+});
+
+test("direct ROM run bypasses project config; malformed run options never build",async()=>{
+  const {prepareRun}=await import("../compiler/run-project.mjs");
+  const cwd=await mkdtemp(path.join(tmpdir(),"mdlua-run-options-"));
+  await writeFile(path.join(cwd,"mdlua.json"),"invalid json");
+  const neverBuild=async()=>assert.fail("must not build");
+  assert.equal(await prepareRun(["existing.BIN"],cwd,neverBuild),path.join(cwd,"existing.BIN"));
+  await writeFile(path.join(cwd,"mdlua.json"),"{}");
+  for(const args of [["--sheet"],["a.lua","b.lua"],["existing.bin","-o","other.bin"],["--unknown"]]) {
+    await assert.rejects(prepareRun(args,cwd,neverBuild));
+  }
+});

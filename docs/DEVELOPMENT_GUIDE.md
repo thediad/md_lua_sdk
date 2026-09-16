@@ -57,8 +57,12 @@ mdlua.cmd run build/game.bin
 
 `npm link` changes the installed command; it has not been run automatically.
 The `run` window needs the optional SDL dependency. BlastEm can open the same
-ROM without it. Project configuration is currently read by **build**, not run;
-build first and pass the resulting ROM to run.
+ROM without it. Both `build` and `run` read project configuration. From your
+project directory, `mdlua.cmd run` rebuilds and launches the configured game;
+`mdlua.cmd run --project path/to/mdlua.json` works from another directory.
+All build overrides also work with `run`. To launch an existing ROM without
+rebuilding or reading project configuration, use `mdlua.cmd run build/game.bin`
+with no build options.
 
 ## Project configuration
 

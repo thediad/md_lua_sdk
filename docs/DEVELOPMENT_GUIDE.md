@@ -157,6 +157,20 @@ rate is approximately 60 Hz NTSC or 50 Hz PAL, and expensive work slows the loop
 `_update`, used instead, runs every other loop. `time()` advances 1/60 second per
 loop; `realsecs()` uses video interrupts and the region's nominal refresh rate.
 
+### Multiline labels
+
+Use a long-bracket string with actual line breaks:
+
+```lua
+print([[LEVEL 1
+GET READY]],16,40,7)
+```
+
+Both drawing modes advance eight pixels per line and clip at the screen edges.
+Cursor printing advances past all lines. Quoted backslash escapes currently stay
+literal in the shared compiler; use `[[...]]` for multiline text.
+See [the multiline example](../examples/multiline_text/README.md) for both modes.
+
 ## Language basics
 
 - Ahead-of-time compilation: Lua becomes C, then native 68000 code via SGDK.
@@ -183,7 +197,7 @@ certification. Tests use Genesis Plus GX unless otherwise stated.
 | Backgrounds | PNG map import, plane-B display, scrolling, tile access | Asset/build coverage; map wrapper currently owns one imported plane-B map |
 | Byte maps / flags | Mutable bounded map data, flag byte/bit access, `--gff` | Runtime filtering/bounds/import regressions; separate from imported background maps |
 | Bitmap drawing | Pixels, lines, rectangles, circles, clipping | Targeted pixel/rectangle/clip regressions; 256x160 buffer, about 41 KiB RAM |
-| Bitmap clearing/text | True color-buffer clear, pixel-positioned glyphs | Clear/readback/clip/draw-order regressions |
+| Bitmap clearing/text | True color-buffer clear, pixel-positioned glyphs | Clear/readback/clip/draw-order and multiline regressions |
 | Bitmap timing | Border timing adaptation | Full-image animated NTSC/PAL regression; user confirmed static diagnostic flicker fix in BlastEm |
 | Numbers / clocks | Fractional print, simulation and elapsed clocks | Formatting and slow-draw NTSC/PAL clock regressions |
 | Saves | 128 slots, 254 payload bytes per slot, array-capacity clamping | Empty/boundary/invalid-count tests, dynamic count evaluated once, SRAM export/reload regression |

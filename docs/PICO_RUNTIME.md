@@ -115,8 +115,8 @@ directly into the 256x160 bitmap at pixel coordinates. Glyph backgrounds are
 transparent; the requested color, clipping, `pget`, `cls`, and later drawing
 all apply to its pixels. Text does not apply the camera, matching the existing
 bitmap drawing wrappers. Print after the first bitmap verb: hardware text
-drawn before activation is not converted into bitmap pixels. Control bytes
-and unsupported characters become `?`; newline layout is not implemented.
+drawn before activation is not converted into bitmap pixels. Other control bytes
+and unsupported characters become `?`.
 The font mask uses 768 ROM bytes and no additional RAM buffer. Regenerate it
 from the bundled SGDK font with `node scripts/generate-bitmap-font.mjs`.
 
@@ -187,3 +187,27 @@ fill diagnostic has no flicker in BlastEm. Genesis Plus GX regression coverage
 includes animated NTSC and PAL frames with no boundary exclusions. Physical
 hardware validation remains pending; emulator tests provide the current
 regression baseline.
+
+
+### Multiline text
+
+Both hardware and bitmap `print` accept actual line breaks in long-bracket strings:
+
+```lua
+print([[LEVEL 1
+GET READY]],16,40,7)
+```
+
+Each line starts at the supplied x coordinate and advances eight pixels vertically.
+LF, CRLF and CR line endings are accepted; CRLF counts as one break. Empty lines
+consume a row. Text clips at screen edges; it does not wrap long lines horizontally.
+Hardware text uses the 40x28 visible tile grid and selects the HUD/window plane
+for each line. Bitmap text preserves pixel positioning, color and `clip`.
+
+Cursor printing advances by the number of line breaks plus one after each call,
+including a trailing empty line. Its next position wraps within 28 hardware rows
+or 20 bitmap rows. A single multiline call clips below the screen rather than
+wrapping its drawing back to the top. Explicit-position print does not move the cursor.
+
+The shared compiler currently preserves backslash escapes in quoted strings:
+`"A\nB"` does not supply a newline. Use actual line breaks in `[[...]]` as above.

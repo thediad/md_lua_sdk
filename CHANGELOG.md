@@ -6,6 +6,14 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Added multiline text in hardware and bitmap modes using long-bracket strings.
+  Lines advance eight pixels; LF/CRLF/CR are supported. Cursor advancement now
+  counts all lines and wraps within the active display height. Hardware text
+  clips to the visible screen instead of sending off-screen coordinates to SGDK.
+  Quoted escape handling in the shared compiler is unchanged.
+- The map/flags diagnostic now draws its persistent hardware labels once,
+  avoiding text loss caused by clearing the plane during each display scan.
+
 - Added `mdlua init <new-directory>`: a playable no-assets starter, project
   configuration, README and build-output ignore file. Existing destinations
   are refused. Updated the guide and corrected stale cheat-sheet timing/text advice.
@@ -62,8 +70,9 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ### Validation policy
 
-- The project creation/build/run validation passed 92 SDK tests with no skips, including
-  headless emulator regressions and starter movement/reset. The optional SDL window was not opened.
+- The multiline-text validation passed 93 SDK tests with no skips, including
+  headless emulator regressions, starter movement/reset and text layout in both
+  drawing modes. Example screenshots were inspected; the SDL window was not opened.
 - Run `npm.cmd test` for current results; do not treat historical counts as live status.
 - Physical hardware verification is pending and does not block emulator-focused work.
 - Audio, advanced direct SGDK APIs, and performance under real game workloads

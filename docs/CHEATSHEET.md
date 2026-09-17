@@ -118,6 +118,8 @@ offset them - it drives the hardware sprite/plane scroll instead.
 - With `hud(rows)` active, text whose row falls inside the strip lands on the
   window plane automatically (a rock-solid unscrolled status bar).
 - In bitmap mode, `print` draws colored glyphs at pixel coordinates and obeys `clip`.
+- Long-bracket strings with actual line breaks print multiple rows, eight pixels
+  apart. Quoted `\n` stays literal. Cursor printing advances past every line.
 - There is **no runtime string concatenation** - print a label and a value as
   two calls: `print("score",8,8,7) print(n,56,8,10)`.
 

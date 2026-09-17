@@ -346,3 +346,61 @@ test("bitmap text composes colored glyphs with clipping, clearing and draw order
     assert.ok(lit>0,"numeric comparison must contain visible text");
   } finally { host.unloadMedia(); }
 });
+
+
+test("multiline text matches positioned lines, clipping and cursor advancement", async () => {
+  const work = await mkdtemp(path.join(tmpdir(), "mdlua-multiline-"));
+  for (const bitmap of [false, true]) {
+    const source = path.join(work, bitmap ? "bitmap.lua" : "hardware.lua");
+    const rom = source.replace(".lua", ".bin");
+    await writeFile(source, `function ${bitmap ? "_draw" : "_init"}()
+  cls(0)
+  ${bitmap ? "pset(0,0,0)" : "hud(2)"}
+  print([[A\r\nB]],16,8,7)
+  print("A",80,8,7)
+  print("B",80,16,7)
+  print([[A\n\nB\n]],16,40,7)
+  print("A",80,40,7)
+  print("B",80,56,7)
+  print([[A\nB]],16,-8,7)
+  print("B",80,0,7)
+  print([[${"A".repeat(50)}\nB]],16,80,7)
+  print("B",80,88,7)
+  print([[A\r\nB]],7)
+  print("C",7)
+  print("A",112,0,7)
+  print("B",112,8,7)
+  print("C",112,16,7)
+  print("AB",-8,112,7)
+  print("B",80,112,7)
+  print([[ ${"\n".repeat(bitmap ? 16 : 24)}]],7)
+  print("Z",7)
+  print("Z",112,0,7)
+end
+${bitmap ? "" : "function _draw() end"}
+`);
+    await buildMd(source, rom);
+    const host = new LibretroHost({ saveDir: work });
+    try {
+      await host.loadCore(core.jsPath, core.wasmPath);
+      await host.loadMedia({ platform: "genesis", path: rom });
+      host.stepFrames(120);
+      const { width, rgba } = host.screenshotRgba();
+      const offset = bitmap ? 32 : 0;
+      const pixel = (x,y) => Array.from(rgba.slice(((y+offset)*width+x+offset)*4,((y+offset)*width+x+offset)*4+3));
+      let lit = 0;
+      for (const [actualX, actualY, refX, refY] of [
+        [16,0,80,0], [16,8,80,8], [16,16,80,16],
+        [16,40,80,40], [16,56,80,56], [16,88,80,88],
+        [0,0,112,0], [0,8,112,8], [0,16,112,16], [0,112,80,112],
+      ]) for (let y=0;y<8;y++) for(let x=0;x<8;x++) {
+        const actual = pixel(actualX+x,actualY+y);
+        assert.deepEqual(actual,pixel(refX+x,refY+y),`${bitmap ? "bitmap" : "hardware"} at ${actualX+x},${actualY+y}`);
+        if (actual.some(v=>v)) lit++;
+      }
+      assert.ok(lit > 0, "comparison must contain visible glyphs");
+      for(let y=48;y<56;y++) for(let x=16;x<24;x++)
+        assert.deepEqual(pixel(x,y),pixel(200,140),"blank line remains empty");
+    } finally { host.unloadMedia(); }
+  }
+});

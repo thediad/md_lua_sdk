@@ -1,6 +1,7 @@
 -- PICO map RAM is zero-filled after these four source cells.
 local __p8map=hexdata("01020301")
 local passed=0
+local labels_drawn=0
 
 function _init()
   if fget(0)~=0 or fget(1)~=0 or fget(255)~=0 then return end
@@ -21,15 +22,20 @@ function _update60()
 end
 
 function _draw()
-  cls(0)
-  print("PICO MAP / FLAGS",8,8,7)
-  if passed==1 then print("RAM AND BOUNDS PASS",8,24,7) else print("FAIL",8,24,7) end
-  print("ALL",8,48,7)
+  -- Plane text persists. Repeated full-plane clears can erase labels while
+  -- the display is scanning them; only the hardware sprites need resubmission.
+  if labels_drawn==0 then
+    cls(0)
+    print("PICO MAP / FLAGS",8,8,7)
+    if passed==1 then print("RAM AND BOUNDS PASS",8,24,7) else print("FAIL",8,24,7) end
+    print("ALL",8,48,7)
+    print("MASK 1",8,72,7)
+    print("MASK 2",8,96,7)
+    print("MASK 0",8,120,7)
+    labels_drawn=1
+  end
   map(0,0,112,48,4,1)
-  print("MASK 1",8,72,7)
   map(0,0,112,72,4,1,1)
-  print("MASK 2",8,96,7)
   map(0,0,112,96,4,1,2)
-  print("MASK 0",8,120,7)
   map(0,0,112,120,4,1,0)
 end

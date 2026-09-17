@@ -461,14 +461,14 @@ static u16 text_pal_for(int color) {
     }
     return PAL3;
 }
-void md_print(const char *s, int x, int y, int color) {
-    u16 row = (u16)(y >> 3);
+static void print_line(const char *s, unsigned int length, int x, int y, int color) {
     if (bmp_on) {
         u16 col = resolve_color(color);
-        // Compose into the write buffer, so flip/cls/clip and drawing order
-        // treat text exactly like bitmap pixels. Glyph backgrounds are clear.
-        while (*s && x < 256) {
-            unsigned char ch = (unsigned char)*s++;
+        unsigned int i;
+        if (y <= -8 || y >= 160) return;
+        // Text shares the bitmap buffer, clipping and draw order.
+        for (i = 0; i < length && x < 256; i++, x += 8) {
+            unsigned char ch = (unsigned char)s[i];
             int gx, gy;
             if (ch < 32 || ch > 127) ch = '?';
             if (x > -8) for (gy = 0; gy < 8; gy++) {
@@ -476,12 +476,40 @@ void md_print(const char *s, int x, int y, int color) {
                 for (gx = 0; gx < 8; gx++)
                     if (bits & (128 >> gx)) plot_clip(x + gx, y + gy, col);
             }
-            x += 8;
         }
-        return;
+    } else {
+        char visible[41];
+        unsigned int i, count = 0;
+        int column = x >> 3, row = y >> 3;
+        if (row < 0 || row >= 28 || column >= 40) return;
+        for (i = 0; i < length && column < 40; i++, column++) {
+            unsigned char ch = (unsigned char)s[i];
+            if (column < 0) continue;
+            visible[count++] = ch < 32 || ch > 127 ? '?' : ch;
+        }
+        visible[count] = 0;
+        if (count) {
+            VDP_setTextPalette(text_pal_for(color));
+            VDP_drawTextBG(hud_rows && row < hud_rows ? WINDOW : BG_A,
+                           visible, x < 0 ? 0 : (u16)(x >> 3), (u16)row);
+        }
     }
-    VDP_setTextPalette(text_pal_for(color));
-    VDP_drawTextBG(hud_rows && row < hud_rows ? WINDOW : BG_A, s, (u16)(x >> 3), row);
+}
+void md_print(const char *s, int x, int y, int color) {
+    const char *line = s;
+    // A wide row accumulator avoids overflow for long multiline strings.
+    long row_y = y;
+    for (;;) {
+        if (*s == '\n' || *s == '\r' || !*s) {
+            if (row_y > -8 && row_y < (bmp_on ? 160 : 224))
+                print_line(line, (unsigned int)(s - line), x, (int)row_y, color);
+            if (!*s) break;
+            row_y += 8;
+            if (*s == '\r' && s[1] == '\n') s++;
+            line = s + 1;
+        }
+        s++;
+    }
 }
 static void itoa10(int v, char *out) {
     char tmp[12]; int i = 0, j = 0; unsigned int u = (v < 0) ? (unsigned int)(-v) : (unsigned int)v;
@@ -514,7 +542,14 @@ static void ftoa16(long v, char *out) {
 void md_print_num(long v, int x, int y, int color) { char b[18]; ftoa16(v, b); md_print(b, x, y, color); }
 void md_print_cur_str(const char *s, int color) {
     md_print(s, cur_col_t << 3, cur_row_t << 3, color);
-    cur_row_t++; if (cur_row_t > 27) cur_row_t = 0;
+    // Each newline consumes a row; print also advances after the final line.
+    do {
+        if (*s == '\n' || *s == '\r' || !*s) {
+            cur_row_t++;
+            if (cur_row_t >= (bmp_on ? 20 : 28)) cur_row_t = 0;
+            if (*s == '\r' && s[1] == '\n') s++;
+        }
+    } while (*s++);
 }
 void md_print_cur_int(int v, int color) { char b[12]; itoa10(v, b); md_print_cur_str(b, color); }
 void md_print_cur_num(long v, int color) { char b[18]; ftoa16(v, b); md_print_cur_str(b, color); }

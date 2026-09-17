@@ -423,7 +423,9 @@ int md_mget(int layer, int col, int row) {
 void md_mset(int layer, int col, int row, int tile) {
     (void)layer;
 #ifdef MD_HAVE_MAP
-    if ((unsigned)col < 64u && (unsigned)row < 32u) {
+    // Tile IDs belong to the imported, deduplicated tileset. Reject invalid
+    // values before adding T_MAP, so they cannot address unrelated VRAM.
+    if ((unsigned)col < 64u && (unsigned)row < 32u && (unsigned)tile < MAPT_N) {
         map_ram[row * 64 + col] = (u16)tile;
         VDP_setTileMapXY(BG_B, TILE_ATTR_FULL(PAL2, 0, 0, 0, T_MAP + (u16)tile), (u16)col, (u16)row);
     }

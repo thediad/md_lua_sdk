@@ -270,7 +270,7 @@ export function pngToTilemap(buf) {
     const w = [];
     for (let py = 0; py < 8; py++) {
       let word = 0;
-      for (let px = 0; px < 8; px++) word |= (idxAt(tx * 8 + px, ty * 8 + py) & 0xf) << (px * 4);
+      for (let px = 0; px < 8; px++) word |= (idxAt(tx * 8 + px, ty * 8 + py) & 0xf) << ((7 - px) * 4);
       w.push(word >>> 0);
     }
     return w;

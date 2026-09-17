@@ -194,7 +194,7 @@ certification. Tests use Genesis Plus GX unless otherwise stated.
 | Input | Two players, three/six-button pads, held and new-press queries | Both regions/ports, all buttons, simultaneous input, press/release regression |
 | Sprites | `spr`, flips, palette/priority state, camera | Example builds; pre-scaled rendering has pixel-level regression; ordinary multi-tile sprites consume one entry per tile |
 | Pre-scaled sprites | Build-time variants, `ssprv`, matching literal `sspr` | Exact pixels/flips/transparency; 8-32 pixels per output axis; no runtime resampling |
-| Backgrounds | PNG map import, plane-B display, scrolling, tile access | Asset/build coverage; map wrapper currently owns one imported plane-B map |
+| Backgrounds | PNG map import, plane-B display, scrolling, tile access | Emulator coverage for pixel orientation, tile writes/bounds and source restoration; one imported plane-B map |
 | Byte maps / flags | Mutable bounded map data, flag byte/bit access, `--gff` | Runtime filtering/bounds/import regressions; separate from imported background maps |
 | Bitmap drawing | Pixels, lines, rectangles, circles, clipping | Targeted pixel/rectangle/clip regressions; 256x160 buffer, about 41 KiB RAM |
 | Bitmap clearing/text | True color-buffer clear, pixel-positioned glyphs | Clear/readback/clip/draw-order and multiline regressions |

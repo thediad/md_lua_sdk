@@ -168,6 +168,11 @@ shows and scrolls it.
 `layer` is accepted for cross-SDK parity - there is one asset map today, on
 plane B. `tget`/`tset` track the plane area (up to 64×32 cells).
 
+Imported tile IDs are deduplicated background tiles, not sprite-sheet indices.
+ID 0 is transparent; use `tget` to obtain another cell's tile ID. Invalid tile IDs
+and out-of-range coordinates are ignored by `tset`; invalid `tget` reads return 0.
+`map_show` restores the source rectangle, leaving cells outside it unchanged.
+
 **PICO-8-style in-source maps** also work: declare the map as a hex blob and
 `map()`/`mget()` use it (128 cells wide, like the PICO-8 map):
 

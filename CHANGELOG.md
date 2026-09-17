@@ -6,6 +6,12 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Fixed PNG background tile packing: individual 8x8 tiles are no longer mirrored
+  horizontally. Rebuild ROMs to apply the correction; sprite-sheet packing is unchanged.
+- `tset` now rejects tile IDs outside the imported tileset before touching map RAM
+  or VRAM. Added emulator coverage for asymmetric art, transparent tile zero,
+  invalid IDs/coordinates, boundary cells and `map_show` source restoration.
+
 - Added multiline text in hardware and bitmap modes using long-bracket strings.
   Lines advance eight pixels; LF/CRLF/CR are supported. Cursor advancement now
   counts all lines and wraps within the active display height. Hardware text
@@ -70,9 +76,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ### Validation policy
 
-- The multiline-text validation passed 93 SDK tests with no skips, including
-  headless emulator regressions, starter movement/reset and text layout in both
-  drawing modes. Example screenshots were inspected; the SDL window was not opened.
+- The imported-map validation passed 94 SDK tests with no skips, including
+  emulator checks of pixel orientation, invalid tile writes and map restoration.
+  Starfall was rebuilt and its emulator screenshot inspected. This ROM has no
+  audio assets; listening validation is not part of this check.
 - Run `npm.cmd test` for current results; do not treat historical counts as live status.
 - Physical hardware verification is pending and does not block emulator-focused work.
 - Audio, advanced direct SGDK APIs, and performance under real game workloads

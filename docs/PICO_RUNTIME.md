@@ -211,3 +211,24 @@ wrapping its drawing back to the top. Explicit-position print does not move the 
 
 The shared compiler currently preserves backslash escapes in quoted strings:
 `"A\nB"` does not supply a newline. Use actual line breaks in `[[...]]` as above.
+
+
+### Imported PNG backgrounds
+
+`map_show(0)` displays the `--map` image on plane B. The importer deduplicates
+8x8 tiles and reserves tile ID 0 as transparent. IDs 1 and above are assigned
+in first-occurrence order while scanning the image by tile rows; they are not
+sprite-sheet IDs. Pixel order within each tile matches the source PNG.
+
+`tget(0,col,row)` reads the map shadow within the 64x32 plane. Use a cell's
+`tget` value when copying its tile to another cell with `tset`. `tset` accepts
+only IDs from the imported tileset, including zero to clear a cell. Negative
+or out-of-range IDs and coordinates are ignored; invalid reads return zero.
+Without a map asset, reads return zero and writes do nothing.
+
+Calling `map_show` again restores the source image's cells (cropped to 64x32).
+Cells outside that source rectangle are not reset. The layer argument still
+selects no additional maps: this wrapper owns one imported map on plane B.
+The map shadow tracks these imported-map calls, not direct SGDK plane writes
+or the separate byte-map API. Plane updates are immediate; draw static maps
+once instead of uploading the whole background every frame.

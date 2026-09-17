@@ -6,6 +6,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- `spr`/`spr8` now reject invalid sheet IDs without using hardware sprite slots.
+  Multi-cell sprites skip cells beyond the sheet. Added pixel-level emulator
+  coverage for bounds, transparency, flips and camera offsets.
+
 - Fixed music play-once after standalone PCM: activate XGM2 before applying the
   loop count instead of trusting a stale loaded-driver flag.
 - Fixed SFX channel numbering: Lua channels 2/3 map to the corresponding SGDK
@@ -82,9 +86,9 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ### Validation policy
 
-- The audio-runtime validation passed 95 SDK tests with no skips. NTSC/PAL
-  output checks cover music stop/loop, finite SFX, standalone PCM and play-once
-  after switching drivers. Human listening and physical hardware remain pending.
+- The sprite-bounds validation passed 96 SDK tests with no skips, including
+  pixel checks for invalid IDs, flips, camera offsets and partial source rectangles.
+  Audio-output checks also pass; human listening and physical hardware remain pending.
 - Run `npm.cmd test` for current results; do not treat historical counts as live status.
 - Physical hardware verification is pending and does not block emulator-focused work.
 - Audio, advanced direct SGDK APIs, and performance under real game workloads

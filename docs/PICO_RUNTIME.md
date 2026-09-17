@@ -252,3 +252,22 @@ stopping, finite sound effects, standalone PCM and returning to play-once music.
 They detect sound/silence and completion, not perceived quality or accurate
 instrument timbre. Listening and physical hardware checks remain separate.
 See [audio check](../examples/audio_check/README.md) for a listening ROM.
+
+
+### Sprite sheet bounds
+
+`spr` and `spr8` use zero-based tile IDs within the loaded sprite sheet (or the
+four fallback tiles when no sheet is supplied). An invalid starting ID draws
+nothing and consumes no hardware sprite slots. A multi-cell `spr` whose source
+extends past the sheet draws only its valid cells; missing cells stay empty.
+Flips mirror both the cells and their positions, including those empty areas.
+Tile addressing remains row-major with the sheet width as the row stride.
+
+`spr8` is a sheet-relative tile helper, not an arbitrary VRAM-address API. Use
+SGDK's direct sprite functions if you manage your own VRAM tiles. Ordinary
+multi-cell sprites still consume one hardware sprite entry per visible valid
+cell; this change does not increase the Genesis sprite capacity.
+
+The emulator regression covers invalid IDs without sprite-list exhaustion,
+all four flip combinations, transparent borders, camera offsets and partial
+source rectangles. Physical sprite-limit and scanline behavior remain unverified.

@@ -283,16 +283,19 @@ static void spr_cell(int tile, int sx, int sy, u16 hf, u16 vf) {
 void md_spr(int n, int x, int y, int w, int h, int flip) {
     int cx, cy;
     u16 hf = (flip & 1) ? 1 : 0, vf = (flip & 2) ? 1 : 0;
+    if ((unsigned)n >= SHEET_N) return;
     if (w < 1) w = 1; if (w > 4) w = 4;
     if (h < 1) h = 1; if (h > 4) h = 4;
     x -= cam_x; y -= cam_y;
     for (cy = 0; cy < h; cy++)
         for (cx = 0; cx < w; cx++) {
             int cell = n + (hf ? (w - 1 - cx) : cx) + (vf ? (h - 1 - cy) : cy) * SHEET_W;
-            spr_cell(T_SHEET + cell, x + cx * 8, y + cy * 8, hf, vf);
+            if ((unsigned)cell < SHEET_N)
+                spr_cell(T_SHEET + cell, x + cx * 8, y + cy * 8, hf, vf);
         }
 }
 void md_spr8(int t, int x, int y, int flip) {
+    if ((unsigned)t >= SHEET_N) return;
     spr_cell(T_SHEET + t, x - cam_x, y - cam_y, (flip & 1) ? 1 : 0, (flip & 2) ? 1 : 0);
 }
 // Unscaled, aligned sspr calls; scaled requests use md_sspr_variant.

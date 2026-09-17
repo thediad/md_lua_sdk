@@ -192,7 +192,7 @@ certification. Tests use Genesis Plus GX unless otherwise stated.
 |---|---|---|
 | Build | Lua to padded/checksummed `.bin`, bundled WASM toolchain | ROM builds and determinism tests; project CLI tested without external preload |
 | Input | Two players, three/six-button pads, held and new-press queries | Both regions/ports, all buttons, simultaneous input, press/release regression |
-| Sprites | `spr`, flips, palette/priority state, camera | Example builds; pre-scaled rendering has pixel-level regression; ordinary multi-tile sprites consume one entry per tile |
+| Sprites | `spr`, flips, palette/priority state, camera | Pixel regressions for sheet bounds, flips, transparency and camera; ordinary multi-tile sprites consume one entry per visible valid tile |
 | Pre-scaled sprites | Build-time variants, `ssprv`, matching literal `sspr` | Exact pixels/flips/transparency; 8-32 pixels per output axis; no runtime resampling |
 | Backgrounds | PNG map import, plane-B display, scrolling, tile access | Emulator coverage for pixel orientation, tile writes/bounds and source restoration; one imported plane-B map |
 | Byte maps / flags | Mutable bounded map data, flag byte/bit access, `--gff` | Runtime filtering/bounds/import regressions; separate from imported background maps |

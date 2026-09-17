@@ -133,11 +133,15 @@ queued into a per-frame display list, not CPU-blitted.
 | Call | What |
 |---|---|
 | `spr(n,x,y,[w,h],[fx,fy])` | draw sheet cell `n`; `w,h` in 8px cells (1-4); flips are free |
-| `spr8(t,x,y,[flip])` | an 8×8 sprite from a raw tile index (bullets, pickups) |
+| `spr8(t,x,y,[flip])` | an 8×8 sprite from a sheet-relative tile index (bullets, pickups) |
 | `spr_pal(line)` | palette line (0-3) for subsequent sprites; default 1 (the sheet line) |
 | `spr_prio(p)` | 1 = in front of high-priority plane tiles (default), 0 = behind |
 | `sspr(sx,sy,sw,sh,dx,dy,[dw,dh],[fx,fy])` | aligned unscaled rectangle or declared pre-scaled variant |
 | `ssprv(id,x,y,[fx,fy])` | draw a declared variant; returns false if invalid, offscreen, or sprite list full |
+
+Invalid sprite IDs draw nothing and use no hardware slots. Multi-cell sprites
+skip source cells beyond the sheet; flips preserve those empty positions.
+`spr8` indices are relative to the sheet, not raw VRAM addresses.
 
 - `n` counts 8×8 cells across the sheet PNG, row-major. A multi-cell `spr()`
   composes `w*h` 1×1 hardware sprites (each costs part of the 80 budget).

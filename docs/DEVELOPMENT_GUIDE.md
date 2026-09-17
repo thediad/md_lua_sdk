@@ -201,7 +201,7 @@ certification. Tests use Genesis Plus GX unless otherwise stated.
 | Bitmap timing | Border timing adaptation | Full-image animated NTSC/PAL regression; user confirmed static diagnostic flicker fix in BlastEm |
 | Numbers / clocks | Fractional print, simulation and elapsed clocks | Formatting and slow-draw NTSC/PAL clock regressions |
 | Saves | 128 slots, 254 payload bytes per slot, array-capacity clamping | Empty/boundary/invalid-count tests, dynamic count evaluated once, SRAM export/reload regression |
-| Sound | PCM SFX and XGM2 music asset pipeline | Conversion/build tests; no claim of comprehensive listening validation |
+| Sound | PCM SFX and XGM2 music asset pipeline | NTSC/PAL audio-output checks for music stop/loop, PCM, SFX and driver switching; listening validation pending |
 | Direct SGDK calls | Generated descriptors and selected callback examples | Coverage varies by API; availability does not imply runtime verification |
 
 ## Hardware drawing versus bitmap drawing

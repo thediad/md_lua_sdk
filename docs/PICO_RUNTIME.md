@@ -232,3 +232,23 @@ selects no additional maps: this wrapper owns one imported map on plane B.
 The map shadow tracks these imported-map calls, not direct SGDK plane writes
 or the separate byte-map API. Plane updates are immediate; draw static maps
 once instead of uploading the whole background every frame.
+
+
+### Audio playback and driver switching
+
+`music(n)` plays a bank entry with looping enabled; `music(n,false)` plays once
+and `music(-1)` stops the music. The source VGM must contain a loop point for
+looping to repeat it. `sfx(n,2)` and `sfx(n,3)` select XGM2 PCM channels 2 and 3;
+the omitted channel and other channel values use channel 3. Channel 1 is left
+for music. These Lua channel numbers are distinct from SGDK's zero-based enums.
+
+`pcm_play` uses SGDK's standalone PCM driver. It replaces XGM2 on the Z80 and
+interrupts its playback; it cannot mix with XGM2 music. Use `sfx` for simultaneous
+music and effects. Sequential switching is supported: the wrappers activate
+the required driver before applying settings, including music's loop count.
+
+Automated Genesis Plus GX tests in NTSC and PAL measure output for looping,
+stopping, finite sound effects, standalone PCM and returning to play-once music.
+They detect sound/silence and completion, not perceived quality or accurate
+instrument timbre. Listening and physical hardware checks remain separate.
+See [audio check](../examples/audio_check/README.md) for a listening ROM.

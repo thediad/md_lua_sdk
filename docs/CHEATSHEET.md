@@ -379,7 +379,7 @@ end
 | Call | What |
 |---|---|
 | `music(n,[loop])` | play song `n` from the `--music` bank (YM2612 FM + PSG, driven by the Z80 XGM2 driver). `music(-1)` stops. `loop` defaults ON; `music(n,false)` plays once |
-| `sfx(n,[ch])` | play PCM sample `n` from the `--sfx` bank; `ch` picks XGM2 PCM channel 2-4 (default 3) |
+| `sfx(n,[ch])` | play PCM sample `n` from the `--sfx` bank; `ch` picks XGM2 PCM channel 2 or 3 (default 3; other values fall back to 3) |
 
 - `--music a.vgm,b.vgm` builds the song bank - bank order is the `music(n)`
   index. `.vgm` comes from any Mega Drive tracker (DefleMask, Furnace:
@@ -405,13 +405,14 @@ end
 ### Raw PCM - SGDK's `SND_PCM` driver
 
 Distinct from the XGM2 path above. `SND_PCM` is SGDK's standalone single-channel
-PCM player. It and XGM2 both own the Z80, so **pick one per cart** - use these
-verbs *instead of* `sfx`/`music`, not alongside.
+PCM player. It and XGM2 both own the Z80: switching drivers interrupts the
+previous playback. Use `sfx` for effects over music. Sequential switching is
+supported; `music(n,false)` still plays once after standalone PCM.
 
 | Call | What |
 |---|---|
-| `pcm_play(n,[rate],[loop])` | load the driver (once) + play `--sfx` blob `n`. `rate` is a `SoundPcmSampleRate` (3 = 13.4 kHz, matches the bank); `loop` is a flag |
-| `pcm_driver()` | load the Z80 PCM driver once (call before raw `SND_PCM_*`) |
+| `pcm_play(n,[rate],[loop])` | ensure the driver is active + play `--sfx` blob `n`. `rate` is a `SoundPcmSampleRate` (3 = 13.4 kHz, matches the bank); `loop` is a flag |
+| `pcm_driver()` | activate the Z80 PCM driver (call before raw `SND_PCM_*`) |
 | `pcm_sample(n)` / `pcm_len(n)` | ROM pointer + byte length of `--sfx` blob `n` |
 
 ```lua

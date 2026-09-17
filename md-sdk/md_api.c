@@ -65,7 +65,6 @@ static u16 cur_color = 7;            // color() state for optional color args
 static u16 cur_col_t, cur_row_t;     // print cursor (tile coords)
 static s16 clip_x0 = 0, clip_y0 = 0, clip_x1 = 319, clip_y1 = 223;
 static u16 hud_rows;               // WINDOW-plane HUD strip (md_hud)
-static u16 xgm_up = 0;                 // XGM2 driver loaded (music/pcm sfx)
 static s16 txt_cache[2] = { -1, -1 };
 static u16 txt_next = 0;
 // CRAM shadow: mid-frame direct PAL_setColor RACES the vblank DMA queue (the
@@ -587,25 +586,28 @@ void md_run(void) { SYS_hardReset(); }
 extern const unsigned char *const md_song_bank[];
 extern const int md_song_count;
 void md_music(int n, int loop) {
-    if (!xgm_up) { XGM2_loadDriver(TRUE); xgm_up = 1; }
+    // SGDK checks the currently loaded driver. PCM or direct SGDK calls may
+    // have replaced XGM2 since the previous song; load before setting loops.
+    XGM2_loadDriver(TRUE);
     if (n < 0) { XGM2_stop(); return; }
     if (md_song_count <= 0) return;
     if (n >= md_song_count) n = md_song_count - 1;
     XGM2_setLoopNumber(loop ? -1 : 0);
     XGM2_play(md_song_bank[n]);
 }
-// sfx: PCM samples through XGM2 (channels 2-4; music may own 1) when a --sfx
+// sfx: PCM samples through XGM2 (channels 2-3; music may own 1) when a --sfx
 // bank exists; PSG blip fallback otherwise. 8-bit signed 13.3 kHz, 256-aligned.
 extern const unsigned char *const md_sfx_bank[];
 extern const unsigned long md_sfx_len[];
 extern const int md_sfx_count;
 void md_sfx(int n, int ch) {
     if (md_sfx_count > 0) {
-        SoundPCMChannel chan = (ch >= 2 && ch <= 4) ? (SoundPCMChannel)ch : SOUND_PCM_CH3;
+        // Lua channel numbers are one-based; SGDK enums are zero-based.
+        SoundPCMChannel chan = ch == 2 ? SOUND_PCM_CH2 : SOUND_PCM_CH3;
         int idx = n;
         if (idx < 0) idx = 0;
         if (idx >= md_sfx_count) idx = md_sfx_count - 1;
-        if (!xgm_up) { XGM2_loadDriver(TRUE); xgm_up = 1; }
+        XGM2_loadDriver(TRUE);
         XGM2_playPCM(md_sfx_bank[idx], md_sfx_len[idx], chan);
         return;
     }
@@ -620,8 +622,7 @@ void md_sfx(int n, int ch) {
 // ---- raw PCM (SGDK single-channel SND_PCM driver) -----------------------------
 // The same --sfx blobs, but played by SGDK's standalone Z80 PCM driver instead
 // of XGM2. pcm_sample/pcm_len hand the ROM blob to SND_PCM_startPlay; pcm_driver
-// loads it once; pcm_play is the whole-recipe convenience wrapper.
-static u16 pcm_up = 0;
+// ensures it is active; pcm_play is the whole-recipe convenience wrapper.
 int md_pcm_sample(int n) {
     int idx = n;
     if (md_sfx_count <= 0) return 0;
@@ -637,7 +638,7 @@ int md_pcm_len(int n) {
     return (int)md_sfx_len[idx];
 }
 void md_pcm_driver(void) {
-    if (!pcm_up) { SND_PCM_loadDriver(TRUE); pcm_up = 1; }
+    SND_PCM_loadDriver(TRUE);
 }
 void md_pcm_play(int n, int rate, int loop) {
     if (md_sfx_count <= 0) return;

@@ -6,6 +6,12 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Fixed music play-once after standalone PCM: activate XGM2 before applying the
+  loop count instead of trusting a stale loaded-driver flag.
+- Fixed SFX channel numbering: Lua channels 2/3 map to the corresponding SGDK
+  enums; unsupported values fall back to channel 3. XGM2 has three PCM channels.
+- Added NTSC/PAL audio-output regressions and a synthetic-tone listening example.
+
 - Fixed PNG background tile packing: individual 8x8 tiles are no longer mirrored
   horizontally. Rebuild ROMs to apply the correction; sprite-sheet packing is unchanged.
 - `tset` now rejects tile IDs outside the imported tileset before touching map RAM
@@ -76,10 +82,9 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ### Validation policy
 
-- The imported-map validation passed 94 SDK tests with no skips, including
-  emulator checks of pixel orientation, invalid tile writes and map restoration.
-  Starfall was rebuilt and its emulator screenshot inspected. This ROM has no
-  audio assets; listening validation is not part of this check.
+- The audio-runtime validation passed 95 SDK tests with no skips. NTSC/PAL
+  output checks cover music stop/loop, finite SFX, standalone PCM and play-once
+  after switching drivers. Human listening and physical hardware remain pending.
 - Run `npm.cmd test` for current results; do not treat historical counts as live status.
 - Physical hardware verification is pending and does not block emulator-focused work.
 - Audio, advanced direct SGDK APIs, and performance under real game workloads

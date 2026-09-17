@@ -212,6 +212,13 @@ The main display is 320x224. A PNG sheet uses row-major 8x8 tiles:
 Export an 8-bit-per-channel PNG with dimensions divisible by eight and no more
 than 15 opaque colors plus transparency per imported palette.
 
+The default hardware layout has room for 1,424 asset tiles (45,568 bytes)
+shared by the sprite sheet, deduplicated background tiles and pre-scaled variants.
+SGDK's system tiles, font and display tables are reserved separately. A sheet
+uses every 8x8 cell; a map counts unique tiles plus its transparent tile. Builds
+that exceed this combined budget fail and leave the previous ROM intact.
+Changing the VRAM layout with direct SGDK calls requires managing that layout yourself.
+
 Pixel/shape drawing activates the software bitmap engine. It has a different
 memory/VRAM budget and lower full-buffer refresh throughput. Pre-scaled sprite
 assets cannot currently share its VRAM layout. `camera` affects the hardware

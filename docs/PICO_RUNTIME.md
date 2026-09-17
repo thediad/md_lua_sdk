@@ -294,3 +294,17 @@ required to finish and reach subsequent drawing within 240 NTSC video frames.
 This is a regression ceiling, not a frame-rate promise: midpoint stepping still
 scales with radius, and large circles can span multiple video frames. Prefer
 `cls` or `rectfill` for full-screen fills.
+
+
+### Shared hardware tile budget
+
+Every hardware asset configuration is checked against the default VRAM layout,
+including builds without pre-scaled variants. The pinned SGDK reserves 16 system
+tiles and 96 font tiles below the display tables at 0xC000. This leaves 1,424
+32-byte asset tiles for the sheet, imported map and variants together. Without
+a sheet, the four fallback tiles also count. Imported maps include tile zero.
+
+The runtime's compile-time guard respects SGDK's configured font placement.
+An oversized build reports a tile VRAM error and does not replace the existing
+output ROM. This protects the default layout; it does not validate custom
+runtime VRAM allocations or make bitmap drawing compatible with pre-scaled assets.

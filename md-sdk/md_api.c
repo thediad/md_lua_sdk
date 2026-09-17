@@ -36,10 +36,19 @@ static const u32 P8_RGB[16] = {
 #endif
 #define T_VARIANTS (T_MAP + MAPT_N)
 #ifdef MD_HAVE_SPRITE_VARIANTS
-// Default SGDK plane tables begin at 0xC000. Do not overwrite them.
-#if (T_VARIANTS + sprite_variant_tiles_count) * 32 > 0xC000
-#error "sheet + map + pre-scaled sprites exceed the default tile VRAM region"
+#define VARIANTS_N sprite_variant_tiles_count
+#else
+#define VARIANTS_N 0
 #endif
+// Default plane tables start at 0xC000. Legacy SGDK puts its font just
+// below them; newer configurations reserve it below TILE_USER_INDEX instead.
+#if LEGACY_FONT_LOCATION
+#define ASSET_TILE_LIMIT ((0xC000 / 32) - FONT_LENGTH)
+#else
+#define ASSET_TILE_LIMIT (0xC000 / 32)
+#endif
+#if T_VARIANTS + VARIANTS_N > ASSET_TILE_LIMIT
+#error "sheet + map + pre-scaled sprites exceed the default tile VRAM region (font space reserved)"
 #endif
 
 #ifndef MD_HAVE_SHEET

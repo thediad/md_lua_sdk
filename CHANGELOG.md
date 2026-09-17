@@ -6,6 +6,12 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Applied the combined tile VRAM guard to ordinary sheet/map builds as well as
+  pre-scaled variants, reserving the pinned SGDK font region. The default asset
+  capacity is 1,424 tiles. Rejected builds preserve the prior output ROM.
+- Fixed toolchain error reporting to consume the parser's issue array, so the
+  actual error is shown instead of the final lines of a noisy compilation log.
+
 - Recorded successful user listening validation of `audio_check` in BlastEm:
   music stop/loop, both SFX channels, standalone PCM followed by play-once music,
   and effects over looping music. Physical hardware remains unverified.
@@ -100,8 +106,9 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ### Validation policy
 
-- The sprite-list validation passed 99 SDK tests with no skips, including
-  full/empty/single-sprite transitions, list overflow and repeated reuse.
+- The VRAM-budget validation passed 100 SDK tests with no skips, including
+  exact-capacity builds, oversized assets, clear diagnostics and preservation
+  of the previous output after failure.
   Audio-output checks pass; the user confirmed the audio-check sequence in BlastEm.
   Physical hardware verification remains pending.
 - Run `npm.cmd test` for current results; do not treat historical counts as live status.

@@ -124,8 +124,8 @@ export async function buildMd(entryLua, outPath, opts = {}) {
 
   const r = await buildGenesisC({ sources, headers, sgdk: true });
   if (!r.ok) {
-    const parsed = parseBuildLog ? parseBuildLog(r.log) : null;
-    const detail = parsed?.errors?.map((e) => `${e.file}:${e.line}: ${e.message}`).join("\n") || r.log.slice(-2000);
+    const errors = parseBuildLog(r.log).filter((issue) => issue.severity === "error");
+    const detail = errors.map((e) => `${e.file ?? r.stage}${e.line ? `:${e.line}` : ""}: ${e.message}`).join("\n") || r.log.slice(-2000);
     throw new Error(`mdlua: ${r.stage} failed\n${detail}`);
   }
   const rom = finalizeGenesisRom(r.binary);

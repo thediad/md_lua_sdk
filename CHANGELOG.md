@@ -6,6 +6,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Optimized `circfill` to skip invisible rows and fill bounded packed spans.
+  Preserved midpoint-circle pixels and clipping; added emulator coverage for
+  small/edge-crossing circles and completion of a radius-32767 draw.
+
 - Fixed large bitmap clip rectangles overflowing their 16-bit stored bounds.
   Clip results are bounded to the bitmap before storage; off-screen and empty
   intersections remain empty. Added an emulator regression for boundary cases.
@@ -90,8 +94,8 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ### Validation policy
 
-- The clip-bounds validation passed 97 SDK tests with no skips, including
-  large/negative/off-screen clip rectangles and empty intersections in the emulator.
+- The filled-circle validation passed 98 SDK tests with no skips, including
+  exact pixel comparisons and a large-radius completion check in the emulator.
   Audio-output checks also pass; human listening and physical hardware remain pending.
 - Run `npm.cmd test` for current results; do not treat historical counts as live status.
 - Physical hardware verification is pending and does not block emulator-focused work.

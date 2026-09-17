@@ -262,13 +262,22 @@ void md_circ(int cx, int cy, int r, int color) {
 }
 void md_circfill(int cx, int cy, int r, int color) {
     int x = r, y = 0, err = 1 - r;
-    u16 col = resolve_color(color);
+    int top = clip_y0 > 0 ? clip_y0 : 0;
+    int bottom = clip_y1 < 159 ? clip_y1 : 159;
     bmp_ensure();
-    if (r < 0) return;
+    if (r < 0 || top > bottom || clip_x0 > clip_x1 ||
+        cx + r < 0 || cx - r > 255 || cy + r < top || cy - r > bottom) return;
     while (x >= y) {
-        int i;
-        for (i = cx - x; i <= cx + x; i++) { plot_clip(i, cy + y, col); plot_clip(i, cy - y, col); }
-        for (i = cx - y; i <= cx + y; i++) { plot_clip(i, cy + x, col); plot_clip(i, cy - x, col); }
+        // Bound each span before touching pixels and fill packed bytes.
+        // Keep the midpoint stepping so existing circle outlines are unchanged.
+        if (cy + y >= top && cy + y <= bottom)
+            md_rectfill(cx - x, cy + y, cx + x, cy + y, color);
+        if (y && cy - y >= top && cy - y <= bottom) md_rectfill(cx - x, cy - y, cx + x, cy - y, color);
+        if (x != y) {
+            if (cy + x >= top && cy + x <= bottom)
+                md_rectfill(cx - y, cy + x, cx + y, cy + x, color);
+            if (x && cy - x >= top && cy - x <= bottom) md_rectfill(cx - y, cy - x, cx + y, cy - x, color);
+        }
         y++;
         if (err < 0) err += 2 * y + 1;
         else { x--; err += 2 * (y - x) + 1; }

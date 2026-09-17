@@ -196,7 +196,7 @@ certification. Tests use Genesis Plus GX unless otherwise stated.
 | Pre-scaled sprites | Build-time variants, `ssprv`, matching literal `sspr` | Exact pixels/flips/transparency; 8-32 pixels per output axis; no runtime resampling |
 | Backgrounds | PNG map import, plane-B display, scrolling, tile access | Emulator coverage for pixel orientation, tile writes/bounds and source restoration; one imported plane-B map |
 | Byte maps / flags | Mutable bounded map data, flag byte/bit access, `--gff` | Runtime filtering/bounds/import regressions; separate from imported background maps |
-| Bitmap drawing | Pixels, lines, rectangles, circles, clipping | Targeted pixel/rectangle/clip regressions, including large clip dimensions; 256x160 buffer, about 41 KiB RAM |
+| Bitmap drawing | Pixels, lines, rectangles, circles, clipping | Pixel regressions for circles, rectangles and clipping, including large dimensions; 256x160 buffer, about 41 KiB RAM |
 | Bitmap clearing/text | True color-buffer clear, pixel-positioned glyphs | Clear/readback/clip/draw-order and multiline regressions |
 | Bitmap timing | Border timing adaptation | Full-image animated NTSC/PAL regression; user confirmed static diagnostic flicker fix in BlastEm |
 | Numbers / clocks | Fractional print, simulation and elapsed clocks | Formatting and slow-draw NTSC/PAL clock regressions |

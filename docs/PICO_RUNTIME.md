@@ -274,3 +274,18 @@ cell; this change does not increase the Genesis sprite capacity.
 The emulator regression covers invalid IDs without sprite-list exhaustion,
 all four flip combinations, transparent borders, camera offsets and partial
 source rectangles. Physical sprite-limit and scanline behavior remain unverified.
+
+
+### Filled-circle work bounds
+
+`circfill` keeps the existing midpoint-circle shape, but fills visible horizontal
+spans through the packed rectangle-fill path. It skips rows outside the clip
+and bitmap instead of iterating over their pixels. Negative radii draw nothing;
+a zero radius draws one pixel. Completely off-screen circles are rejected early.
+
+Pixel-level emulator coverage compares the result with the original algorithm
+for small, clipped and edge-crossing circles. A radius-32767 circle is also
+required to finish and reach subsequent drawing within 240 NTSC video frames.
+This is a regression ceiling, not a frame-rate promise: midpoint stepping still
+scales with radius, and large circles can span multiple video frames. Prefer
+`cls` or `rectfill` for full-screen fills.

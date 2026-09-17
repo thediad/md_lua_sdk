@@ -404,3 +404,48 @@ ${bitmap ? "" : "function _draw() end"}
     } finally { host.unloadMedia(); }
   }
 });
+
+
+test("large clip rectangles clamp before narrowing and preserve empty intersections",async()=>{
+  const work=await mkdtemp(path.join(tmpdir(),"mdlua-wide-clip-"));
+  const source=path.join(work,"main.lua"),rom=path.join(work,"clip.bin");
+  const cases=[
+    {args:[8,9,32767,32767],box:[8,9,255,159]},
+    {args:[-10,-12,32767,32767],box:[0,0,255,159]},
+    {args:[32767,0,32767,160]},
+    {args:[0,32767,256,32767]},
+    {args:[-32768,0,32767,160]},
+    {args:[8,9,0,32767]},
+    {args:[8,9,32767,-1]},
+    {before:[20,30,10,12],args:[8,9,32767,32767,true],box:[20,30,29,41]},
+    {before:[0,0,0,0],args:[8,9,32767,32767,true]},
+  ];
+  const checks=cases.map(({args,box,before})=>{
+    const points=[[0,0],[7,9],[8,8],[8,9],[255,159],[20,30],[29,41],[30,42],[255,0],[0,159]];
+    return `cls(0)\nclip()\n${before?`clip(${before.join(",")})`:""}\nclip(${args.join(",")})\nrectfill(0,0,255,159,11)\n`+
+      points.map(([x,y])=>`if pget(${x},${y})~=${box && x>=box[0] && y>=box[1] && x<=box[2] && y<=box[3]?11:0} then passed=0 end`).join("\n");
+  }).join("\n");
+  await writeFile(source,`local passed=1
+function _init()
+  pset(0,0,0)
+  ${checks}
+  clip()
+end
+function _draw()
+  cls(0)
+  rectfill(240,0,247,7,11)
+  if passed==1 then rectfill(8,8,31,15,11) else rectfill(8,8,31,15,8) end
+end
+`);
+  await buildMd(source,rom);
+  const host=new LibretroHost({saveDir:work});
+  try {
+    await host.loadCore(core.jsPath,core.wasmPath);
+    await host.loadMedia({platform:"genesis",path:rom});
+    host.stepFrames(240);
+    const {width,rgba}=host.screenshotRgba();
+    const pixel=(x,y)=>Array.from(rgba.slice(((y+32)*width+x+32)*4,((y+32)*width+x+32)*4+3));
+    assert.notDeepEqual(pixel(242,2),pixel(100,100),"reference must be visible");
+    assert.deepEqual(pixel(10,10),pixel(242,2),"large clip and intersection checks must pass");
+  } finally {host.unloadMedia();}
+});

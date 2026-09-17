@@ -185,6 +185,17 @@ void md_clip(int x, int y, int w, int h, int previous) {
         if (x1 > clip_x1) x1 = clip_x1;
         if (y1 > clip_y1) y1 = clip_y1;
     }
+    // Clamp before storing in s16: valid Lua sizes can put x+w/y+h past
+    // 32767, which otherwise wraps and turns a visible clip into an empty one.
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (x1 > 255) x1 = 255;
+    if (y1 > 159) y1 = 159;
+    if (x > x1 || y > y1) {
+        clip_x0 = clip_y0 = 0;
+        clip_x1 = clip_y1 = -1;
+        return;
+    }
     clip_x0 = (s16)x; clip_y0 = (s16)y; clip_x1 = (s16)x1; clip_y1 = (s16)y1;
 }
 void md_line(int x0, int y0, int x1, int y1, int color) {

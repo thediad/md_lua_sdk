@@ -6,6 +6,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Fixed large bitmap clip rectangles overflowing their 16-bit stored bounds.
+  Clip results are bounded to the bitmap before storage; off-screen and empty
+  intersections remain empty. Added an emulator regression for boundary cases.
+
 - `spr`/`spr8` now reject invalid sheet IDs without using hardware sprite slots.
   Multi-cell sprites skip cells beyond the sheet. Added pixel-level emulator
   coverage for bounds, transparency, flips and camera offsets.
@@ -86,8 +90,8 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ### Validation policy
 
-- The sprite-bounds validation passed 96 SDK tests with no skips, including
-  pixel checks for invalid IDs, flips, camera offsets and partial source rectangles.
+- The clip-bounds validation passed 97 SDK tests with no skips, including
+  large/negative/off-screen clip rectangles and empty intersections in the emulator.
   Audio-output checks also pass; human listening and physical hardware remain pending.
 - Run `npm.cmd test` for current results; do not treat historical counts as live status.
 - Physical hardware verification is pending and does not block emulator-focused work.

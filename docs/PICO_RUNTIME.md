@@ -106,7 +106,10 @@ serves explicit-position and cursor printing.
 
 `clip()` resets bitmap clipping. `clip(x,y,w,h)` replaces the rectangle;
 `clip(x,y,w,h,true)` intersects it with the previous rectangle. A zero or
-negative width/height creates an empty rectangle. This clips bitmap pixels
+negative width/height creates an empty rectangle. The result is bounded to the
+256x160 bitmap before storage, so large widths/heights do not wrap at 32767.
+Completely off-screen rectangles stay empty, including after intersection.
+This clips bitmap pixels
 and shapes, including bitmap text, but not hardware sprites, tilemaps, or
 hardware text.
 

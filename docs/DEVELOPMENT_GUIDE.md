@@ -192,7 +192,7 @@ certification. Tests use Genesis Plus GX unless otherwise stated.
 |---|---|---|
 | Build | Lua to padded/checksummed `.bin`, bundled WASM toolchain | ROM builds and determinism tests; project CLI tested without external preload |
 | Input | Two players, three/six-button pads, held and new-press queries | Both regions/ports, all buttons, simultaneous input, press/release regression |
-| Sprites | `spr`, flips, palette/priority state, camera | Pixel regressions for sheet bounds, flips, transparency and camera; ordinary multi-tile sprites consume one entry per visible valid tile |
+| Sprites | `spr`, flips, palette/priority state, camera | Pixel regressions for bounds/flips/camera and 80-entry list overflow, clearing and reuse; one entry per visible valid tile |
 | Pre-scaled sprites | Build-time variants, `ssprv`, matching literal `sspr` | Exact pixels/flips/transparency; 8-32 pixels per output axis; no runtime resampling |
 | Backgrounds | PNG map import, plane-B display, scrolling, tile access | Emulator coverage for pixel orientation, tile writes/bounds and source restoration; one imported plane-B map |
 | Byte maps / flags | Mutable bounded map data, flag byte/bit access, `--gff` | Runtime filtering/bounds/import regressions; separate from imported background maps |
@@ -201,7 +201,7 @@ certification. Tests use Genesis Plus GX unless otherwise stated.
 | Bitmap timing | Border timing adaptation | Full-image animated NTSC/PAL regression; user confirmed static diagnostic flicker fix in BlastEm |
 | Numbers / clocks | Fractional print, simulation and elapsed clocks | Formatting and slow-draw NTSC/PAL clock regressions |
 | Saves | 128 slots, 254 payload bytes per slot, array-capacity clamping | Empty/boundary/invalid-count tests, dynamic count evaluated once, SRAM export/reload regression |
-| Sound | PCM SFX and XGM2 music asset pipeline | NTSC/PAL audio-output checks for music stop/loop, PCM, SFX and driver switching; listening validation pending |
+| Sound | PCM SFX and XGM2 music asset pipeline | NTSC/PAL output checks; user confirmed audio-check sequence in BlastEm (music stop/loop, PCM, both SFX channels and effects over music) |
 | Direct SGDK calls | Generated descriptors and selected callback examples | Coverage varies by API; availability does not imply runtime verification |
 
 ## Hardware drawing versus bitmap drawing

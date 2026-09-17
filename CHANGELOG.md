@@ -6,6 +6,12 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Recorded successful user listening validation of `audio_check` in BlastEm:
+  music stop/loop, both SFX channels, standalone PCM followed by play-once music,
+  and effects over looping music. Physical hardware remains unverified.
+- Added a sprite-list lifecycle regression for 80 entries, overflow, clearing
+  all sprites and repeated reuse; existing runtime behavior passed unchanged.
+
 - Optimized `circfill` to skip invisible rows and fill bounded packed spans.
   Preserved midpoint-circle pixels and clipping; added emulator coverage for
   small/edge-crossing circles and completion of a radius-32767 draw.
@@ -94,9 +100,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ### Validation policy
 
-- The filled-circle validation passed 98 SDK tests with no skips, including
-  exact pixel comparisons and a large-radius completion check in the emulator.
-  Audio-output checks also pass; human listening and physical hardware remain pending.
+- The sprite-list validation passed 99 SDK tests with no skips, including
+  full/empty/single-sprite transitions, list overflow and repeated reuse.
+  Audio-output checks pass; the user confirmed the audio-check sequence in BlastEm.
+  Physical hardware verification remains pending.
 - Run `npm.cmd test` for current results; do not treat historical counts as live status.
 - Physical hardware verification is pending and does not block emulator-focused work.
 - Audio, advanced direct SGDK APIs, and performance under real game workloads

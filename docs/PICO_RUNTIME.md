@@ -253,7 +253,10 @@ the required driver before applying settings, including music's loop count.
 Automated Genesis Plus GX tests in NTSC and PAL measure output for looping,
 stopping, finite sound effects, standalone PCM and returning to play-once music.
 They detect sound/silence and completion, not perceived quality or accurate
-instrument timbre. Listening and physical hardware checks remain separate.
+instrument timbre. The user also completed the audio-check sequence successfully
+in BlastEm: stop, both effect channels, standalone PCM followed by play-once
+music, looping restart, and effects over music. This confirms that synthetic-tone
+example, not arbitrary music assets or physical hardware.
 See [audio check](../examples/audio_check/README.md) for a listening ROM.
 
 
@@ -273,7 +276,9 @@ cell; this change does not increase the Genesis sprite capacity.
 
 The emulator regression covers invalid IDs without sprite-list exhaustion,
 all four flip combinations, transparent borders, camera offsets and partial
-source rectangles. Physical sprite-limit and scanline behavior remain unverified.
+source rectangles. An additional regression checks all 80 sprite entries, the ignored 81st entry,
+empty frames and repeated list reuse. These tests spread sprites across rows;
+scanline overflow and physical hardware behavior remain unverified.
 
 
 ### Filled-circle work bounds

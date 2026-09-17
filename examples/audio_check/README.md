@@ -19,4 +19,8 @@ button names; keyboard mappings depend on the emulator.
 Report missing sound, effects that never stop, or A looping after C. The assets
 are generated sine-wave WAV and PSG-tone VGM fixtures, not borrowed game audio.
 Automated tests check sound/silence and duration in NTSC and PAL. Listening is
-still needed to assess clicks, distortion and real emulator audio output.
+used to assess clicks, distortion and real emulator audio output.
+
+User validation: the full sequence above succeeded in BlastEm, including effects
+on both channels after stopping music and effects over looping music. Physical
+hardware and other music/sample assets have not been confirmed by this check.

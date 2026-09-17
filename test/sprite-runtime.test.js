@@ -62,3 +62,55 @@ end
       assert.deepEqual(pixel(80+x,96+y),pixel(24+x,56+y),"spr8 uses the same sheet tiles");
   } finally {host.unloadMedia();}
 });
+
+
+test("sprite lists handle 80 entries, overflow, empty frames and reuse",async()=>{
+  const work=await mkdtemp(path.join(tmpdir(),"mdlua-sprite-list-"));
+  const source=path.join(work,"main.lua"),rom=path.join(work,"list.bin");
+  await writeFile(source,`local mode=0
+function _init() cls(0) end
+function _update60()
+  if btnp(4) then mode=1 end
+  if btnp(5) then mode=2 end
+  if btnp(6) then mode=0 end
+end
+function _draw()
+  if mode==0 then
+    for i=0,79 do spr(0,8+(i%10)*24,8+(i\\10)*20) end
+    spr(0,280,200)
+  end
+  if mode==2 then spr(0,280,200) end
+end
+`);
+  await buildMd(source,rom);
+  const host=new LibretroHost({saveDir:work});
+  try {
+    await host.loadCore(core.jsPath,core.wasmPath);
+    await host.loadMedia({platform:"genesis",path:rom});
+    host.stepFrames(60);
+    const snapshot=()=>{
+      const {width,rgba}=host.screenshotRgba();
+      return (x,y)=>Array.from(rgba.slice((y*width+x)*4,(y*width+x)*4+3));
+    };
+    const initial=snapshot(),blank=initial(300,220),color=initial(10,10);
+    assert.notDeepEqual(color,blank,"first sprite visible");
+    const check=(mode)=>{
+      const pixel=snapshot();
+      for(let i=0;i<80;i++)assert.deepEqual(pixel(10+(i%10)*24,10+Math.floor(i/10)*20),mode===0?color:blank,`mode ${mode} entry ${i}`);
+      assert.deepEqual(pixel(282,202),mode===2?color:blank,"overflow/reused sprite");
+    };
+    const press=(key)=>{
+      host.setInput({ports:[{[key]:true},{}]});host.stepFrames(4);
+      host.setInput({ports:[{},{}]});host.stepFrames(4);
+    };
+    check(0);
+    for(let round=0;round<2;round++) {
+      press("b");check(1);
+      host.stepFrames(20);check(1);
+      press("a");check(2);
+      press("y");check(0);
+      press("a");check(2);
+      press("y");check(0);
+    }
+  } finally {host.unloadMedia();}
+});

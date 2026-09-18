@@ -6,6 +6,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Finished ROMs now replace the output via a same-directory temporary file.
+  Failed writes/replacements preserve the prior ROM, and normal failure paths
+  remove the temporary file. Tests include a write interrupted after some bytes.
+
 - Recorded successful user verification of Problems-panel navigation and rebuilding
   after correcting a Lua error.
 - Project JSON syntax/validation errors now use clickable absolute source
@@ -134,6 +138,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
   supports its lowering. Genesis development retains save/load only.
 
 ### Validation policy
+
+- ROM replacement passed 14 focused checks, including partial-write failure,
+  replacement failure, CLI builds, output collision checks and starter emulator
+  movement/reset. Runtime rendering code was unchanged.
 
 - The subsequent project-diagnostics change passed 11 focused project, starter,
   output-path and emulator checks; the full runtime suite was not repeated for

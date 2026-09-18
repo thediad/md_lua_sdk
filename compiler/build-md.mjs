@@ -8,10 +8,11 @@
 // Unlike gbalua there is NO romdevtools resolution dance: the driver ships in
 // the pinned toolchain package (0.3.0) — the day-one dependency graph is the
 // final one.
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildGenesisC, finalizeGenesisRom, parseBuildLog, shareDir } from "romdev-toolchain-m68k-gcc";
+import { writeRom } from "./write-rom.mjs";
 import { assertOutputDistinct } from "./output-path.mjs";
 import { bitmapTimingSource } from "./bitmap-timing.mjs";
 import { compile, formatDiagnostics } from "./index.js";
@@ -146,8 +147,7 @@ export async function buildMd(entryLua, outPath, opts = {}) {
     throw new Error(`mdlua: ${r.stage} failed\n${detail}`);
   }
   const rom = finalizeGenesisRom(r.binary);
-  await mkdir(path.dirname(path.resolve(outPath)), { recursive: true });
   await assertOutputDistinct(outPath, inputs);
-  await writeFile(outPath, rom);
+  await writeRom(outPath, rom);
   return { ok: true, outPath, log: r.log, spriteVariants: assets.scaling, graphics: assets.graphics };
 }

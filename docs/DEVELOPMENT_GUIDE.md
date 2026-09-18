@@ -143,6 +143,10 @@ determines zero-based IDs in Lua.
 - The ROM output must differ from source, asset and project-configuration files.
   Collisions (including existing file aliases) are rejected before the build.
   Rebuilding to an existing ROM path is supported.
+- Finished ROMs are written to a temporary file beside the output, then renamed
+  into place. A failed write or replacement keeps the prior ROM intact. If an
+  emulator locks the output file, close/release it and rebuild. An abrupt process
+  termination may leave a `.mdlua-rom-*.tmp` file; normal failures clean it up.
 
 ## Write the game
 

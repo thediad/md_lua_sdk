@@ -6,6 +6,12 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Horizontal/vertical bitmap lines and rectangle outlines now use clipped packed
+  fills, avoiding work proportional to off-screen endpoint distances. Diagonal
+  pixel stepping is preserved, with a signed-shift undefined behavior removed.
+  Added full-bitmap emulator comparisons for clipping, reversed endpoints,
+  degenerate lines, extreme axis endpoints, rectangle outlines and diagonals.
+
 - Added successful general and per-command CLI help, including build options.
   Help does not load project configuration or create files.
 - `mdlua c` now validates its single source argument, reports file errors without
@@ -144,6 +150,9 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
   supports its lowering. Genesis development retains save/load only.
 
 ### Validation policy
+
+- The bitmap line update passed the full SDK suite: 109 tests, no failures or
+  skips, including the new pixel comparison and existing runtime regressions.
 
 - CLI help and generated-C diagnostics passed 11 focused checks together with
   project configuration, generated-task builds and starter movement/reset emulator

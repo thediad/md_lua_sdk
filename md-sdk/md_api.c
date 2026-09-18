@@ -211,6 +211,12 @@ void md_line(int x0, int y0, int x1, int y1, int color) {
     int dx, sx, dy, sy, err, e2;
     u16 col = resolve_color(color);
     bmp_ensure();
+    // Axis-aligned lines share the bounded packed-fill path. This also bounds
+    // rectangle outlines without changing diagonal Bresenham pixel selection.
+    if (x0 == x1 || y0 == y1) {
+        md_rectfill(x0, y0, x1, y1, color);
+        return;
+    }
     dx = x1 - x0; if (dx < 0) dx = -dx;
     sx = x0 < x1 ? 1 : -1;
     dy = y1 - y0; if (dy < 0) dy = -dy;
@@ -219,7 +225,7 @@ void md_line(int x0, int y0, int x1, int y1, int color) {
     for (;;) {
         plot_clip(x0, y0, col);
         if (x0 == x1 && y0 == y1) break;
-        e2 = err << 1;
+        e2 = err * 2; // err may be negative; signed left shift is undefined in C.
         if (e2 > -dy) { err -= dy; x0 += sx; }
         if (e2 <  dx) { err += dx; y0 += sy; }
     }

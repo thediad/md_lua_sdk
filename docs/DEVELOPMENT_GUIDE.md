@@ -278,7 +278,13 @@ counts from the result's `graphics` field. `run` builds the same assets but does
 not currently print this report; use `build` to inspect the budget.
 
 
-Pixel/shape drawing activates the software bitmap engine. It has a different
+Pixel/shape drawing activates the software bitmap engine.
+Horizontal and vertical `line` calls, including `rect` outlines, clip before
+iterating and use packed pixel writes. Their work is bounded by the visible
+bitmap area even with distant endpoints. Diagonal lines retain their original
+pixel stepping and may take longer with distant endpoints.
+
+The bitmap engine has a different
 memory/VRAM budget and lower full-buffer refresh throughput. Pre-scaled sprite
 assets cannot currently share its VRAM layout. `camera` affects the hardware
 path, not bitmap coordinates. See [pre-scaled sprites](PRESCALED_SPRITES.md).

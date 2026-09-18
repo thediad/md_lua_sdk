@@ -137,6 +137,12 @@ before iterating, then fills packed pixel bytes while preserving neighboring
 edge pixels. Huge offscreen rectangles therefore cost no more than a visible
 full-screen fill. This does not imply a guaranteed bitmap frame rate.
 
+Horizontal and vertical `line` calls use the same bounded fill path, including
+the four edges of `rect`. Reversed endpoints and single-pixel lines are supported.
+Emulator pixel checks cover clipping, empty clips, rectangle outlines, extreme
+axis endpoints and diagonal slopes. Diagonal lines still step across the original
+endpoints; their runtime is not bounded by the visible screen dimensions.
+
 ## Diagnostic examples
 
 - `pico_map_flags`: expect `RAM AND BOUNDS PASS`; ALL has four cells,

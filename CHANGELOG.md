@@ -6,6 +6,11 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Added a numeric behavior reference and reconciled README/cheat-sheet claims:
+  `sgn(0)` is zero, general overflow compatibility is unsupported, and constant
+  rounding/approximation limits are explicit. Clarified the development compiler
+  dependency, emulator validation scope and advanced direct SGDK API status.
+
 - Guarded fixed modulo by raw -1 to avoid signed quotient overflow. Expanded
   numeric emulator checks for minimum values, one-unit fractions, zero division
   and large square roots; 51 focused compiler/math/RNG tests passed.

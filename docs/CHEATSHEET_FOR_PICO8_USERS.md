@@ -97,19 +97,19 @@ default here.**
 
 ## Number model
 
-Full **16.16 fixed point**, PICO-8 edge cases and all.
+Signed **16.16 fixed point** with SDK-specific limits. See [numeric behavior](NUMERIC_BEHAVIOR.md).
 
 | | | Notes |
 |---|:--:|---|
 | range | ✅ | −32768.0 … 32767.99998 |
-| overflow | ✅ | wraps (two's complement) |
+| overflow | unsupported | keep intermediate results in range |
 | `a / 0` | ✅ | saturates |
 | `sin(.25) == -1` | ✅ | turns-based, screen-inverted |
-| `sgn(0) == 1` · `flr` toward −∞ | ✅ | |
+| `sgn(0) == 0` · `flr` toward −∞ | ✅ | |
 | `>>` / `>>>` | ✅ | arithmetic / logical shift |
 
-The compiler keeps values that stay integral in fast 32-bit ints - an
-optimization, never a semantic change.
+Integral values may use 32-bit storage. Do not assume identical overflow or
+rounding behavior between integer, fixed-point and constant-folded expressions.
 
 ## Graphics & draw (the bitmap verbs)
 

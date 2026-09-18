@@ -5,6 +5,9 @@
 Start with the **[development guide](docs/DEVELOPMENT_GUIDE.md)** for the current
 Windows workflow, project configuration, working features and limits.
 The **[development changelog](CHANGELOG.md)** tracks ongoing changes.
+The **[release checklist](docs/RELEASE_CHECKLIST.md)** tracks standalone-release
+readiness. This branch is local development work; the npm badge below does not
+mean these changes are in the published package.
 
 From this SDK checkout: `npm.cmd run build -- examples/hello/main.lua`.
 For a project, put source/output/assets in `mdlua.json`; a linked CLI can then
@@ -18,8 +21,9 @@ Make games for the **Sega Mega Drive / Genesis** by writing a
 **PICO-8-flavored Lua** instead of C or 68000 assembly.
 
 The SDK **ahead-of-time compiles** your Lua to C, builds it with a bundled m68k
-toolchain against an SGDK runtime, and produces a `.bin` ROM that runs in any
-Genesis emulator and on real hardware via flashcart. No interpreter, no VM: your
+toolchain against an SGDK runtime, and produces a Genesis `.bin` ROM. This branch
+is tested with Genesis Plus GX and BlastEm; physical hardware validation is
+deferred. No interpreter, no VM: your
 Lua becomes native 68000 machine code.
 
 If you know PICO-8 you'll feel at home (`spr`/`btn`/`_init`/`_update`/`_draw`,
@@ -38,7 +42,7 @@ Genesis (68000).
 ## Your first game
 
 The whole hello, one `main.lua` with no asset files: a greeting plus a hardware
-sprite you move with the d-pad. `_update60` runs the movement 60 times a second;
+sprite you move with the d-pad. `_update60` runs movement once per game loop;
 `_draw` redraws the sprite every frame (`examples/hello/main.lua`):
 
 ```lua
@@ -73,7 +77,7 @@ mdlua run hello.bin
 
 `mdlua run` opens an emulator window (bundled Genesis Plus GX core): arrows =
 d-pad, `Z`/`X`/`C` = the A/B/C buttons, Enter = START. The same `.bin` runs
-in any Genesis emulator or on a flashcart. That's the whole loop: write
+in BlastEm. That's the development loop: write
 `main.lua`, build the `.bin`, ship it.
 
 ## Featured example: a full shmup
@@ -96,7 +100,10 @@ mdlua run starfall.bin
 ## Requirements
 
 - [Node.js](https://nodejs.org/) **24+**
-- **nothing else** - `npm install` brings the whole toolchain as published
+- This development branch requires the sibling canonical `luacretro` checkout
+  through `file:../../luacretro`; see the [setup guide](docs/DEVELOPMENT_GUIDE.md).
+  A standalone distributable compiler pin is still pending.
+- `npm install` brings the remaining toolchain dependencies as published
   packages: m68k-gcc + SGDK + the XGM2 sound driver, all **as WebAssembly**
   (via [`romdev-toolchain-m68k-gcc`](https://www.npmjs.com/package/romdev-toolchain-m68k-gcc),
   pinned). No SGDK install, no cross-compiler to build, no native tools.
@@ -130,10 +137,10 @@ Define `_update60()` plus `_draw()`, and optionally `_init()`. The runtime
 latches input before each update and ends the frame after `_draw()` (sprite
 list + palette flush as queued DMA at vblank).
 
-**Numbers are PICO-8 numbers**: 16.16 fixed point. `sin`/`cos`/`atan2` use
+**Numbers use 16.16 fixed point**. `sin`/`cos`/`atan2` use
 turns (0..1) with PICO-8's screen-space-inverted sin. The compiler keeps
-values that stay integral in fast 32-bit ints - an optimization, never a
-semantic change.
+values that stay integral in 32-bit ints. Do not rely on overflow matching
+PICO-8; see the [numeric behavior reference](docs/NUMERIC_BEHAVIOR.md).
 
 **The dialect** keeps PICO-8's syntax: `+=`-style compound assignment,
 one-line `if (cond) stmt` / `while (cond) stmt`, `!=`, `\` floor division,
@@ -167,6 +174,12 @@ See **[docs/CHEATSHEET.md](docs/CHEATSHEET.md)** for every verb with
 signatures and the honest limits.
 
 ## The Genesis flavor
+
+Direct SGDK calls are an advanced interface. Generated descriptors establish
+which calls the compiler accepts, not runtime verification of every API. The
+[development guide](docs/DEVELOPMENT_GUIDE.md) distinguishes tested behavior from
+availability; callers managing SGDK resources directly must respect the SDK's
+VRAM, palette, sprite and audio ownership.
 
 The reason this target is fun:
 

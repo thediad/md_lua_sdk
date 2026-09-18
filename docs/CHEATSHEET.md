@@ -293,7 +293,7 @@ automatic repeat. X/Y/Z/Mode require a six-button controller.
 
 | Call | What |
 |---|---|
-| `flr ceil abs sgn(x)` | rounding / sign (`flr` toward −∞, `sgn(0)==1`) |
+| `flr ceil abs sgn(x)` | rounding / sign (`flr` toward −∞, `sgn(0)==0`) |
 | `min max(x,y)` · `mid(x,y,z)` | min / max / median |
 | `sqrt(x)` | square root |
 | `sin(x) cos(x)` | turns-based (0..1), PICO-8 screen-inverted sin |
@@ -302,9 +302,9 @@ automatic repeat. X/Y/Z/Mode require a six-button controller.
 | `t()` / `time()` | elapsed seconds (16.16), advanced once per frame |
 | `band bor bxor bnot shl shr lshr` | bit ops (also `& \| ^^ ~ << >> >>>`) |
 
-Numbers are **16.16 fixed point**: range ±32767, overflow wraps, `/0`
-saturates. The compiler keeps values that stay integral in fast 32-bit ints -
-an optimization, never a semantic change.
+See [numeric behavior](NUMERIC_BEHAVIOR.md) for the fixed-point range, rounding,
+zero-divisor handling and overflow limits. Integral values may use 32-bit storage;
+PICO-8 overflow compatibility is not guaranteed.
 
 ---
 

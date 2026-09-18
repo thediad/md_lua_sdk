@@ -221,6 +221,9 @@ See [the multiline example](../examples/multiline_text/README.md) for both modes
 
 ## Language basics
 
+See [numeric behavior](NUMERIC_BEHAVIOR.md) for supported math semantics and
+limits, including the differences from PICO-8 and open constant-folding review.
+
 - Ahead-of-time compilation: Lua becomes C, then native 68000 code via SGDK.
 - Use ordinary functions, loops, boolean conditions, and `+=`/`-=` assignments.
 - Conditions need booleans: `if lives > 0 then`, not `if lives then`.

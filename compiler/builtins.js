@@ -255,7 +255,7 @@ export const CURATED_BUILTINS = {
   // ---- math ------------------------------------------------------------------
   flr:   { params: [["num", false]], ret: "int", c: null, special: "flr" },
   ceil:  { params: [["num", false]], ret: "int", c: null, special: "ceil" },
-  abs:   { params: [["num", false]], ret: "same", c: null, special: "abs" },
+  abs:   { params: [["num", false]], ret: "fixed", c: null, special: "abs" },
   sgn:   { params: [["num", false]], ret: "int", c: null, special: "sgn" },
   min:   { params: [["num", false], ["num", true]], ret: "same", c: null, special: "min" },
   max:   { params: [["num", false], ["num", true]], ret: "same", c: null, special: "max" },

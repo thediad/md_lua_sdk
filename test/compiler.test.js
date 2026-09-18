@@ -337,8 +337,9 @@ test("abs uses fixed-point helper for 16.16 minimum saturation", () => {
   // folding saturates it to the largest representable positive value.
   assert.match(c, /long lcl_edge = 2147483647L/);
 
-  // Runtime integer values are promoted to 16.16 before the saturating
-  // fixed-point abs helper is called.
-  assert.match(c, /lcl_runtime = md_absf\(\(\(long\)lcl_runtime << 16\)\)/);
+  // The fixed return descriptor propagates into storage; the helper result
+  // must not be treated as an integer and shifted into fixed point again.
+  assert.match(c, /long lcl_runtime = -2147483648L/);
+  assert.match(c, /lcl_runtime = md_absf\(lcl_runtime\)/);
   assert.doesNotMatch(c, /md_absi\(lcl_runtime\)/);
 });

@@ -223,6 +223,8 @@ See [the multiline example](../examples/multiline_text/README.md) for both modes
 - Use ordinary functions, loops, boolean conditions, and `+=`/`-=` assignments.
 - Conditions need booleans: `if lives > 0 then`, not `if lives then`.
 - Fractional math uses 16.16 fixed point; integral values may use integer code.
+- `abs` returns fixed point. At -32768 it saturates to 32767.99998474121,
+  the largest positive 16.16 value; runtime values and constants behave alike.
 - `rnd(n)` returns a value from zero up to, but excluding, positive `n`;
   `rnd()` uses one. Nonpositive bounds return zero. `srand(seed)` restarts a
   repeatable sequence; `flr(rnd(n))` gives an integer below a positive integer bound.

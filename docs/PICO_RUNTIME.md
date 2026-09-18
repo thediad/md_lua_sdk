@@ -143,6 +143,14 @@ Emulator pixel checks cover clipping, empty clips, rectangle outlines, extreme
 axis endpoints and diagonal slopes. Diagonal lines still step across the original
 endpoints; their runtime is not bounded by the visible screen dimensions.
 
+## Absolute values
+
+`abs` returns a fixed-point value even for integer inputs. The minimum value,
+-32768, has no positive counterpart in signed 16.16, so its absolute value
+saturates to 32767.99998474121. Runtime calls now match constant folding at this
+boundary. Emulator checks cover integer/fractional inputs, array reads, mixed
+comparisons and folded constants. Rebuild existing ROMs to apply the correction.
+
 ## Random numbers
 
 `rnd(n)` scales a 16-bit xorshift value into `[0,n)` for positive bounds;

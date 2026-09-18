@@ -6,6 +6,11 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Fixed runtime `abs(-32768)` to saturate like compiler-folded constants instead
+  of overflowing. Corrected the Genesis `abs` return descriptor to fixed point,
+  preventing extra scaling in mixed integer/fixed expressions. Added emulator
+  comparisons across integer/fractional inputs and the minimum boundary.
+
 - Fixed the random generator retaining 32-bit state despite requiring 16-bit
   xorshift steps. `rnd(n)` and its integer fast path now stay within their
   positive bounds; seed folding is explicitly masked too. Seeded sequences
@@ -162,6 +167,9 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
   supports its lowering. Genesis development retains save/load only.
 
 ### Validation policy
+
+- The absolute-value fixes passed the full SDK suite: 112 tests with no failures
+  or skips. The new emulator check reproduced incorrect results before the fixes.
 
 - The bitmap line update passed the full SDK suite: 109 tests, no failures or
   skips, including the new pixel comparison and existing runtime regressions.

@@ -100,7 +100,12 @@ int md_rnd_int(int n) {                      // flr(rnd(n)) fast path
     return (int)(((unsigned long)s * (unsigned int)n) >> 16);
 }
 int  md_absi(int v)              { return v < 0 ? -v : v; }
-long md_absf(long v)             { return v < 0 ? -v : v; }
+long md_absf(long v) {
+    // Signed 16.16 cannot represent +32768. Match compiler constant folding
+    // without negating LONG_MIN, which overflows signed arithmetic.
+    if (v == (-2147483647L - 1L)) return 2147483647L;
+    return v < 0 ? -v : v;
+}
 int  md_sgni(int v)              { return v > 0 ? 1 : (v < 0 ? -1 : 0); }
 long md_sgnf(long v)             { return v > 0 ? 0x10000L : (v < 0 ? -0x10000L : 0); }
 int  md_midi(int a, int b, int c) {

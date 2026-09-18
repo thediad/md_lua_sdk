@@ -6,10 +6,14 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- User confirmed the integrated release-check ROM works as intended in BlastEm
+  and BEST survives closing and reopening. Integrated user validation is complete;
+  physical hardware verification remains deferred.
+
 - Added a finite first-release checklist and an integrated `release_check` game
   covering movement, collection, scrolling, tone music/effects and explicit saves.
   Automated play checks collection, saved bytes and continued movement; normal
-  BlastEm quit/reopen persistence is the next user checkpoint.
+  BlastEm quit/reopen persistence was subsequently confirmed by the user.
 - `layer_show`/`layer_pri` now reject compilation instead of silently doing nothing.
 - Numeric audit: supplied missing fixed min/max helpers, corrected fractional
   sign return typing, and fixed minimum-value angle magnitudes. Genesis opts into
@@ -180,7 +184,8 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 - First-release audit checkpoint: 115 Genesis tests and 48 canonical compiler
   tests passed, no skips. Includes integrated play/save checks and numeric edge
-  regressions. BlastEm integrated play and automatic save persistence remain pending.
+  regressions. User subsequently confirmed BlastEm integrated play and automatic
+  save persistence for the release-check ROM.
 
 - The absolute-value fixes passed the full SDK suite: 112 tests with no failures
   or skips. The new emulator check reproduced incorrect results before the fixes.

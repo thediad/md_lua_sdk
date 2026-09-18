@@ -22,8 +22,9 @@ Hardware verification is deferred; the release must say emulator-tested.
 - [x] Automate a sustained play session and check resource limits/visible results.
   `examples/release_check`: 113/1424 tiles, collection/save assertions and about
   26 seconds of simulated input; not a maximum-load benchmark.
-- [ ] User checks the example in BlastEm, including sound and normal quit/reopen
-  save persistence. Existing isolated audio and starter confirmations remain valid.
+- [x] User checks the example in BlastEm and normal quit/reopen save persistence.
+  User reports the ROM works as intended and BEST survives reopening. Existing
+  isolated audio and starter confirmations remain valid; hardware is unverified.
 
 ## 3. Standalone installation
 
@@ -49,7 +50,7 @@ None should silently expand this first-release checklist.
 Baseline: commit 279f75d passed 112 SDK tests, no skips. This is historical
 evidence; rerun tests for the final candidate. Development commits are local.
 
-Next user checkpoint: [release-check instructions](../examples/release_check/README.md).
+Completed user checkpoint: [release-check instructions](../examples/release_check/README.md).
 Packaging and the final documentation pass are still open, not release-ready.
 Current automated checkpoint: 115 Genesis tests and 48 canonical compiler tests
 passed without skips. Integrated ROM screen layout was inspected in Genesis Plus GX.

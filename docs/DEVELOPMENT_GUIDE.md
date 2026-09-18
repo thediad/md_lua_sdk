@@ -314,7 +314,9 @@ path, not bitmap coordinates. See [pre-scaled sprites](PRESCALED_SPRITES.md).
 
 - Physical hardware verification is deferred; development continues on emulators.
 - Save/load remains the persistence API. No cartdata/dget/dset mode or reserved slots.
-- SRAM tests cover explicit export/import, not every emulator's automatic save policy.
+- SRAM tests cover explicit export/import. The user also confirmed that BEST in
+  `release_check` survives closing and reopening BlastEm; other emulators' automatic
+  save policies and physical hardware remain unverified.
 - Ordinary input is sampled at game-loop boundaries; sufficiently short input during
   slow rendering can be missed. `btnp` has no automatic repeat.
 - Hardware-plane updates are immediate and may expose partial large redraws.

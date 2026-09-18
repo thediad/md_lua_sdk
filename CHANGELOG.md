@@ -6,6 +6,11 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Added missing integer min/max runtime helpers for function-call arguments.
+  The regression reproduced a C compilation failure before the fix; explicit and
+  omitted second arguments now pass emulator checks with single evaluation.
+  All 50 focused math/compiler tests passed.
+
 - Genesis constant-folded `sgn(0)` now returns zero, matching its runtime.
   The SDK-specific hook preserves other consoles' defaults. An expanded ROM
   regression failed before the fix; all 50 focused math/compiler checks passed

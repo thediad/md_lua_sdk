@@ -17,6 +17,8 @@ Hardware verification is deferred; the release must say emulator-tested.
   runtime now agrees with the folded result for that boundary and both signs.
   Corrected Genesis constant folding of `sgn(0)` from one to zero to match the
   runtime; ROM checks compare folded and runtime signs for zero and both signs.
+  Added missing integer min/max fallback helpers; function-call arguments and
+  omitted second arguments now build and pass single-evaluation ROM checks.
 - [ ] Record remaining numeric limits explicitly; resolve release-blocking bugs.
 
 ## 2. Integrated game validation

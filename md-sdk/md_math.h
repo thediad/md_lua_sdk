@@ -25,6 +25,8 @@ int  md_midi(int a, int b, int c);
 long md_midf(long a, long b, long c);
 long md_minf(long a, long b);
 long md_maxf(long a, long b);
+int md_mini(int a, int b);
+int md_maxi(int a, int b);
 // Inline so literal divisors retain GCC's constant-division optimization.
 static inline int md_ifdiv(int a, int b) {
     int q;

@@ -62,6 +62,11 @@ test("numeric boundaries preserve rounding, signs, square roots and angle quadra
 local folded_floor=-0.0000152587890625\\2.5
 local outcomes=array8(${checks.length})
 local passed=1
+local calls=0
+function next_value()
+  calls+=1
+  return calls
+end
 function _init()
   a[1]=-1.5 a[2]=0 a[3]=2.5 a[4]=4 a[5]=0.25 a[6]=-32768 a[7]=32767
   a[8]=-0.0000152587890625
@@ -70,6 +75,10 @@ function _init()
   local y=3
   if x\\y!=-3 or x%y!=2 then passed=0 end
   if (0-a[8])\\a[1]!=-1 or a[8]\\a[1]!=0 then passed=0 end
+  if min(next_value(),10)!=1 or calls!=1 then passed=0 end
+  if max(next_value(),1)!=2 or calls!=2 then passed=0 end
+  if min(next_value())!=0 or calls!=3 then passed=0 end
+  if max(next_value())!=4 or calls!=4 then passed=0 end
 end
 function _draw()
   cls(0)

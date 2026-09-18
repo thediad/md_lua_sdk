@@ -24,6 +24,10 @@ through 32767.99998474121. This is not a promise of PICO-8 numeric compatibility
 
 ## Limits to design around
 
+`min(x)` and `max(x)` default their second argument to zero. Integer function-call
+arguments use runtime helpers so each argument is evaluated once. ROM tests
+cover this path with a counter, including the omitted second argument.
+
 - Keep intermediate arithmetic inside the fixed-point range. General overflow,
   integer/fixed conversions outside that range and excessive shift counts do not
   have a supported wraparound or saturation contract.

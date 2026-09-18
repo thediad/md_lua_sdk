@@ -125,6 +125,8 @@ long md_midf(long a, long b, long c) {
 }
 long md_minf(long a, long b) { return a < b ? a : b; }
 long md_maxf(long a, long b) { return a > b ? a : b; }
+int md_mini(int a, int b) { return a < b ? a : b; }
+int md_maxi(int a, int b) { return a > b ? a : b; }
 // PICO-8 \ (floor div) and % (floor mod) on ints — sign-correct floor semantics.
 long md_ffmod(long a, long b) {
     long r;

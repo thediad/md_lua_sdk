@@ -84,6 +84,7 @@
     "romdev-xgm2": "0.1.0"
   },
   "scripts": {
+    "release:check": "node tools/release-preflight.mjs",
     "build": "node bin/mdlua-launch.mjs build",
     "test": "node --import ./bin/windows-paths.mjs --test \"test/**/*.test.js\"",
     "coverage": "node tools/coverage-report.mjs"

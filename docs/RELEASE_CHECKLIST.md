@@ -30,6 +30,13 @@ Hardware verification is deferred; the release must say emulator-tested.
 
 ## 3. Standalone installation
 
+From the SDK checkout, run `npm.cmd run release:check` for the static package
+audit. It examines npm's actual dry-run file list, requires an exact compiler
+version or full Git revision, and rejects missing runtime files or generated
+example builds. It does not publish, install, run package lifecycle scripts or
+verify remote availability. A nonzero exit currently reports the local compiler
+dependency as a release blocker; this is expected for the development manifest.
+
 - [ ] Replace the sibling compiler dependency with a reproducible distributable
   dependency after verifying the exact canonical revision is available.
 - [ ] Inspect package contents and install into a clean isolated directory.
@@ -61,7 +68,7 @@ evidence; rerun tests for the final candidate. Development commits are local.
 
 Completed user checkpoint: [release-check instructions](../examples/release_check/README.md).
 Packaging and the final documentation pass are still open, not release-ready.
-The required canonical compiler revision is currently local (3775b5e); GitHub
+The required canonical compiler revision is currently local (db8b09c); GitHub
 availability could not be verified during the package audit. Do not replace the
 sibling dependency with an unverified remote pin or publish the development manifest.
 Current automated checkpoint: 115 Genesis tests and 48 canonical compiler tests

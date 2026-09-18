@@ -6,6 +6,12 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Added `npm run release:check` for checkout-based package auditing: exact
+  compiler dependency specification, required runtime files and generated build
+  exclusions. Three focused tests pass. The actual 113-file package audit reports
+  the sibling compiler dependency as the only static blocker; remote availability
+  and isolated installation remain unverified.
+
 - Fixed fractional floor division rounding tiny negative quotients to zero before
   flooring. Genesis now uses a direct raw-value quotient helper; a ROM regression
   compares it with a folded constant and checks both divisor signs. The canonical

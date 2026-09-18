@@ -24,6 +24,9 @@ if (cmd === "init") {
     const r = await buildMd(entry, out, assets);
     const { statSync } = await import("node:fs");
     console.log(`${r.outPath} (${statSync(r.outPath).size} bytes)`);
+    const g = r.graphics;
+    console.log(`Graphics tiles (default hardware layout): ${g.totalTiles}/${g.capacityTiles} used, ${g.freeTiles} free (${g.bytes} bytes used).`);
+    console.log(`  ${g.fallbackSheet ? "Fallback sheet" : "Sheet"}: ${g.sheetTiles}; map: ${g.mapTiles}; pre-scaled: ${g.variantTiles}.`);
     if (r.spriteVariants.variants.length) {
       console.log(`Pre-scaled sprites: ${r.spriteVariants.bytes} graphics bytes in ROM and VRAM; base sheet ${r.spriteVariants.sheetBytes} bytes; one hardware sprite per draw.`);
       for (const v of r.spriteVariants.variants) console.log(`  ${v.id}: ${v.source.join(",")} -> ${v.size.join("x")}: ${v.bytes} bytes`);

@@ -19,7 +19,10 @@ test("ordinary sheets and maps respect the shared tile VRAM budget",async()=>{
   // plane tables start at tile 1536.
   // 1424 user tiles reach, but do not cross, that boundary.
   const exact=await sheet("exact.png",128,712);
-  await buildMd(source,out,{sheetPath:exact});
+  const result=await buildMd(source,out,{sheetPath:exact});
+  assert.equal(result.graphics.totalTiles,1424);
+  assert.equal(result.graphics.freeTiles,0);
+  assert.equal(result.graphics.bytes,45568);
   const good=await readFile(out);
   assert.match(good.toString("ascii",0x100,0x110),/SEGA/);
   const overflow=await sheet("overflow.png",128,720);

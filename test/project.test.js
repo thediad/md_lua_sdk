@@ -39,6 +39,8 @@ test("CLI builds a project without an external Windows preload or asset argument
   const launcher=fileURLToPath(new URL("../bin/mdlua-launch.mjs",import.meta.url));
   const {stdout}=await promisify(execFile)(process.execPath,[launcher,"build"],{cwd,env});
   assert.match(stdout,/test\.bin/);
+  assert.match(stdout,/4\/1424 used, 1420 free/);
+  assert.match(stdout,/Fallback sheet: 4; map: 0; pre-scaled: 0/);
   const rom=await readFile(path.join(cwd,"build/test.bin"));
   assert.ok(rom.length>=0x200);
   assert.match(rom.toString("ascii",0x100,0x110),/SEGA/);

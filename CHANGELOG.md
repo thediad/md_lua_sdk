@@ -6,6 +6,11 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Successful CLI builds now report graphics tiles used/free and the sheet/map/
+  pre-scaled breakdown. `buildMd` also returns these counts as `graphics`.
+  The report includes fallback sheet tiles and deduplicated map tile zero;
+  it describes the default hardware layout, not bitmap or general RAM usage.
+
 - Applied the combined tile VRAM guard to ordinary sheet/map builds as well as
   pre-scaled variants, reserving the pinned SGDK font region. The default asset
   capacity is 1,424 tiles. Rejected builds preserve the prior output ROM.
@@ -106,9 +111,9 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ### Validation policy
 
-- The VRAM-budget validation passed 100 SDK tests with no skips, including
-  exact-capacity builds, oversized assets, clear diagnostics and preservation
-  of the previous output after failure.
+- The graphics-report validation passed 100 SDK tests with no skips, including
+  CLI fallback counts, deduplicated map counts and exact-capacity reporting.
+  Starfall built with 113/1424 tiles used (16 sheet + 97 map).
   Audio-output checks pass; the user confirmed the audio-check sequence in BlastEm.
   Physical hardware verification remains pending.
 - Run `npm.cmd test` for current results; do not treat historical counts as live status.

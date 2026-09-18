@@ -219,6 +219,19 @@ uses every 8x8 cell; a map counts unique tiles plus its transparent tile. Builds
 that exceed this combined budget fail and leave the previous ROM intact.
 Changing the VRAM layout with direct SGDK calls requires managing that layout yourself.
 
+Each successful `build` prints a graphics budget, for example:
+
+```text
+Graphics tiles (default hardware layout): 4/1424 used, 1420 free (128 bytes used).
+  Fallback sheet: 4; map: 0; pre-scaled: 0.
+```
+
+This reports the startup hardware tile assets. It is not total RAM usage or a
+bitmap-mode memory budget. Programmatic `buildMd` callers can read the same
+counts from the result's `graphics` field. `run` builds the same assets but does
+not currently print this report; use `build` to inspect the budget.
+
+
 Pixel/shape drawing activates the software bitmap engine. It has a different
 memory/VRAM budget and lower full-buffer refresh throughput. Pre-scaled sprite
 assets cannot currently share its VRAM layout. `camera` affects the hardware

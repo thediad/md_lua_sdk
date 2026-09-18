@@ -46,7 +46,9 @@ test("imported map writes reject invalid tiles and coordinates and restore sourc
 end
 function _draw() end
 `);
-  await buildMd(source,rom,{mapPath});
+  const result=await buildMd(source,rom,{mapPath});
+  assert.equal(result.graphics.mapTiles,3,"two unique tiles plus transparent tile zero");
+  assert.equal(result.graphics.totalTiles,7,"includes the four fallback sheet tiles");
   const host=new LibretroHost({saveDir:work});
   try {
     await host.loadCore(core.jsPath,core.wasmPath);

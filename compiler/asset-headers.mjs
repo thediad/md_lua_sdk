@@ -35,7 +35,7 @@ export function sheetAssetsHeader(pngBytes, srcName = "sheet.png", varPrefix = "
 }
 
 // background tilemap: deduped tiles + u16 map of tile ids + palette.
-export function mapAssetHeader(pngBytes, srcName = "map.png") {
+export function mapAssets(pngBytes, srcName = "map.png") {
   const { tileWords, map, pal, cols, rows } = pngToTilemap(pngBytes);
   let h = `// generated from ${srcName} — ${cols}x${rows} map, ${tileWords.length / 8} unique tiles\n`;
   h += `#define map_cols ${cols}\n#define map_rows ${rows}\n`;
@@ -43,5 +43,9 @@ export function mapAssetHeader(pngBytes, srcName = "map.png") {
   h += `static const unsigned int map_tiles[${tileWords.length}] = {${tileWords.map((w) => w >>> 0).join(",")}};\n`;
   h += `static const unsigned short map_data[${map.length}] = {${map.join(",")}};\n`;
   h += `static const unsigned short map_pal[16] = {${pal.join(",")}};\n`;
-  return h;
+  return { header: h, tileCount: tileWords.length / 8 };
+}
+
+export function mapAssetHeader(pngBytes, srcName = "map.png") {
+  return mapAssets(pngBytes, srcName).header;
 }

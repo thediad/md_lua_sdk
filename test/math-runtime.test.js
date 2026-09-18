@@ -10,11 +10,11 @@ import {buildMd} from "../compiler/build-md.mjs";
 test("runtime abs and sign match constant folding at fixed-point boundaries",async()=>{
   const work=await mkdtemp(path.join(tmpdir(),"mdlua-abs-"));
   const source=path.join(work,"main.lua"),rom=path.join(work,"abs.bin");
-  const values=[-32768,-32767.5,-3,-0.5,0,0.5,32767];
+  const values=[-32768,-32767.5,-3,-0.5,0,0.5,32767,32767.5,32767.99998474121];
   await writeFile(source,`local passed=1
 ${values.map((v,i)=>`local expected${i}=abs(${v})`).join("\n")}
 ${values.map((v,i)=>`local sign${i}=sgn(${v})`).join("\n")}
-local input=array(7)
+local input=array(${values.length})
 function _init()
   ${values.map((v,i)=>`input[${i+1}]=${v}`).join("\n")}
   ${values.map((v,i)=>`if abs(input[${i+1}])!=abs(${v}) then passed=0 end`).join("\n")}

@@ -6,6 +6,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- The canonical lexer now accepts the exact largest 16.16 literal,
+  32767.99998474121 (`0x7fff.ffff`), instead of rejecting it against a rounded
+  limit. Larger literals remain rejected. Genesis boundary ROM tests pass.
+
 - Added missing integer min/max runtime helpers for function-call arguments.
   The regression reproduced a C compilation failure before the fix; explicit and
   omitted second arguments now pass emulator checks with single evaluation.

@@ -19,6 +19,9 @@ Hardware verification is deferred; the release must say emulator-tested.
   runtime; ROM checks compare folded and runtime signs for zero and both signs.
   Added missing integer min/max fallback helpers; function-call arguments and
   omitted second arguments now build and pass single-evaluation ROM checks.
+  Corrected the lexer's rounded upper range limit; the exact maximum literal
+  now compiles and passes Genesis ROM checks. Review of rounding results beyond
+  the fixed-point range remains open.
 - [ ] Record remaining numeric limits explicitly; resolve release-blocking bugs.
 
 ## 2. Integrated game validation

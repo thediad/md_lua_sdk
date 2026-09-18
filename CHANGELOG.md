@@ -6,6 +6,12 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Added successful general and per-command CLI help, including build options.
+  Help does not load project configuration or create files.
+- `mdlua c` now validates its single source argument, reports file errors without
+  Node stack traces, and sends warnings/errors with absolute Lua source locations
+  to standard error while keeping generated C on standard output.
+
 - Finished ROMs now replace the output via a same-directory temporary file.
   Failed writes/replacements preserve the prior ROM, and normal failure paths
   remove the temporary file. Tests include a write interrupted after some bytes.
@@ -138,6 +144,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
   supports its lowering. Genesis development retains save/load only.
 
 ### Validation policy
+
+- CLI help and generated-C diagnostics passed 11 focused checks together with
+  project configuration, generated-task builds and starter movement/reset emulator
+  checks. The full runtime suite was not repeated for this CLI-only change.
 
 - ROM replacement passed 14 focused checks, including partial-write failure,
   replacement failure, CLI builds, output collision checks and starter emulator

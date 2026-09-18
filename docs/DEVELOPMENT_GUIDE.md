@@ -64,6 +64,26 @@ All build overrides also work with `run`. To launch an existing ROM without
 rebuilding or reading project configuration, use `mdlua.cmd run build/game.bin`
 with no build options.
 
+### Command help and generated C
+
+```powershell
+mdlua.cmd --help
+mdlua.cmd build --help
+mdlua.cmd help run
+mdlua.cmd c main.lua
+```
+
+Each command accepts `--help` or `-h`. Help exits successfully without loading
+project configuration or creating files. Without a global command, use
+`node bin/mdlua-launch.mjs --help` from the SDK checkout.
+
+The `c` command prints generated C for inspecting compiler output. It accepts
+exactly one Lua source file and does not load `mdlua.json`, assets or sprite
+variant manifests; use `build` for the complete game. C goes to standard output,
+while warnings and errors go to standard error. Lua diagnostics include absolute
+source paths and line/column locations. Missing files and invalid arguments
+produce a concise error and a nonzero exit status.
+
 ## Create a new game
 
 With the SDK command installed:

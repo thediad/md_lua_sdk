@@ -8,12 +8,21 @@ import { buildMd } from "../compiler/build-md.mjs";
 import { compile, formatDiagnostics } from "../compiler/index.js";
 import { prepareRun } from "../compiler/run-project.mjs";
 import { resolveBuild } from "../compiler/project.mjs";
+import { helpText } from "./help.mjs";
 import { initProject } from "../compiler/init-project.mjs";
 
 const [cmd, ...rest] = process.argv.slice(2);
 const fail = (m) => { console.error(m); process.exit(1); };
 
-if (cmd === "init") {
+if (cmd === undefined || ["help", "--help", "-h"].includes(cmd)) {
+  try {
+    if (rest.length > 1) throw new Error("usage: mdlua help [command]");
+    console.log(helpText(rest[0]));
+  } catch (e) { fail(String(e.message ?? e)); }
+} else if (rest.includes("--help") || rest.includes("-h")) {
+  try { console.log(helpText(cmd)); }
+  catch (e) { fail(String(e.message ?? e)); }
+} else if (cmd === "init") {
   try {
     const directory = await initProject(rest);
     console.log(`Created ${directory}\nOpen its README.md for build and run instructions.`);
@@ -42,11 +51,17 @@ if (cmd === "init") {
     fail(String(e.message ?? e));
   }
 } else if (cmd === "c") {
-  if (!rest[0]) fail("usage: mdlua c <main.lua>");
-  const src = await readFile(rest[0], "utf8");
-  const res = compile(src, path.basename(rest[0]), { target: "md" });
-  if (!res.ok) fail(formatDiagnostics(res.diagnostics.filter((d) => d.severity === "error")));
-  process.stdout.write(res.c + "\n");
+  try {
+    if (rest.length !== 1 || rest[0].startsWith("-")) throw new Error("usage: mdlua c <main.lua>");
+    const source = path.resolve(rest[0]);
+    const src = await readFile(source, "utf8");
+    const res = compile(src, path.basename(source), { target: "md" });
+    const diagnostics = res.diagnostics.map(d => ({ ...d, file: source }));
+    const warnings = diagnostics.filter(d => d.severity === "warning");
+    if (warnings.length) console.error(formatDiagnostics(warnings));
+    if (!res.ok) throw new Error(formatDiagnostics(diagnostics.filter(d => d.severity === "error")));
+    process.stdout.write(res.c + "\n");
+  } catch (e) { fail(String(e.message ?? e)); }
 } else {
-  fail("usage: mdlua init <new-directory>\n       mdlua build [main.lua] [--project mdlua.json] [--sheet s.png] [--sprite-variants variants.json] [--gff sprites.gff] [--map m.png] [--sfx a.wav,b.wav] [--music a.vgm,b.vgm] [-o game.bin]\n       mdlua run [main.lua] [same build flags] | mdlua run game.bin\n       mdlua c <main.lua>");
+  fail(`unknown command: ${cmd}\nUse mdlua --help for usage.`);
 }

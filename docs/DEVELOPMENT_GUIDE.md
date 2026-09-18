@@ -223,6 +223,11 @@ See [the multiline example](../examples/multiline_text/README.md) for both modes
 - Use ordinary functions, loops, boolean conditions, and `+=`/`-=` assignments.
 - Conditions need booleans: `if lives > 0 then`, not `if lives then`.
 - Fractional math uses 16.16 fixed point; integral values may use integer code.
+- `rnd(n)` returns a value from zero up to, but excluding, positive `n`;
+  `rnd()` uses one. Nonpositive bounds return zero. `srand(seed)` restarts a
+  repeatable sequence; `flr(rnd(n))` gives an integer below a positive integer bound.
+  The 16-bit RNG correction changes sequences from older builds, so rebuilds
+  may change randomized levels or replays that depended on those sequences.
 - `array(n)` and `array8(n)` allocate fixed capacities. Arrays are 1-indexed;
   tile, button, player, sound, and save-slot IDs are zero-based.
 - `array8` stores bytes. Use it for explicit save records and compact flags.

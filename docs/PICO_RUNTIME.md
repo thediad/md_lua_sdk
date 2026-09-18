@@ -143,6 +143,19 @@ Emulator pixel checks cover clipping, empty clips, rectangle outlines, extreme
 axis endpoints and diagonal slopes. Diagonal lines still step across the original
 endpoints; their runtime is not bounded by the visible screen dimensions.
 
+## Random numbers
+
+`rnd(n)` scales a 16-bit xorshift value into `[0,n)` for positive bounds;
+`rnd()` uses a bound of one, and nonpositive bounds return zero. Each call
+advances the generator, including nonpositive bounds. `srand(seed)` folds the
+upper/lower 16-bit halves of the seed; a zero result uses the nonzero default.
+Reseeding repeats the sequence. This is a small game RNG, not PICO-8 sequence
+compatibility. The corrected 16-bit masking changes sequences from older SDK
+builds, whose wider state could produce out-of-range results.
+
+An emulator regression covers bounds, repeatability, zero/negative/fractional
+seeds and agreement between integer draws and floored fixed-point draws.
+
 ## Diagnostic examples
 
 - `pico_map_flags`: expect `RAM AND BOUNDS PASS`; ALL has four cells,

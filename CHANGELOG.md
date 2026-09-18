@@ -6,6 +6,12 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Fixed the random generator retaining 32-bit state despite requiring 16-bit
+  xorshift steps. `rnd(n)` and its integer fast path now stay within their
+  positive bounds; seed folding is explicitly masked too. Seeded sequences
+  change from older builds. The new ROM regression failed before the fix and
+  passed afterward; all 48 focused random-runtime/compiler checks passed.
+
 - Outline circles now reject empty clips and bounding boxes outside the clipped
   bitmap before radius-dependent stepping. Added outline pixel comparisons and
   a repeated invisible-circle completion regression; visible circle shapes remain

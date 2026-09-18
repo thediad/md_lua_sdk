@@ -55,7 +55,11 @@ fx md_fatan2(fx dx, fx dy) {
 static unsigned int rng_state = 0xABCDu;
 static unsigned int rng_next(void) {
     unsigned int x = rng_state;
-    x ^= x << 7; x ^= x >> 9; x ^= x << 8;
+    // unsigned int is 32-bit on this target. Preserve 16-bit xorshift steps,
+    // including truncation before the right shift, so rnd stays below its bound.
+    x = (x ^ (x << 7)) & 0xFFFFu;
+    x ^= x >> 9;
+    x = (x ^ (x << 8)) & 0xFFFFu;
     rng_state = x ? x : 0xABCDu;
     return rng_state;
 }
@@ -67,7 +71,8 @@ fx md_rnd(fx x) {
     return md_fmul((fx)s, x);
 }
 void md_srand(fx seed) {
-    rng_state = (unsigned int)(seed >> 16) ^ (unsigned int)seed;
+    unsigned long bits = (unsigned long)seed;
+    rng_state = (unsigned int)((bits >> 16) ^ bits) & 0xFFFFu;
     if (rng_state == 0) rng_state = 0xABCDu;
 }
 

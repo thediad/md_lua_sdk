@@ -6,6 +6,12 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Recorded user confirmation of the generated VS Code build task and starter
+  movement/reset in BlastEm.
+- Generated VS Code tasks now match Lua diagnostics into the Problems panel.
+  Builds report absolute Lua source paths so nested project entries resolve
+  correctly; an automated test verifies file/line/column extraction.
+
 - `mdlua init` now creates VS Code process tasks: Ctrl+Shift+B builds, and the
   run task builds and launches the optional emulator. Tasks use the current
   Node/SDK installation, so no global command is required; moving either
@@ -123,8 +129,8 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ### Validation policy
 
-- The output-path validation passed 102 SDK tests with no skips, including
-  source/asset/configuration collisions, hard-link aliases and normal CLI builds.
+- The IDE-diagnostics validation passed 103 SDK tests with no skips, including
+  nested-file error matching, generated-task builds and emulator regressions.
 - Run `npm.cmd test` for current results; do not treat historical counts as live status.
 - Physical hardware verification is pending and does not block emulator-focused work.
 - Audio, advanced direct SGDK APIs, and performance under real game workloads

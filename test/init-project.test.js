@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, writeFile, readdir } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile, readdir, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { execFile } from "node:child_process";
@@ -57,4 +57,28 @@ test("CLI starter builds and supports movement and reset in the emulator", async
     assert.deepEqual(pixel(158,110), sprite, "B resets position");
     assert.deepEqual(pixel(314,110), background, "old sprite is removed");
   } finally { host.unloadMedia(); }
+});
+
+
+test("generated task matcher locates compiler errors in a nested source path",async()=>{
+  const cwd=await mkdtemp(path.join(tmpdir(),"mdlua-ide-errors-"));
+  const directory=await initProject(["my game"],cwd);
+  await mkdir(path.join(directory,"src"));
+  const source=path.join(directory,"src","broken.lua");
+  await writeFile(source,"function _draw()\n local x =\nend\n");
+  await writeFile(path.join(directory,"mdlua.json"),JSON.stringify({entry:"src/broken.lua",out:"build/game.bin"}));
+  const config=JSON.parse(await readFile(path.join(directory,".vscode/tasks.json"),"utf8"));
+  const task=config.tasks[0],matcher=task.problemMatcher[0];
+  assert.equal(matcher.fileLocation,"absolute");
+  const expand=value=>value.replaceAll("${workspaceFolder}",directory);
+  const error=await promisify(execFile)(task.command,task.args.map(expand),{cwd:directory}).then(()=>assert.fail("invalid Lua must fail"),e=>e);
+  const matches=error.stderr.split(/\r?\n/).map(line=>new RegExp(matcher.pattern.regexp).exec(line)).filter(Boolean);
+  assert.ok(matches.length>0,error.stderr);
+  for(const match of matches) {
+    assert.equal(match[matcher.pattern.file],source);
+    assert.ok(Number(match[matcher.pattern.line])>0);
+    assert.ok(Number(match[matcher.pattern.column])>0);
+    assert.equal(match[matcher.pattern.severity],"error");
+    assert.ok(match[matcher.pattern.message].length>0);
+  }
 });

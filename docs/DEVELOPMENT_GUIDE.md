@@ -88,8 +88,15 @@ opens the optional SDL emulator. These process tasks use the Node executable
 and SDK launcher paths recorded at project creation; no `npm link` or PowerShell
 execution-policy change is needed. If those installations move, update their
 paths in the tasks file. Tasks resolve `mdlua.json` from the opened game folder.
+Lua compiler errors and warnings appear in VS Code's Problems panel. Select an
+entry to open the source location, including entry files in subfolders. This
+matcher covers Lua diagnostics; generated C/toolchain errors remain in the terminal.
 
- The starter uses an 8x8 fallback sprite: D-pad moves it and B
+User validation: Ctrl+Shift+B built the generated starter successfully, and the
+ROM's movement/reset behavior worked in BlastEm. Problems-panel navigation is
+covered by automated matching tests; its IDE interaction still needs confirmation.
+
+The starter uses an 8x8 fallback sprite: D-pad moves it and B
 resets its position. No asset downloads are needed. Creation requires a new
 directory with an existing parent; existing directories and files are refused.
 If creation fails partway through, the partial directory is retained for inspection.

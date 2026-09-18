@@ -44,7 +44,11 @@ export async function initProject(args, cwd = process.cwd()) {
   const tasks = ["build", "run"].map(command => ({
     label: `Genesis Lua: ${command}`, type: "process", command: process.execPath,
     args: [launcher, command, "--project", "${workspaceFolder}/mdlua.json"],
-    options: { cwd: "${workspaceFolder}" }, problemMatcher: [],
+    options: { cwd: "${workspaceFolder}" },
+    problemMatcher: [{ owner: "mdlua", fileLocation: "absolute", pattern: {
+      regexp: "^(.+):(\\d+):(\\d+): (error|warning): (.*)$",
+      file: 1, line: 2, column: 3, severity: 4, message: 5,
+    } }],
     ...(command === "build" ? { group: { kind: "build", isDefault: true } } : {}),
   }));
   await mkdir(path.join(directory, ".vscode"));
@@ -56,7 +60,8 @@ export async function initProject(args, cwd = process.cwd()) {
     "README.md": `# Genesis Lua starter
 
 Open this folder in VS Code, save your Lua changes, then press **Ctrl+Shift+B**
-to build. Use **Terminal > Run Task > Genesis Lua: run** to build and open the
+to build. Lua errors and warnings appear in the Problems panel with source locations.
+Use **Terminal > Run Task > Genesis Lua: run** to build and open the
 optional emulator. These tasks use the Node and SDK paths found when the project
 was created; no global command is required. If you move the SDK or reinstall
 Node elsewhere, update those paths in .vscode/tasks.json.

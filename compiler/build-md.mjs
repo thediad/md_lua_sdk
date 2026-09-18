@@ -85,10 +85,11 @@ export async function buildMd(entryLua, outPath, opts = {}) {
   if (variants.length && /\b(?:md_(?:pset|pget|line|rect|rectfill|circ|circfill)|BMP_\w+)\(/.test(res.c ?? "")) {
     throw new Error("pre-scaled sprite variants cannot share VRAM with bitmap drawing; use the hardware sprite/tile path");
   }
-  const warnings = res.diagnostics.filter((d) => d.severity === "warning");
+  const diagnostics = res.diagnostics.map(d => ({ ...d, file: path.resolve(entryLua) }));
+  const warnings = diagnostics.filter((d) => d.severity === "warning");
   if (warnings.length) process.stderr.write(formatDiagnostics(warnings) + "\n");
   if (!res.ok) {
-    const errs = res.diagnostics.filter((d) => d.severity === "error");
+    const errs = diagnostics.filter((d) => d.severity === "error");
     throw new Error("mdlua: compile failed\n" + formatDiagnostics(errs));
   }
 

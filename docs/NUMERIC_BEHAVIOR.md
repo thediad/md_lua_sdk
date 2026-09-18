@@ -38,6 +38,10 @@ through 32767.99998474121. This is not a promise of PICO-8 numeric compatibility
 
 ## Evidence
 
+Genesis owns constant folding for `sgn`, so folded `sgn(0)` and runtime
+`sgn(0)` both return zero. Older builds folded the constant to one; rebuild
+ROMs that use this expression in global initializers to apply the correction.
+
 ROM tests cover abs boundary/constant agreement, rounding, fractional signs,
 min/max/mid, roots, angle quadrants including -32768, signed division/remainders,
 zero divisors and RNG range/reseeding. This is targeted coverage, not exhaustive

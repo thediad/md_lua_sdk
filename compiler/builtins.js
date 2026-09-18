@@ -259,6 +259,7 @@ export const CURATED_BUILTINS = {
   ceil:  { params: [["num", false]], ret: "int", c: null, special: "ceil" },
   abs:   { params: [["num", false]], ret: "fixed", c: null, special: "abs" },
   sgn:   { params: [["num", false]], ret: "int",
+    constEval([value]) { return value > 0 ? 1 : value < 0 ? -1 : 0; },
     emit(call, { argAt, cName }) { return `${cName("lc_sgni")}(${argAt(call, 0, "num", "0")})`; } },
   min:   { params: [["num", false], ["num", true]], ret: "same", c: null, special: "min" },
   max:   { params: [["num", false], ["num", true]], ret: "same", c: null, special: "max" },

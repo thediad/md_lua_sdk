@@ -6,6 +6,11 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Genesis constant-folded `sgn(0)` now returns zero, matching its runtime.
+  The SDK-specific hook preserves other consoles' defaults. An expanded ROM
+  regression failed before the fix; all 50 focused math/compiler checks passed
+  afterward. Rebuild ROMs containing folded sign expressions for this correction.
+
 - Added `npm run release:check` for checkout-based package auditing: exact
   compiler dependency specification, required runtime files and generated build
   exclusions. Three focused tests pass. The actual 113-file package audit reports

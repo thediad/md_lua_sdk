@@ -15,6 +15,8 @@ Hardware verification is deferred; the release must say emulator-tested.
   and constant-folding differences remains before checking this item off.
   Found and corrected tiny negative fractional floor quotients becoming zero;
   runtime now agrees with the folded result for that boundary and both signs.
+  Corrected Genesis constant folding of `sgn(0)` from one to zero to match the
+  runtime; ROM checks compare folded and runtime signs for zero and both signs.
 - [ ] Record remaining numeric limits explicitly; resolve release-blocking bugs.
 
 ## 2. Integrated game validation

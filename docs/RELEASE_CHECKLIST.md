@@ -31,6 +31,8 @@ Hardware verification is deferred; the release must say emulator-tested.
 - [ ] Replace the sibling compiler dependency with a reproducible distributable
   dependency after verifying the exact canonical revision is available.
 - [ ] Inspect package contents and install into a clean isolated directory.
+  Initial `npm pack --dry-run` audit found and excluded example build output.
+  The source/asset package contents are checked; isolated installation is pending.
 - [ ] Create and build a new project without sibling development repositories.
 - [ ] Verify saved VS Code task paths and CLI diagnostics from the clean install.
 
@@ -52,5 +54,8 @@ evidence; rerun tests for the final candidate. Development commits are local.
 
 Completed user checkpoint: [release-check instructions](../examples/release_check/README.md).
 Packaging and the final documentation pass are still open, not release-ready.
+The required canonical compiler revision is currently local (3775b5e); GitHub
+availability could not be verified during the package audit. Do not replace the
+sibling dependency with an unverified remote pin or publish the development manifest.
 Current automated checkpoint: 115 Genesis tests and 48 canonical compiler tests
 passed without skips. Integrated ROM screen layout was inspected in Genesis Plus GX.

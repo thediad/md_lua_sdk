@@ -128,7 +128,9 @@ long md_maxf(long a, long b) { return a > b ? a : b; }
 // PICO-8 \ (floor div) and % (floor mod) on ints — sign-correct floor semantics.
 long md_ffmod(long a, long b) {
     long r;
-    if (b == 0) return 0;
+    // Every raw fixed-point integer is divisible by -1. Handle it before
+    // C remainder: LONG_MIN % -1 otherwise has an overflowing quotient.
+    if (b == 0 || b == -1) return 0;
     r = a % b;
     if (r != 0 && ((r < 0) != (b < 0))) r += b;
     return r;

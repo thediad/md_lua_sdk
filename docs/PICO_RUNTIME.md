@@ -153,6 +153,12 @@ The compiler's opt-in `runtimeDivision` capability preserves native multiplicati
 and leaves other SDK descriptors unchanged. Integer helpers are inline so literal
 divisors can still be optimized. Rebuild ROMs for these corrections.
 
+Fixed modulo also handles the smallest negative fixed-point divisor
+(-1/65536) explicitly: every representable value has remainder zero. This
+avoids the overflowing C quotient for the minimum value modulo raw -1.
+Boundary tests additionally cover negative division by zero, `atan2(0,0)`,
+the sign of a one-unit fraction and square root near the positive range limit.
+
 `abs` returns a fixed-point value even for integer inputs. The minimum value,
 -32768, has no positive counterpart in signed 16.16, so its absolute value
 saturates to 32767.99998474121. Runtime calls now match constant folding at this

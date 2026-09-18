@@ -6,6 +6,12 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Guarded fixed modulo by raw -1 to avoid signed quotient overflow. Expanded
+  numeric emulator checks for minimum values, one-unit fractions, zero division
+  and large square roots; 51 focused compiler/math/RNG tests passed.
+- Excluded generated example build directories from npm package contents.
+  Standalone dependency pinning and isolated installation remain pending.
+
 - User confirmed the integrated release-check ROM works as intended in BlastEm
   and BEST survives closing and reopening. Integrated user validation is complete;
   physical hardware verification remains deferred.

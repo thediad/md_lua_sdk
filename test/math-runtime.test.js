@@ -51,12 +51,16 @@ test("numeric boundaries preserve rounding, signs, square roots and angle quadra
     'atan2(a[6],a[6])==0.375','abs(atan2(a[6],a[7])-0.625)<0.0001',
     'sin(a[5])==-1','cos(a[5])==0',
     'a[3]%a[2]==0','a[3]/a[2]==abs(-32768)',
+    'a[6]%a[8]==0','a[7]%a[8]==0',
+    'a[6]/a[2]==-32768','atan2(a[2],a[2])==0.75',
+    'sgn(a[8])==-1','sqrt(a[7])>181','sqrt(a[7])<182',
   ];
-  await writeFile(source,`local a=array(7)
-local outcomes=array8(22)
+  await writeFile(source,`local a=array(8)
+local outcomes=array8(${checks.length})
 local passed=1
 function _init()
   a[1]=-1.5 a[2]=0 a[3]=2.5 a[4]=4 a[5]=0.25 a[6]=-32768 a[7]=32767
+  a[8]=-0.0000152587890625
   ${checks.map((c,i)=>`if ${c} then outcomes[${i+1}]=1 else passed=0 end`).join('\n')}
   local x=-7
   local y=3
@@ -66,7 +70,7 @@ function _draw()
   cls(0)
   rectfill(0,0,7,7,11)
   if passed==1 then rectfill(16,0,23,7,11) else rectfill(16,0,23,7,8) end
-  for i=1,22 do if outcomes[i]==1 then rectfill(i*8,16,i*8+3,19,11) end end
+  for i=1,${checks.length} do if outcomes[i]==1 then rectfill(i*8,16,i*8+3,19,11) end end
 end`);
   await buildMd(source,rom);
   const host=new LibretroHost({saveDir:work});

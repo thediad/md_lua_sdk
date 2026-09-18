@@ -6,6 +6,12 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Recorded successful user verification of Problems-panel navigation and rebuilding
+  after correcting a Lua error.
+- Project JSON syntax/validation errors now use clickable absolute source
+  locations. Exact JSON positions are used when supplied by Node; other errors
+  point to the config file start. UTF-8 BOM-prefixed project files are accepted.
+
 - Recorded user confirmation of the generated VS Code build task and starter
   movement/reset in BlastEm.
 - Generated VS Code tasks now match Lua diagnostics into the Problems panel.
@@ -128,6 +134,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
   supports its lowering. Genesis development retains save/load only.
 
 ### Validation policy
+
+- The subsequent project-diagnostics change passed 11 focused project, starter,
+  output-path and emulator checks; the full runtime suite was not repeated for
+  this configuration-only change.
 
 - The IDE-diagnostics validation passed 103 SDK tests with no skips, including
   nested-file error matching, generated-task builds and emulator regressions.

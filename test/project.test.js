@@ -78,3 +78,28 @@ test("direct ROM run bypasses project config; malformed run options never build"
     await assert.rejects(prepareRun(args,cwd,neverBuild));
   }
 });
+
+
+test("project JSON accepts a UTF-8 BOM and reports clickable configuration errors",async()=>{
+  const cwd=await mkdtemp(path.join(tmpdir(),"mdlua-json-diagnostics-"));
+  const file=path.join(cwd,"mdlua.json");
+  await writeFile(file,'\uFEFF{"entry":"main.lua","out":"build/game.bin"}');
+  assert.equal((await resolveBuild([],cwd)).out,path.join(cwd,"build/game.bin"));
+  const check=async(text,expected)=>{
+    await writeFile(file,text);
+    await assert.rejects(resolveBuild([],cwd),error=>{
+      assert.ok(error.message.startsWith(`${file}:`));
+      assert.match(error.message,/:\d+:\d+: error: /);
+      assert.match(error.message,expected);
+      return true;
+    });
+  };
+  await check('{\n "entry": "main.lua",\n "out": }',/invalid project JSON/);
+  // V8 omits source positions for some errors; those point to the file start.
+  await assert.rejects(resolveBuild([],cwd),error=>error.message.startsWith(`${file}:1:1: error:`));
+  await check('{\n "entry": "main.lua",\n "out" "game.bin"\n}',/invalid project JSON/);
+  await assert.rejects(resolveBuild([],cwd),error=>error.message.startsWith(`${file}:3:8: error:`));
+  await check('{"entyr":"main.lua"}',/unknown project setting: entyr/);
+  await check('{"music":"song.vgm"}',/invalid project setting: music/);
+  await check('null',/must contain an object/);
+});

@@ -26,17 +26,27 @@ export async function resolveBuild(args, cwd = process.cwd()) {
     }
   }
   const configPath = path.resolve(cwd, overrides.project ?? "mdlua.json");
+  const configError = (message, line = 1, column = 1) =>
+    new Error(`${configPath}:${line}:${column}: error: ${message.replace(/\r?\n/g, " ")}`);
   let config = {};
   try {
-    config = JSON.parse(await readFile(configPath, "utf8"));
+    const text = (await readFile(configPath, "utf8")).replace(/^\uFEFF/, "");
+    try { config = JSON.parse(text); }
+    catch (error) {
+      const location = /line (\d+) column (\d+)/.exec(error.message);
+      throw configError(`invalid project JSON: ${error.message}`, location ? Number(location[1]) : 1, location ? Number(location[2]) : 1);
+    }
   } catch (error) {
-    if (error.code !== "ENOENT" || overrides.project) throw new Error(`${configPath}: ${error.message}`);
+    if (error.code !== "ENOENT" || overrides.project) {
+      if (error.message.startsWith(`${configPath}:`)) throw error;
+      throw configError(error.message);
+    }
   }
-  if (!config || typeof config !== "object" || Array.isArray(config)) throw new Error("mdlua.json must contain an object");
+  if (!config || typeof config !== "object" || Array.isArray(config)) throw configError("project configuration must contain an object");
   for (const [key, value] of Object.entries(config)) {
-    if (!keys.has(key)) throw new Error(`unknown project setting: ${key}`);
+    if (!keys.has(key)) throw configError(`unknown project setting: ${key}`);
     const paths = key === "sfx" || key === "music" ? value : [value];
-    if (!Array.isArray(paths) || paths.some(p => typeof p !== "string" || !p.trim())) throw new Error(`invalid project setting: ${key}`);
+    if (!Array.isArray(paths) || paths.some(p => typeof p !== "string" || !p.trim())) throw configError(`invalid project setting: ${key}`);
   }
   const resolved = {};
   for (const key of keys) {

@@ -284,6 +284,10 @@ iterating and use packed pixel writes. Their work is bounded by the visible
 bitmap area even with distant endpoints. Diagonal lines retain their original
 pixel stepping and may take longer with distant endpoints.
 
+`circ` skips empty clips and circles whose bounding boxes miss the drawing clip.
+Visible or intersecting circles still require work proportional to their radius.
+Outline and filled-circle pixels have automated emulator coverage.
+
 The bitmap engine has a different
 memory/VRAM budget and lower full-buffer refresh throughput. Pre-scaled sprite
 assets cannot currently share its VRAM layout. `camera` affects the hardware

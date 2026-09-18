@@ -262,9 +262,14 @@ void md_rectfill(int x0, int y0, int x1, int y1, int color) {
 }
 void md_circ(int cx, int cy, int r, int color) {
     int x = r, y = 0, err = 1 - r;
+    int left = clip_x0 > 0 ? clip_x0 : 0;
+    int right = clip_x1 < 255 ? clip_x1 : 255;
+    int top = clip_y0 > 0 ? clip_y0 : 0;
+    int bottom = clip_y1 < 159 ? clip_y1 : 159;
     u16 col = resolve_color(color);
     bmp_ensure();
-    if (r < 0) return;
+    if (r < 0 || left > right || top > bottom ||
+        cx + r < left || cx - r > right || cy + r < top || cy - r > bottom) return;
     while (x >= y) {
         plot_clip(cx + x, cy + y, col); plot_clip(cx - x, cy + y, col);
         plot_clip(cx + x, cy - y, col); plot_clip(cx - x, cy - y, col);

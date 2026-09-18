@@ -289,6 +289,13 @@ scanline overflow and physical hardware behavior remain unverified.
 
 ### Filled-circle work bounds
 
+Outline circles (`circ`) reject empty clips and bounding boxes wholly outside
+the clipped bitmap before midpoint stepping. This avoids radius-sized work for
+those invisible circles. Circles whose bounding boxes intersect the clip still
+step with their radius, even if the outline ultimately misses every visible pixel.
+Emulator checks compare outline pixels for zero/negative radii, clipped and
+edge-crossing circles, and bound completion of repeated invisible large circles.
+
 `circfill` keeps the existing midpoint-circle shape, but fills visible horizontal
 spans through the packed rectangle-fill path. It skips rows outside the clip
 and bitmap instead of iterating over their pixels. Negative radii draw nothing;

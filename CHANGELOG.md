@@ -6,6 +6,12 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Outline circles now reject empty clips and bounding boxes outside the clipped
+  bitmap before radius-dependent stepping. Added outline pixel comparisons and
+  a repeated invisible-circle completion regression; visible circle shapes remain
+  unchanged. All three focused circle/line emulator tests passed. Disabling the
+  new guard caused the completion regression to fail as expected.
+
 - Horizontal/vertical bitmap lines and rectangle outlines now use clipped packed
   fills, avoiding work proportional to off-screen endpoint distances. Diagonal
   pixel stepping is preserved, with a signed-shift undefined behavior removed.

@@ -7,7 +7,8 @@ import {LibretroHost} from "romdev-core-host";
 import {core} from "romdev-core-gpgx";
 import {buildMd} from "../compiler/build-md.mjs";
 
-test("packed circle spans preserve midpoint pixels, clipping and large-radius completion",async()=>{
+for (const mode of ["circfill", "circ"]) {
+test(`${mode} preserves midpoint pixels, clipping and large-radius completion`,async()=>{
   const work=await mkdtemp(path.join(tmpdir(),"mdlua-circles-"));
   const source=path.join(work,"main.lua"),rom=path.join(work,"circles.bin");
   const circles=[[20,20,0],[40,20,1],[65,25,9],[110,40,23],[-3,90,15],[254,90,17],[80,158,12],[160,110,18],[210,120,-1]];
@@ -16,11 +17,22 @@ function _init()
   cls(0)
   circfill(128,80,32767,11)
   if pget(0,0)==11 and pget(255,159)==11 then passed=1 end
+  -- Repeated invisible outlines must complete without radius-sized work.
+  for i=1,100 do
+    circ(-32768,80,32767,8)
+    circ(128,-32768,32767,8)
+    clip(0,0,0,0)
+    circ(128,80,32767,8)
+    clip(0,0,1,1)
+    circ(32767,80,32766,8)
+    circ(128,32767,32766,8)
+    clip()
+  end
 end
 function _draw()
   cls(0)
   clip()
-  ${circles.map(([x,y,r],i)=>`${i===7?"clip(154,102,12,14)":"clip()"}\ncircfill(${x},${y},${r},11)`).join("\n")}
+  ${circles.map(([x,y,r],i)=>`${i===7?"clip(154,102,12,14)":"clip()"}\n${mode}(${x},${y},${r},11)`).join("\n")}
   clip()
   rectfill(240,0,247,7,11)
   if passed==1 then rectfill(224,0,231,7,11) else rectfill(224,0,231,7,8) end
@@ -48,8 +60,13 @@ end
       let x=r,y=0,err=1-r;
       while(x>=y){
         // Original per-pixel algorithm is the independent reference.
-        for(let i=cx-x;i<=cx+x;i++){plot(i,cy+y);plot(i,cy-y);}
-        for(let i=cx-y;i<=cx+y;i++){plot(i,cy+x);plot(i,cy-x);}
+        if (mode === "circfill") {
+          for(let i=cx-x;i<=cx+x;i++){plot(i,cy+y);plot(i,cy-y);}
+          for(let i=cx-y;i<=cx+y;i++){plot(i,cy+x);plot(i,cy-x);}
+        } else {
+          for(const [px,py] of [[x,y],[-x,y],[x,-y],[-x,-y],[y,x],[-y,x],[y,-x],[-y,-x]])
+            plot(cx+px,cy+py);
+        }
         y++;
         if(err<0)err+=2*y+1;else{x--;err+=2*(y-x)+1;}
       }
@@ -60,3 +77,4 @@ end
     }
   } finally {host.unloadMedia();}
 });
+}

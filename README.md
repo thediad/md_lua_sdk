@@ -70,9 +70,9 @@ end
 
 Build it to a ROM and run it:
 
-```sh
-mdlua build examples/hello/main.lua -o hello.bin
-mdlua run hello.bin
+```powershell
+node bin/mdlua-launch.mjs build --project examples/hello/mdlua.json
+node bin/mdlua-launch.mjs run examples/hello/build/hello.bin
 ```
 
 `mdlua run` opens an emulator window (bundled Genesis Plus GX core): arrows =
@@ -87,15 +87,17 @@ in BlastEm. That's the development loop: write
 </p>
 
 [`examples/starfall`](examples/starfall) is a complete little shmup - hardware
-sprites, a scrolling starfield, FM music + sfx, a HUD, win/lose states - in one
+sprites, a scrolling starfield, demo music and PSG effects, a HUD, win/lose states - in one
 `main.lua`. That's what this SDK is for:
 
-```sh
-mdlua build examples/starfall/main.lua \
-  --sheet examples/starfall/shmup_sheet.png \
-  --map examples/starfall/space_bg.png -o starfall.bin
-mdlua run starfall.bin
+```powershell
+node bin/mdlua-launch.mjs build --project examples/starfall/mdlua.json
+node bin/mdlua-launch.mjs run examples/starfall/build/starfall.bin
 ```
+
+These commands run from the SDK checkout. Open the resulting ROM in BlastEm
+if the optional SDL runner is unavailable. See the
+[Starfall instructions](examples/starfall/README.md) for controls and audio assets.
 
 ## Requirements
 

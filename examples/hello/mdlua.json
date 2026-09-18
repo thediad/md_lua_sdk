@@ -1,0 +1,4 @@
+{
+  "entry": "main.lua",
+  "out": "build/hello.bin"
+}

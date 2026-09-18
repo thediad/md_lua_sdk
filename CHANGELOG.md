@@ -6,6 +6,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Added project configuration and build instructions for Hello and Starfall.
+  README commands now include their assets through project files and use the
+  Windows-compatible launcher. Clarified Starfall's default PSG effect fallback.
+
 - Added a numeric behavior reference and reconciled README/cheat-sheet claims:
   `sgn(0)` is zero, general overflow compatibility is unsupported, and constant
   rounding/approximation limits are explicit. Clarified the development compiler

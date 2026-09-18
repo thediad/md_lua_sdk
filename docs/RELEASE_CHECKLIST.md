@@ -41,7 +41,9 @@ Hardware verification is deferred; the release must say emulator-tested.
 - [ ] Reconcile README, guide, cheat sheets and example build commands.
   README and numeric sections now distinguish this branch from published packages,
   document the sibling compiler requirement and remove PICO-8 overflow promises.
-  Example commands and remaining API descriptions still need review.
+  Hello and Starfall now have project manifests and documented launcher commands;
+  both commands built 524288-byte ROMs successfully. Remaining API descriptions
+  and other examples still need review.
 - [x] Label direct SGDK APIs as advanced and individually validated, not covered
   merely because a descriptor exists.
 - [ ] Run final automated suite and clean-install smoke test; record evidence.

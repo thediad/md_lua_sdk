@@ -1,0 +1,6 @@
+{
+  "entry": "main.lua",
+  "out": "build/starfall.bin",
+  "sheet": "shmup_sheet.png",
+  "map": "space_bg.png"
+}

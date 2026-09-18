@@ -16,6 +16,7 @@ through 32767.99998474121. This is not a promise of PICO-8 numeric compatibility
 | `sin`, `cos` | Turns; quarter-turn sine is -1; runtime uses a 256-entry table |
 | `atan2(dx,dy)` | Approximate screen-space angle in turns; `(0,0)` returns 0.75 |
 | Integer floor division (`\`) | Rounds toward negative infinity |
+| Fractional floor division (`\`) | Floors the raw-value quotient directly, retaining tiny negative remainders |
 | `%` | Floor remainder, with divisor's sign when nonzero; runtime zero divisor returns zero |
 | Runtime fixed division by zero | Negative numerator returns -32768; otherwise the positive range limit |
 | `rnd(n)` | For positive n, result is at least zero and below n; nonpositive n returns zero |

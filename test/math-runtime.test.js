@@ -54,8 +54,10 @@ test("numeric boundaries preserve rounding, signs, square roots and angle quadra
     'a[6]%a[8]==0','a[7]%a[8]==0',
     'a[6]/a[2]==-32768','atan2(a[2],a[2])==0.75',
     'sgn(a[8])==-1','sqrt(a[7])>181','sqrt(a[7])<182',
+    'a[8]\\a[3]==folded_floor',
   ];
   await writeFile(source,`local a=array(8)
+local folded_floor=-0.0000152587890625\\2.5
 local outcomes=array8(${checks.length})
 local passed=1
 function _init()
@@ -65,6 +67,7 @@ function _init()
   local x=-7
   local y=3
   if x\\y!=-3 or x%y!=2 then passed=0 end
+  if (0-a[8])\\a[1]!=-1 or a[8]\\a[1]!=0 then passed=0 end
 end
 function _draw()
   cls(0)

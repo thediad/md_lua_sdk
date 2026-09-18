@@ -41,5 +41,6 @@ static inline int md_ifmod(int a, int b) {
     return r;
 }
 long md_ffmod(long a, long b);
+int md_ffdiv(long a, long b);
 
 #endif

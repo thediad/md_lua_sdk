@@ -6,6 +6,11 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Fixed fractional floor division rounding tiny negative quotients to zero before
+  flooring. Genesis now uses a direct raw-value quotient helper; a ROM regression
+  compares it with a folded constant and checks both divisor signs. The canonical
+  option remains opt-in, leaving other SDK defaults unchanged.
+
 - Added project configuration and build instructions for Hello and Starfall.
   README commands now include their assets through project files and use the
   Windows-compatible launcher. Clarified Starfall's default PSG effect fallback.

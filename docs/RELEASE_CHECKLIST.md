@@ -13,6 +13,8 @@ Hardware verification is deferred; the release must say emulator-tested.
   square root, trig/atan2, division/modulo and constant/runtime agreement.
   Boundary coverage now includes each listed family; a final review of overflow
   and constant-folding differences remains before checking this item off.
+  Found and corrected tiny negative fractional floor quotients becoming zero;
+  runtime now agrees with the folded result for that boundary and both signs.
 - [ ] Record remaining numeric limits explicitly; resolve release-blocking bugs.
 
 ## 2. Integrated game validation

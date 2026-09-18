@@ -135,3 +135,12 @@ long md_ffmod(long a, long b) {
     if (r != 0 && ((r < 0) != (b < 0))) r += b;
     return r;
 }
+int md_ffdiv(long a, long b) {
+    long long q;
+    if (b == 0) return a < 0 ? -32768 : 32767;
+    // Divide raw values directly: quantizing a fixed quotient first can erase
+    // a negative fraction smaller than 1/65536 before floor is applied.
+    q = (long long)a / b;
+    if ((long long)a % b != 0 && ((a < 0) != (b < 0))) q--;
+    return (int)q;
+}

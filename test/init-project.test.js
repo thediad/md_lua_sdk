@@ -9,7 +9,6 @@ import { fileURLToPath } from "node:url";
 import { LibretroHost } from "romdev-core-host";
 import { core } from "romdev-core-gpgx";
 import { initProject } from "../compiler/init-project.mjs";
-import { prepareRun } from "../compiler/run-project.mjs";
 
 test("init refuses existing destinations and malformed arguments without modifying files", async () => {
   const cwd = await mkdtemp(path.join(tmpdir(), "mdlua-init-"));
@@ -26,8 +25,17 @@ test("CLI starter builds and supports movement and reset in the emulator", async
   const launcher = fileURLToPath(new URL("../bin/mdlua-launch.mjs", import.meta.url));
   await promisify(execFile)(process.execPath, [launcher, "init", "my game"], { cwd });
   const directory = path.join(cwd, "my game");
-  assert.deepEqual((await readdir(directory)).sort(), [".gitignore", "README.md", "main.lua", "mdlua.json"]);
-  const rom = await prepareRun([], directory);
+  assert.deepEqual((await readdir(directory)).sort(), [".gitignore", ".vscode", "README.md", "main.lua", "mdlua.json"]);
+  const config=JSON.parse(await readFile(path.join(directory,".vscode/tasks.json"),"utf8"));
+  const build=config.tasks.find(task=>task.label==="Genesis Lua: build");
+  assert.equal(build.type,"process");
+  assert.deepEqual(build.group,{kind:"build",isDefault:true});
+  const run=config.tasks.find(task=>task.label==="Genesis Lua: run");
+  assert.equal(run.args[1],"run");
+  const expand=value=>value.replaceAll("${workspaceFolder}",directory);
+  const env={...process.env};delete env.NODE_OPTIONS;
+  await promisify(execFile)(build.command,build.args.map(expand),{cwd:expand(build.options.cwd),env});
+  const rom=path.join(directory,"build/game.bin");
   const host = new LibretroHost({ saveDir: cwd });
   try {
     await host.loadCore(core.jsPath, core.wasmPath);

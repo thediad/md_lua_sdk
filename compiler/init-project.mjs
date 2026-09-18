@@ -1,4 +1,5 @@
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { mkdir, writeFile } from "node:fs/promises";
 
 const main = `-- Genesis hardware sprite starter. No external assets required.
@@ -39,13 +40,28 @@ export async function initProject(args, cwd = process.cwd()) {
     if (error.code === "EEXIST") throw new Error(`project destination already exists: ${directory}`);
     throw error;
   }
+  const launcher = fileURLToPath(new URL("../bin/mdlua-launch.mjs", import.meta.url));
+  const tasks = ["build", "run"].map(command => ({
+    label: `Genesis Lua: ${command}`, type: "process", command: process.execPath,
+    args: [launcher, command, "--project", "${workspaceFolder}/mdlua.json"],
+    options: { cwd: "${workspaceFolder}" }, problemMatcher: [],
+    ...(command === "build" ? { group: { kind: "build", isDefault: true } } : {}),
+  }));
+  await mkdir(path.join(directory, ".vscode"));
   const files = {
+    ".vscode/tasks.json": JSON.stringify({ version: "2.0.0", tasks }, null, 2) + "\n",
     "main.lua": main,
     "mdlua.json": JSON.stringify({ entry: "main.lua", out: "build/game.bin" }, null, 2) + "\n",
     ".gitignore": "/build/\n",
     "README.md": `# Genesis Lua starter
 
-With the SDK command installed, run from this directory:
+Open this folder in VS Code, save your Lua changes, then press **Ctrl+Shift+B**
+to build. Use **Terminal > Run Task > Genesis Lua: run** to build and open the
+optional emulator. These tasks use the Node and SDK paths found when the project
+was created; no global command is required. If you move the SDK or reinstall
+Node elsewhere, update those paths in .vscode/tasks.json.
+
+With the SDK command installed, you can also run from this directory:
 
 \x60\x60\x60powershell
 mdlua.cmd build

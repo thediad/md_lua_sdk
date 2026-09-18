@@ -79,8 +79,17 @@ Without a global command, from the SDK checkout use
 `node bin/mdlua-launch.mjs init ../my-game`, then build with
 `node bin/mdlua-launch.mjs build --project ../my-game/mdlua.json`.
 
-The new directory contains `main.lua`, `mdlua.json`, a README, and a `.gitignore`
-for build output. The starter uses an 8x8 fallback sprite: D-pad moves it and B
+The new directory contains `main.lua`, `mdlua.json`, a README, a `.gitignore`
+for build output, and `.vscode/tasks.json`.
+
+Open the generated game folder itself in VS Code. Save your changes and press
+**Ctrl+Shift+B** to build. **Terminal > Run Task > Genesis Lua: run** builds and
+opens the optional SDL emulator. These process tasks use the Node executable
+and SDK launcher paths recorded at project creation; no `npm link` or PowerShell
+execution-policy change is needed. If those installations move, update their
+paths in the tasks file. Tasks resolve `mdlua.json` from the opened game folder.
+
+ The starter uses an 8x8 fallback sprite: D-pad moves it and B
 resets its position. No asset downloads are needed. Creation requires a new
 directory with an existing parent; existing directories and files are refused.
 If creation fails partway through, the partial directory is retained for inspection.

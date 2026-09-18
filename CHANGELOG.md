@@ -6,6 +6,13 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- `mdlua init` now creates VS Code process tasks: Ctrl+Shift+B builds, and the
+  run task builds and launches the optional emulator. Tasks use the current
+  Node/SDK installation, so no global command is required; moving either
+  installation requires updating the saved task paths.
+- The generated task command was executed from a project path containing spaces
+  without NODE_OPTIONS; the resulting starter passed movement/reset emulator checks.
+
 - Builds reject output paths that would overwrite source or asset inputs;
   project builds also protect their configuration file. Existing file aliases
   are checked by identity, and normal rebuilding to a ROM path still works.

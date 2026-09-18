@@ -10,6 +10,13 @@ const REPO = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
 const LOOP = "function _update60()\nend\nfunction _draw()\nend\n";
 
+test("inactive layer APIs fail explicitly instead of silently doing nothing", () => {
+  for (const call of ["layer_show(0,false)", "layer_pri(0,1)"]) {
+    assert.throws(() => compile(`function _init() ${call} end\n${LOOP}`, "layers.lua"),
+      /not implemented on Genesis/);
+  }
+});
+
 function errorsOf(src) {
   return compile(src, "t.lua").diagnostics
     .filter((d) => d.severity === "error")
@@ -68,10 +75,12 @@ test("abs/sgn emit md_* helpers; fixed mid calls md_midf (int mid inlines)", () 
   assert.match(cf, /md_midf\(/);
 });
 
-test("fixed multiply/divide inline with a 64-bit intermediate (no runtime call)", () => {
+test("fixed multiplication stays native while division uses runtime semantics", () => {
   const c = cOf("local a = 1.5\nlocal b = 2.5\nlocal r = 0.0\nfunction _update60()\n  r = a * b\nend\n" + "function _draw()\nend\n");
   assert.match(c, /long long/);
-  assert.doesNotMatch(c, /md_fmul/);          // inlined, not the cdecl fallback
+  assert.doesNotMatch(c, /md_fmul/);
+  const divided = cOf("local a=1.5\nlocal b=2.5\nlocal r=0.0\nfunction _update60() r=a/b end\nfunction _draw() end");
+  assert.match(divided, /md_fdiv/);
 });
 
 // ---- Genesis-flavor verbs -------------------------------------------------------

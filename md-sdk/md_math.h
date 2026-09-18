@@ -23,8 +23,23 @@ int  md_sgni(int v);
 long md_sgnf(long v);
 int  md_midi(int a, int b, int c);
 long md_midf(long a, long b, long c);
-int  md_ifdiv(int a, int b);
-int  md_ifmod(int a, int b);
+long md_minf(long a, long b);
+long md_maxf(long a, long b);
+// Inline so literal divisors retain GCC's constant-division optimization.
+static inline int md_ifdiv(int a, int b) {
+    int q;
+    if (b == 0) return a < 0 ? -32768 : 32767;
+    q = a / b;
+    if ((a % b != 0) && ((a < 0) != (b < 0))) q--;
+    return q;
+}
+static inline int md_ifmod(int a, int b) {
+    int r;
+    if (b == 0) return 0;
+    r = a % b;
+    if (r != 0 && ((r < 0) != (b < 0))) r += b;
+    return r;
+}
 long md_ffmod(long a, long b);
 
 #endif

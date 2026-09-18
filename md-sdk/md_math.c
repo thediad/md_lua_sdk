@@ -13,7 +13,7 @@
 typedef long fx;   // 16.16
 
 fx md_fmul(fx a, fx b) { return (fx)(((long long)a * b) >> 16); }
-fx md_fdiv(fx a, fx b) { if (b == 0) return a < 0 ? (fx)0x80000000 : (fx)0x7FFFFFFF; return (fx)((((long long)a) << 16) / b); }
+fx md_fdiv(fx a, fx b) { if (b == 0) return a < 0 ? (fx)0x80000000 : (fx)0x7FFFFFFF; return (fx)(((long long)a * 65536LL) / b); }
 
 fx md_fsin(fx turns) { return md_sintab[(unsigned char)(((unsigned long)turns >> 8) & 0xFF)]; }
 fx md_fcos(fx turns) { return -md_sintab[(unsigned char)((((unsigned long)turns + 0x4000UL) >> 8) & 0xFF)]; }
@@ -37,13 +37,16 @@ fx md_fsqrt(fx x) {
 // atan2 -> PICO-8 turns [0,1) in 16.16. Reuses the gt-lua first-octant approx.
 fx md_fatan2(fx dx, fx dy) {
     unsigned char swap = 0, mirror = 0, negate = 0;
-    fx mx = dx, my = -dy;
-    fx ax, ay, r, a;
+    unsigned long ax, ay;
+    fx r, a;
     if (dx == 0 && dy == 0) return 0xC000L;
-    if (mx < 0) { mirror = 1; ax = -mx; } else ax = mx;
-    if (my < 0) { negate = 1; ay = -my; } else ay = my;
-    if (ay > ax) { swap = 1; r = md_fdiv(ax, ay); }
-    else         {           r = md_fdiv(ay, ax); }
+    mirror = dx < 0;
+    negate = dy > 0;
+    // Unsigned magnitudes include 0x80000000 without signed negation overflow.
+    ax = dx < 0 ? 0UL - (unsigned long)dx : (unsigned long)dx;
+    ay = dy < 0 ? 0UL - (unsigned long)dy : (unsigned long)dy;
+    if (ay > ax) { swap = 1; r = (fx)(((unsigned long long)ax * 65536ULL) / ay); }
+    else         {           r = (fx)(((unsigned long long)ay * 65536ULL) / ax); }
     a = md_fmul(r, 0x2000L + md_fmul(0x0B20L, 0x10000L - r));
     if (swap) a = 0x4000L - a;
     if (mirror) a = 0x8000L - a;
@@ -120,21 +123,9 @@ long md_midf(long a, long b, long c) {
     if (b > c) { b = c; }
     return a > b ? a : b;
 }
+long md_minf(long a, long b) { return a < b ? a : b; }
+long md_maxf(long a, long b) { return a > b ? a : b; }
 // PICO-8 \ (floor div) and % (floor mod) on ints — sign-correct floor semantics.
-int md_ifdiv(int a, int b) {
-    int q;
-    if (b == 0) return a < 0 ? -32768 : 32767;
-    q = a / b;
-    if ((a % b != 0) && ((a < 0) != (b < 0))) q--;
-    return q;
-}
-int md_ifmod(int a, int b) {
-    int r;
-    if (b == 0) return 0;
-    r = a % b;
-    if (r != 0 && ((r < 0) != (b < 0))) r += b;
-    return r;
-}
 long md_ffmod(long a, long b) {
     long r;
     if (b == 0) return 0;

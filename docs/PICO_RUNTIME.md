@@ -145,6 +145,14 @@ endpoints; their runtime is not bounded by the visible screen dimensions.
 
 ## Absolute values
 
+The numeric release audit added fixed-point `min`/`max` runtime helpers and
+corrected fractional `sgn` to return an integer sign. `atan2` uses unsigned
+magnitudes to handle -32768 without negation overflow. Integer floor division
+and modulo now use sign-correct helpers; fixed division checks a zero divisor.
+The compiler's opt-in `runtimeDivision` capability preserves native multiplication
+and leaves other SDK descriptors unchanged. Integer helpers are inline so literal
+divisors can still be optimized. Rebuild ROMs for these corrections.
+
 `abs` returns a fixed-point value even for integer inputs. The minimum value,
 -32768, has no positive counterpart in signed 16.16, so its absolute value
 saturates to 32767.99998474121. Runtime calls now match constant folding at this

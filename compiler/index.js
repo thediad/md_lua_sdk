@@ -11,7 +11,8 @@ import { BUILTINS, CALLBACKS } from "./builtins.js";
 const TARGET = {
   caps: {
     zpFastcall: false, zpUserFn: false, fixedZp: false,
-    banked: false, nativeDiv: true, colorBake: false, framebuffer: true,
+    // Use the SDK's sign-correct floor division/modulo and guarded division.
+    banked: false, nativeDiv: true, runtimeDivision: true, colorBake: false, framebuffer: true,
     prefix: "md", finalRename: true,
   },
   harness: {

@@ -73,8 +73,10 @@ export const CURATED_BUILTINS = {
   // map_show(layer): display the build-bundled tilemap on a layer (loads its
   //   tiles + map, enables it). Call once (usually _init).
   map_show:  { params: [["int", true]], ret: "void", c: "lc_map_show", mdOnly: true },
-  layer_show:{ params: [["int", false], ["flip", false]], ret: "void", c: "lc_layer_show", mdOnly: true },
-  layer_pri: { params: [["int", false], ["int", false]], ret: "void", c: "lc_layer_priority", mdOnly: true },
+  layer_show:{ params: [["int", false], ["flip", false]], ret: "void", mdOnly: true,
+    emit() { throw new Error("layer_show is not implemented on Genesis; it cannot hide or show a plane"); } },
+  layer_pri: { params: [["int", false], ["int", false]], ret: "void", mdOnly: true,
+    emit() { throw new Error("layer_pri is not implemented on Genesis; plane priority must be set through tile attributes"); } },
   // camera(x,y) already exists (PICO-8) and maps to gba_camera — hardware scroll.
   layer_scroll:{ params: [["int", false], ["coord", false], ["coord", false]], ret: "void", c: "lc_layer_scroll", mdOnly: true },
   // tget/tset: read/set a tile in a layer's map at (col,row). (Distinct from the
@@ -256,7 +258,8 @@ export const CURATED_BUILTINS = {
   flr:   { params: [["num", false]], ret: "int", c: null, special: "flr" },
   ceil:  { params: [["num", false]], ret: "int", c: null, special: "ceil" },
   abs:   { params: [["num", false]], ret: "fixed", c: null, special: "abs" },
-  sgn:   { params: [["num", false]], ret: "int", c: null, special: "sgn" },
+  sgn:   { params: [["num", false]], ret: "int",
+    emit(call, { argAt, cName }) { return `${cName("lc_sgni")}(${argAt(call, 0, "num", "0")})`; } },
   min:   { params: [["num", false], ["num", true]], ret: "same", c: null, special: "min" },
   max:   { params: [["num", false], ["num", true]], ret: "same", c: null, special: "max" },
   mid:   { params: [["num", false], ["num", false], ["num", false]], ret: "same", c: null, special: "mid" },

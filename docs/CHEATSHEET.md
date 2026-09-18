@@ -167,7 +167,7 @@ shows and scrolls it.
 | `tget(layer,col,row)` | read a map cell (the shown 64×32 plane area) |
 | `tset(layer,col,row,tile)` | change a tile at runtime (breakable blocks, doors) |
 | `layer_scroll(layer,x,y)` | scroll one plane directly: `1` = plane A (text); plane B (`0`) is owned by `camera()`/`hscroll()` |
-| `layer_show(l,on)` / `layer_pri(l,p)` | accepted for cross-SDK parity; no-ops today |
+| `layer_show(l,on)` / `layer_pri(l,p)` | unsupported; compilation fails explicitly |
 
 `layer` is accepted for cross-SDK parity - there is one asset map today, on
 plane B. `tget`/`tset` track the plane area (up to 64×32 cells).

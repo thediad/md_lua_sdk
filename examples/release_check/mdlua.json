@@ -1,0 +1,8 @@
+{
+  "entry": "main.lua",
+  "out": "build/release-check.bin",
+  "sheet": "../starfall/shmup_sheet.png",
+  "map": "../starfall/space_bg.png",
+  "music": ["../audio_check/tone.vgm"],
+  "sfx": ["../audio_check/tone.wav"]
+}

@@ -4,6 +4,8 @@ This guide describes the `luacretro-sync-test` development branch. The goal is
 Genesis-native games using convenient Lua functions, not PICO-8 cartridge
 compatibility. Use this guide and [runtime details](PICO_RUNTIME.md) for current
 behavior; [CHANGELOG](../CHANGELOG.md) records changes as development proceeds.
+The [release checklist](RELEASE_CHECKLIST.md) defines the first-release scope
+and remaining acceptance checks.
 
 ## Quick build on this workstation
 
@@ -301,6 +303,14 @@ assets cannot currently share its VRAM layout. `camera` affects the hardware
 path, not bitmap coordinates. See [pre-scaled sprites](PRESCALED_SPRITES.md).
 
 ## Known limitations / deliberate decisions
+
+- `layer_show` and `layer_pri` are unsupported and now fail compilation. Older
+  builds silently ignored these calls; remove them or manage tile attributes
+  explicitly through advanced SGDK APIs.
+- Numeric boundary regressions cover sign, min/max/mid, rounding, sqrt, trig and
+  angles as well as abs/RNG. Division/modulo use runtime helpers for floor signs
+  and zero checks; multiplication retains native code. General arithmetic outside
+  the signed 16.16 range is not a supported way to saturate values.
 
 - Physical hardware verification is deferred; development continues on emulators.
 - Save/load remains the persistence API. No cartdata/dget/dset mode or reserved slots.

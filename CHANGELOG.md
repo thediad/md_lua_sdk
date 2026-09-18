@@ -6,6 +6,16 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Added a finite first-release checklist and an integrated `release_check` game
+  covering movement, collection, scrolling, tone music/effects and explicit saves.
+  Automated play checks collection, saved bytes and continued movement; normal
+  BlastEm quit/reopen persistence is the next user checkpoint.
+- `layer_show`/`layer_pri` now reject compilation instead of silently doing nothing.
+- Numeric audit: supplied missing fixed min/max helpers, corrected fractional
+  sign return typing, and fixed minimum-value angle magnitudes. Genesis opts into
+  runtime division/modulo semantics while preserving native multiplication and
+  inline integer division optimization. Other SDK defaults remain unchanged.
+
 - Fixed runtime `abs(-32768)` to saturate like compiler-folded constants instead
   of overflowing. Corrected the Genesis `abs` return descriptor to fixed point,
   preventing extra scaling in mixed integer/fixed expressions. Added emulator
@@ -167,6 +177,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
   supports its lowering. Genesis development retains save/load only.
 
 ### Validation policy
+
+- First-release audit checkpoint: 115 Genesis tests and 48 canonical compiler
+  tests passed, no skips. Includes integrated play/save checks and numeric edge
+  regressions. BlastEm integrated play and automatic save persistence remain pending.
 
 - The absolute-value fixes passed the full SDK suite: 112 tests with no failures
   or skips. The new emulator check reproduced incorrect results before the fixes.

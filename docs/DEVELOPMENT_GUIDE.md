@@ -121,6 +121,9 @@ determines zero-based IDs in Lua.
 - Without an output setting, build writes `game.bin` beside the entry file.
 - Missing flag values, unknown settings/options, and malformed JSON fail clearly.
 - Existing explicit source/asset build arguments remain supported.
+- The ROM output must differ from source, asset and project-configuration files.
+  Collisions (including existing file aliases) are rejected before the build.
+  Rebuilding to an existing ROM path is supported.
 
 ## Write the game
 

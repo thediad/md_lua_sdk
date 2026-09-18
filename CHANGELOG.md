@@ -6,6 +6,11 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Builds reject output paths that would overwrite source or asset inputs;
+  project builds also protect their configuration file. Existing file aliases
+  are checked by identity, and normal rebuilding to a ROM path still works.
+  Source/asset collisions are checked before compilation and again before writing.
+
 - Successful CLI builds now report graphics tiles used/free and the sheet/map/
   pre-scaled breakdown. `buildMd` also returns these counts as `graphics`.
   The report includes fallback sheet tiles and deduplicated map tile zero;
@@ -111,11 +116,8 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ### Validation policy
 
-- The graphics-report validation passed 100 SDK tests with no skips, including
-  CLI fallback counts, deduplicated map counts and exact-capacity reporting.
-  Starfall built with 113/1424 tiles used (16 sheet + 97 map).
-  Audio-output checks pass; the user confirmed the audio-check sequence in BlastEm.
-  Physical hardware verification remains pending.
+- The output-path validation passed 102 SDK tests with no skips, including
+  source/asset/configuration collisions, hard-link aliases and normal CLI builds.
 - Run `npm.cmd test` for current results; do not treat historical counts as live status.
 - Physical hardware verification is pending and does not block emulator-focused work.
 - Audio, advanced direct SGDK APIs, and performance under real game workloads

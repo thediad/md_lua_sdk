@@ -1,4 +1,5 @@
 import path from "node:path";
+import { assertOutputDistinct } from "./output-path.mjs";
 import { readFile } from "node:fs/promises";
 
 const options = {
@@ -46,6 +47,8 @@ export async function resolveBuild(args, cwd = process.cwd()) {
   }
   resolved.entry ??= path.resolve(path.dirname(configPath), "main.lua");
   resolved.out ??= path.join(path.dirname(resolved.entry), "game.bin");
+  await assertOutputDistinct(resolved.out, [configPath, resolved.entry, resolved.sheet,
+    resolved.map, resolved.gff, resolved.spriteVariants, ...(resolved.sfx ?? []), ...(resolved.music ?? [])]);
   return {
     entry: resolved.entry, out: resolved.out,
     assets: { sheetPath: resolved.sheet, mapPath: resolved.map, gffPath: resolved.gff,

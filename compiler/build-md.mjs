@@ -12,6 +12,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildGenesisC, finalizeGenesisRom, parseBuildLog, shareDir } from "romdev-toolchain-m68k-gcc";
+import { assertOutputDistinct } from "./output-path.mjs";
 import { bitmapTimingSource } from "./bitmap-timing.mjs";
 import { compile, formatDiagnostics } from "./index.js";
 import { sheetAssetsHeader, mapAssets, scaledSheetAssets, flagsAssetHeader } from "./asset-headers.mjs";
@@ -66,6 +67,9 @@ async function buildAssetsHeader(opts) {
 // generated C is identical on every host.)
 
 export async function buildMd(entryLua, outPath, opts = {}) {
+  const inputs = [entryLua, opts.sheetPath, opts.mapPath, opts.gffPath,
+    opts.spriteVariantsPath, ...(opts.sfxPaths ?? []), ...(opts.musicPaths ?? [])];
+  await assertOutputDistinct(outPath, inputs);
   const src = await readFile(entryLua, "utf8");
   const assets = await buildAssetsHeader(opts);
   // num8 (8.8): emit supports it; the RUNTIME does not yet (16.16 sin table,
@@ -142,6 +146,7 @@ export async function buildMd(entryLua, outPath, opts = {}) {
   }
   const rom = finalizeGenesisRom(r.binary);
   await mkdir(path.dirname(path.resolve(outPath)), { recursive: true });
+  await assertOutputDistinct(outPath, inputs);
   await writeFile(outPath, rom);
   return { ok: true, outPath, log: r.log, spriteVariants: assets.scaling, graphics: assets.graphics };
 }

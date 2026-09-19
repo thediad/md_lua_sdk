@@ -12,6 +12,13 @@
 
 typedef long fx;   // 16.16
 
+int md_ceil(long value) {
+    // C division truncates toward zero: already ceil for negative values.
+    // Do not add 65535 to the raw value; that overflows near LONG_MAX.
+    int whole = (int)(value / 65536L);
+    return whole + (value > 0 && (value & 65535L) != 0);
+}
+
 fx md_fmul(fx a, fx b) { return (fx)(((long long)a * b) >> 16); }
 fx md_fdiv(fx a, fx b) { if (b == 0) return a < 0 ? (fx)0x80000000 : (fx)0x7FFFFFFF; return (fx)(((long long)a * 65536LL) / b); }
 

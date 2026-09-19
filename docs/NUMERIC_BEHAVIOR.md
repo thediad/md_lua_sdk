@@ -28,6 +28,12 @@ through 32767.99998474121. This is not a promise of PICO-8 numeric compatibility
 arguments use runtime helpers so each argument is evaluated once. ROM tests
 cover this path with a counter, including the omitted second argument.
 
+Runtime `ceil` can produce the integer 32768 for inputs above 32767. It now
+avoids raw fixed-point overflow during rounding. This result cannot be represented
+as signed 16.16: keep it in integer operations, or clamp it before assigning it
+to a fixed-point array or passing it to a fixed-point API. Out-of-range folded
+initializers still fall under the conversion limits below and remain under review.
+
 - Keep intermediate arithmetic inside the fixed-point range. General overflow,
   integer/fixed conversions outside that range and excessive shift counts do not
   have a supported wraparound or saturation contract.

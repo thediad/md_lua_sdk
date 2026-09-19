@@ -256,7 +256,11 @@ export const CURATED_BUILTINS = {
 
   // ---- math ------------------------------------------------------------------
   flr:   { params: [["num", false]], ret: "int", c: null, special: "flr" },
-  ceil:  { params: [["num", false]], ret: "int", c: null, special: "ceil" },
+  ceil:  { params: [["num", false]], ret: "int",
+    emit(call, { argAt, cName }) {
+      return call.args[0].tk === "int" ? argAt(call, 0, "int", "0")
+        : `${cName("lc_ceil")}(${argAt(call, 0, "num", "0")})`;
+    } },
   abs:   { params: [["num", false]], ret: "fixed", c: null, special: "abs" },
   sgn:   { params: [["num", false]], ret: "int",
     constEval([value]) { return value > 0 ? 1 : value < 0 ? -1 : 0; },

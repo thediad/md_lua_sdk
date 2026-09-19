@@ -6,6 +6,12 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Fixed runtime `ceil` overflowing near the positive fixed-point limit. Genesis
+  now uses an SDK-owned helper for fractional inputs and preserves integer inputs.
+  Boundary ROM checks failed before the fix and pass afterward; all 50 focused
+  math/compiler tests passed. The integer result 32768 is not representable in
+  fixed-point storage; this conversion limit is documented.
+
 - The canonical lexer now accepts the exact largest 16.16 literal,
   32767.99998474121 (`0x7fff.ffff`), instead of rejecting it against a rounded
   limit. Larger literals remain rejected. Genesis boundary ROM tests pass.

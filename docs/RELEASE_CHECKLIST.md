@@ -22,6 +22,8 @@ Hardware verification is deferred; the release must say emulator-tested.
   Corrected the lexer's rounded upper range limit; the exact maximum literal
   now compiles and passes Genesis ROM checks. Review of rounding results beyond
   the fixed-point range remains open.
+  Runtime ceiling now rounds upper-bound fractions without overflowing. Conversion
+  of its 32768 integer result back to fixed point remains outside the supported range.
 - [ ] Record remaining numeric limits explicitly; resolve release-blocking bugs.
 
 ## 2. Integrated game validation

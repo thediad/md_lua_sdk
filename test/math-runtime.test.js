@@ -7,7 +7,7 @@ import {LibretroHost} from "romdev-core-host";
 import {core} from "romdev-core-gpgx";
 import {buildMd} from "../compiler/build-md.mjs";
 
-test("runtime abs and sign match constant folding at fixed-point boundaries",async()=>{
+test("abs/sign folding and ceiling preserve fixed-point boundary results",async()=>{
   const work=await mkdtemp(path.join(tmpdir(),"mdlua-abs-"));
   const source=path.join(work,"main.lua"),rom=path.join(work,"abs.bin");
   const values=[-32768,-32767.5,-3,-0.5,0,0.5,32767,32767.5,32767.99998474121];
@@ -22,6 +22,8 @@ function _init()
   ${values.map((v,i)=>`if sgn(input[${i+1}])!=sign${i} then passed=0 end`).join("\n")}
   local minimum=-32768
   if abs(minimum)!=abs(-32768) then passed=0 end
+  if ceil(input[8])<=32767 or ceil(input[9])<=32767 then passed=0 end
+  if ceil(input[2])!=-32767 or ceil(input[4])!=0 then passed=0 end
 end
 function _draw()
   cls(0)
@@ -37,7 +39,7 @@ end`);
     const {width,rgba}=host.screenshotRgba();
     const pixel=x=>Array.from(rgba.slice((34*width+x+32)*4,(34*width+x+32)*4+3));
     assert.notDeepEqual(pixel(2),pixel(10),"ROM reached drawing");
-    assert.deepEqual(pixel(18),pixel(2),"runtime and constant abs/sign agree");
+    assert.deepEqual(pixel(18),pixel(2),"abs/sign folding and ceiling checks agree");
   } finally {host.unloadMedia();}
 });
 

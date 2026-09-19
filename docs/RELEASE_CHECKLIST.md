@@ -71,6 +71,8 @@ dependency as a release blocker; this is expected for the development manifest.
   Hello and Starfall now have project manifests and documented launcher commands;
   both commands built 524288-byte ROMs successfully. Remaining API descriptions
   and other examples still need review.
+  Drawing-mode/clip descriptions, asset command syntax, PSG fallback duration and
+  hardware validation claims have also been reconciled with the runtime.
 - [x] Label direct SGDK APIs as advanced and individually validated, not covered
   merely because a descriptor exists.
 - [ ] Run final automated suite and clean-install smoke test; record evidence.

@@ -6,6 +6,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Corrected guide details for mode-dependent `cls`, clip preservation/intersection
+  and the sustained PSG fallback. Replaced an invalid shell continuation example
+  with a copyable build command and clarified emulator-only validation claims.
+
 - Prepared draft candidate release notes with migration details and remaining
   publication gates. Corrected stale guaranteed-frame-rate and Hello bitmap claims
   in introductory documentation; no release version or publication was changed.

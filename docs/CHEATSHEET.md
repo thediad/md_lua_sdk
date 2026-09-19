@@ -89,17 +89,18 @@ frame (mid-frame CRAM writes race the VDP - the runtime handles it).
 
 | Call | What |
 |---|---|
-| `cls([c])` | clear the screen to color `c` (also resets the print cursor) |
+| `cls([c])` | clear the active drawing mode; reset the print cursor; preserve the clip |
 | `pset(x,y,[c])` | set one pixel |
 | `pget(x,y)` | read a pixel back (0 if the bitmap engine is off) |
 | `rect(x0,y0,x1,y1,[c])` / `rectfill(...)` | outline / filled rectangle (inclusive corners) |
 | `circ(x,y,r,[c])` / `circfill(...)` | outline / filled circle |
 | `line(x0,y0,x1,y1,[c])` | a line |
 | `color(c)` | set the default draw color |
-| `clip(x,y,w,h)` | bound bitmap draws to a rectangle; `clip()` (no args) resets |
+| `clip(x,y,w,h[,previous])` | bound bitmap draws; `previous=true` intersects; `clip()` resets |
 
-All of these live in the 256×160 bitmap (see above). `camera()` does **not**
-offset them - it drives the hardware sprite/plane scroll instead.
+Pixel and shape calls activate the 256x160 bitmap. `cls` alone does not: it
+clears plane A in hardware mode or the full pixel buffer in bitmap mode.
+`camera()` affects hardware sprites/plane scroll, not bitmap coordinates.
 
 ---
 
@@ -395,7 +396,8 @@ end
   13.3 kHz, 256-byte aligned (the XGM2 contract). Music and SFX share the
   driver and play TOGETHER (PCM channel 1 is left for music; sfx defaults
   to channel 3).
-- With no `--sfx` bank, `sfx(n)` falls back to a PSG blip pitched by `n`.
+- With no `--sfx` bank, `sfx(n)` falls back to a sustained PSG tone pitched by `n`; it has no timed envelope.
+  Supply a WAV bank for finite effects.
 
 ```lua
 function _init() music(0) end          -- looped
@@ -470,14 +472,14 @@ end
 
 ## Assets & building
 
-```sh
-mdlua build main.lua \
-  --sheet sprites.png   \  # sprite art (PNG -> VDP tiles + palette line 1)
-  --map level.png       \  # a tilemap (deduped tiles + palette line 2)
-  --sfx laser.wav,boom.wav \  # PCM sample bank (sfx(n) = list order)
-  --music intro.vgm,level.vgm \  # XGM2 song bank (music(n) = list order)
-  -o game.bin              # output ROM (padded + checksummed)
+```powershell
+mdlua.cmd build main.lua --sheet sprites.png --map level.png --sfx laser.wav,boom.wav --music intro.vgm,level.vgm -o game.bin
 ```
+
+This assumes the optional linked CLI. Without it, use the SDK launcher from its
+checkout: `node bin/mdlua-launch.mjs build --project path/to/mdlua.json`.
+Project configuration is the recommended way to retain asset paths. Sheet/map
+assets use palette lines 1/2; audio IDs follow their list order.
 
 - PNGs can be indexed, RGB, RGBA, or grayscale - dimensions in multiples of
   8, up to 15 opaque colors (pixels with alpha < 128 read as color 0,
@@ -486,8 +488,8 @@ mdlua build main.lua \
   (Genesis Plus GX, 3× scale; needs the optional `@kmamal/sdl`). Keys: arrows
   = d-pad, `Z`/`X`/`C` = A/B/C, Enter = START. `run` takes `--sheet`/`--map`.
 - `mdlua c main.lua` prints the generated C for debugging.
-- The `.bin` gets the header checksum strict loaders demand - it runs in any
-  Genesis emulator and on flashcarts.
+- The `.bin` includes a Genesis header checksum. This branch is tested with
+  Genesis Plus GX and BlastEm; physical hardware verification is deferred.
 
 ---
 

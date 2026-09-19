@@ -195,7 +195,7 @@ The reason this target is fun:
 - **FM music.** `music(n)` plays song n from your `--music` bank through the
   XGM2 driver on the Z80 - the sound of the platform. `music(-1)` stops,
   `music(n, false)` plays once. `sfx(n)` fires PCM samples from your `--sfx`
-  bank OVER the music (PSG blip fallback so you hear something before assets
+  bank OVER the music (PSG tone fallback so you hear something before assets
   exist; a built-in demo tune answers `music()` before you add songs).
 - **`hud(rows)`** claims the VDP's third plane as an unscrollable status bar;
   `print` routes into it automatically.

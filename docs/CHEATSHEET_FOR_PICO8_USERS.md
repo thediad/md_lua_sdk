@@ -309,12 +309,13 @@ function _draw()
 end
 ```
 
-`mdlua build main.lua -o game.bin` → runs in any Genesis emulator
-(`mdlua run main.lua` opens one) and on real hardware via flashcart.
+Build with `mdlua.cmd build main.lua -o game.bin` when the CLI is linked,
+then open the ROM in BlastEm. The optional SDL runner also accepts the ROM.
+Physical hardware verification is deferred.
 
 ---
 
-*Status reflects the shipped implementation, cross-checked against the
+*Status describes this development branch, cross-checked against the
 compiler builtins and the SDK runtime. PICO-8 is by Lexaloffle Games; the
 Sega Mega Drive / Genesis is Sega hardware. This SDK is an independent
 homebrew toolchain.*

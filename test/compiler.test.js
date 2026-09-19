@@ -10,6 +10,15 @@ const REPO = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
 const LOOP = "function _update60()\nend\nfunction _draw()\nend\n";
 
+test("out-of-range folded global initializers fail instead of wrapping", () => {
+  for (const value of ["ceil(32767.5)", "32767+1", "-32768-1",
+    "array(2,32767+1)", "{1,32767+1}"]) {
+    assert.match(errorsOf(`local x=${value}\n${LOOP}`).join("\n"), /constant initializer is outside/);
+  }
+  for (const value of ["32767.99998474121", "-32768", "abs(-32768)", "array(2,32767)"])
+    cOf(`local x=${value}\n${LOOP}`);
+});
+
 test("inactive layer APIs fail explicitly instead of silently doing nothing", () => {
   for (const call of ["layer_show(0,false)", "layer_pri(0,1)"]) {
     assert.throws(() => compile(`function _init() ${call} end\n${LOOP}`, "layers.lua"),

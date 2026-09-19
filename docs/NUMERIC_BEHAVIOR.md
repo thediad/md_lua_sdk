@@ -31,8 +31,10 @@ cover this path with a counter, including the omitted second argument.
 Runtime `ceil` can produce the integer 32768 for inputs above 32767. It now
 avoids raw fixed-point overflow during rounding. This result cannot be represented
 as signed 16.16: keep it in integer operations, or clamp it before assigning it
-to a fixed-point array or passing it to a fixed-point API. Out-of-range folded
-initializers still fall under the conversion limits below and remain under review.
+to a fixed-point array or passing it to a fixed-point API. Folded global
+initializers outside the fixed-point range now produce a compiler error, including
+`local n=ceil(32767.5)`. Scalar globals, non-byte array fills and numeric table
+initializers are checked. This does not add runtime overflow checks.
 
 - Keep intermediate arithmetic inside the fixed-point range. General overflow,
   integer/fixed conversions outside that range and excessive shift counts do not

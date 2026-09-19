@@ -6,6 +6,11 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Genesis rejects out-of-range folded scalar globals, non-byte array fills and
+  numeric table initializers instead of silently wrapping their stored values.
+  The shared checker option is opt-in; other SDK defaults remain unchanged.
+  Validation: 51 focused Genesis tests and 50 canonical compiler tests passed.
+
 - Fixed runtime `ceil` overflowing near the positive fixed-point limit. Genesis
   now uses an SDK-owned helper for fractional inputs and preserves integer inputs.
   Boundary ROM checks failed before the fix and pass afterward; all 50 focused

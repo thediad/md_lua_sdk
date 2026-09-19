@@ -24,6 +24,9 @@ Hardware verification is deferred; the release must say emulator-tested.
   the fixed-point range remains open.
   Runtime ceiling now rounds upper-bound fractions without overflowing. Conversion
   of its 32768 integer result back to fixed point remains outside the supported range.
+  Folded global initializers outside the supported range now fail compilation
+  (scalars, non-byte array fills and numeric tables); runtime overflow remains
+  unsupported rather than dynamically checked.
 - [ ] Record remaining numeric limits explicitly; resolve release-blocking bugs.
 
 ## 2. Integrated game validation

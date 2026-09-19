@@ -31,6 +31,7 @@ export function compile(source, file = "main.lua", opts = {}) {
     builtins: BUILTINS,
     callbacks: CALLBACKS,
     ...opts,
+    rejectInitializerOverflow: true,
     target: TARGET,   // the SDK OWNS its target - not overridable by callers
   });
 }

@@ -50,7 +50,7 @@ sprite you move with the d-pad. `_update60` runs movement once per game loop;
 -- is needed. Colors are PICO-8-style indices 0-15 (1 dark-blue, 14 pink).
 local x, y = 152, 104
 
-function _update60()               -- 60fps input + movement
+function _update60()               -- input + movement each game loop
   if (btn(1)) then x += 2 end      -- right
   if (btn(0)) then x -= 2 end      -- left
   if (btn(3)) then y += 2 end      -- down
@@ -130,8 +130,8 @@ both.
   (`starfall`) uses.
 - **Bitmap verbs** - immediate `pset`/`rect`/`circ`/`line` into a 256×160
   software framebuffer (the SGDK BMP engine, lazy-initialized, ~41 KB of the
-  64 KB work RAM). Simplest to start with (the hello above); not the
-  scrolling-game path.
+  64 KB work RAM). Useful for pixel drawing and effects. Hello above uses
+  hardware sprites; the bitmap engine has a separate memory and timing budget.
 
 ## The PICO-8 contract
 

@@ -75,6 +75,8 @@ dependency as a release blocker; this is expected for the development manifest.
   merely because a descriptor exists.
 - [ ] Run final automated suite and clean-install smoke test; record evidence.
 - [ ] Choose release version and assemble release notes with compatibility changes.
+  [Draft notes](RELEASE_NOTES_DRAFT.md) propose 0.4.0-rc.1 and list compatibility
+  changes. Version availability and the final manifest update remain pending.
 - [ ] Explicit publishing decision, then publish/tag the reviewed candidate.
 
 Optional future work: physical hardware certification, additional platforms and

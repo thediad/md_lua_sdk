@@ -6,6 +6,10 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Prepared draft candidate release notes with migration details and remaining
+  publication gates. Corrected stale guaranteed-frame-rate and Hello bitmap claims
+  in introductory documentation; no release version or publication was changed.
+
 - Full accumulated numeric validation passed 119 Genesis tests with no skips;
   the scoped numeric audit is complete with documented overflow/precision limits.
 - Verified isolated installation from local SDK/compiler archives, starter

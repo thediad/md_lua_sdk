@@ -74,13 +74,13 @@ pad - the Genesis is a two-controller machine.
 | Call | | Notes |
 |---|:--:|---|
 | `_init()` | ✅ | runs once at startup |
-| `_update60()` | ✅ | logic @ 60 fps - the native rate |
-| `_update()` | 🟡 | runs every other native frame (30 Hz at NTSC) |
+| `_update60()` | ✅ | once per game loop; rate depends on region and drawing workload |
+| `_update()` | 🟡 | runs every other game loop |
 | `_draw()` | ✅ | 1× per frame |
 
-Same fixed-timestep model as PICO-8 (no `dt`; move by a constant per frame).
-The 68000 holds 60 fps on the sprite/tile path - **`_update60()` is the
-default here.**
+Use `_update60()` for input and movement each game loop. Nominal video timing is
+60 Hz on NTSC and 50 Hz on PAL; heavy drawing can reduce loop frequency.
+`time()` advances by 1/60 per loop. Use `realsecs()` for elapsed video time.
 
 ## Dialect & syntax
 

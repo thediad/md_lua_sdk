@@ -43,8 +43,8 @@ initializers are checked. This does not add runtime overflow checks.
   in their rounding or approximation; do not assume exact equality for calculated
   fractions or trigonometric results. Use a tolerance appropriate to the calculation.
 - Runtime zero-divisor handling is a fallback, not a way to produce infinity.
-  Avoid zero divisors in source expressions, including folded constants; constant
-  evaluation is still under final release review.
+  Avoid zero divisors in source expressions, including folded constants; do not
+  use runtime fallback behavior as a constant-expression contract.
 - The simulation clock is fixed point too; long-running games should maintain
   bounded counters instead of assuming an unlimited `time()` value.
 
@@ -57,5 +57,5 @@ ROMs that use this expression in global initializers to apply the correction.
 ROM tests cover abs boundary/constant agreement, rounding, fractional signs,
 min/max/mid, roots, angle quadrants including -32768, signed division/remainders,
 zero divisors and RNG range/reseeding. This is targeted coverage, not exhaustive
-proof over all numeric inputs. The release checklist retains the final overflow
-and constant-folding review as an open item.
+proof over all numeric inputs. The scoped release audit is complete with the
+limits above; newly discovered in-range correctness bugs still require fixes.

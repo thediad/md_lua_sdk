@@ -6,6 +6,12 @@ released on npm. See [the guide](docs/DEVELOPMENT_GUIDE.md) for usage and covera
 
 ## Unreleased
 
+- Full accumulated numeric validation passed 119 Genesis tests with no skips;
+  the scoped numeric audit is complete with documented overflow/precision limits.
+- Verified isolated installation from local SDK/compiler archives, starter
+  creation, CLI/task builds and source diagnostics. A test-only compiler override
+  was required; final remote dependency pinning and installation remain pending.
+
 - Genesis rejects out-of-range folded scalar globals, non-byte array fills and
   numeric table initializers instead of silently wrapping their stored values.
   The shared checker option is opt-in; other SDK defaults remain unchanged.

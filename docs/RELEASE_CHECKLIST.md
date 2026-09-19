@@ -9,10 +9,11 @@ Hardware verification is deferred; the release must say emulator-tested.
 
 - [x] Establish this release scope and completion checklist.
 - [x] Reject silently inactive layer visibility/priority calls (compiler regression).
-- [ ] Finish numeric boundary tests: abs, RNG, sign/min/max/mid, rounding,
+- [x] Finish the scoped numeric boundary tests: abs, RNG, sign/min/max/mid, rounding,
   square root, trig/atan2, division/modulo and constant/runtime agreement.
-  Boundary coverage now includes each listed family; a final review of overflow
-  and constant-folding differences remains before checking this item off.
+  Boundary coverage includes each listed family. General runtime overflow and
+  exact fractional/trigonometric folding equivalence are outside the supported
+  contract; see [numeric behavior](NUMERIC_BEHAVIOR.md).
   Found and corrected tiny negative fractional floor quotients becoming zero;
   runtime now agrees with the folded result for that boundary and both signs.
   Corrected Genesis constant folding of `sgn(0)` from one to zero to match the
@@ -20,14 +21,16 @@ Hardware verification is deferred; the release must say emulator-tested.
   Added missing integer min/max fallback helpers; function-call arguments and
   omitted second arguments now build and pass single-evaluation ROM checks.
   Corrected the lexer's rounded upper range limit; the exact maximum literal
-  now compiles and passes Genesis ROM checks. Review of rounding results beyond
-  the fixed-point range remains open.
+  now compiles and passes Genesis ROM checks. Rounding results beyond the
+  fixed-point range are documented as integer-only results.
   Runtime ceiling now rounds upper-bound fractions without overflowing. Conversion
   of its 32768 integer result back to fixed point remains outside the supported range.
   Folded global initializers outside the supported range now fail compilation
   (scalars, non-byte array fills and numeric tables); runtime overflow remains
   unsupported rather than dynamically checked.
-- [ ] Record remaining numeric limits explicitly; resolve release-blocking bugs.
+- [x] Record remaining numeric limits explicitly; resolve known numeric release blockers.
+  Full SDK checkpoint: 119 tests passed without skips. This closes the scoped
+  audit, not a claim of exhaustive correctness for every possible input.
 
 ## 2. Integrated game validation
 
@@ -51,11 +54,14 @@ dependency as a release blocker; this is expected for the development manifest.
 
 - [ ] Replace the sibling compiler dependency with a reproducible distributable
   dependency after verifying the exact canonical revision is available.
-- [ ] Inspect package contents and install into a clean isolated directory.
+- [x] Inspect package contents and install into a clean isolated directory.
   Initial `npm pack --dry-run` audit found and excluded example build output.
-  The source/asset package contents are checked; isolated installation is pending.
-- [ ] Create and build a new project without sibling development repositories.
-- [ ] Verify saved VS Code task paths and CLI diagnostics from the clean install.
+  Local SDK/compiler tarballs installed with a validation-only compiler override;
+  lifecycle scripts were disabled. This does not validate a final remote pin.
+- [x] Create and build a new project without sibling development repositories.
+- [x] Verify saved VS Code task paths and CLI diagnostics from the clean install.
+  Installed CLI and generated task each built a 524288-byte starter ROM. Invalid
+  Lua reported its absolute source location. See [installation evidence](INSTALL_VALIDATION.md).
 
 ## 4. Documentation and release candidate
 
@@ -80,8 +86,9 @@ evidence; rerun tests for the final candidate. Development commits are local.
 
 Completed user checkpoint: [release-check instructions](../examples/release_check/README.md).
 Packaging and the final documentation pass are still open, not release-ready.
-The required canonical compiler revision is currently local (db8b09c); GitHub
-availability could not be verified during the package audit. Do not replace the
-sibling dependency with an unverified remote pin or publish the development manifest.
-Current automated checkpoint: 115 Genesis tests and 48 canonical compiler tests
+The required canonical compiler revision is local (d8c37f8). A read-only GitHub
+lookup on 2026-09-19 found the remote branch still at 74ca7d0. Do not pin that
+older revision or publish the development manifest. Publishing the reviewed
+compiler revision and verifying the final remote dependency remain release steps.
+Current automated checkpoint: 119 Genesis tests and 50 canonical compiler tests
 passed without skips. Integrated ROM screen layout was inspected in Genesis Plus GX.

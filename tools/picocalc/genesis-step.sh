@@ -34,18 +34,45 @@ fi
 manifest="$project/mdlua.json"
 
 if [ -f "$manifest" ]; then
-    source=$(node -e '
-        const fs=require("fs"), path=require("path");
-        const f=process.argv[1];
-        const c=JSON.parse(fs.readFileSync(f,"utf8"));
-        console.log(path.resolve(path.dirname(f), c.entry || "main.lua"));
-    ' "$manifest")
-    rom=$(node -e '
-        const fs=require("fs"), path=require("path");
-        const f=process.argv[1];
-        const c=JSON.parse(fs.readFileSync(f,"utf8"));
-        console.log(path.resolve(path.dirname(f), c.out || "game.bin"));
-    ' "$manifest")
+    cache=${MDEDIT_RESOLVE_CACHE:-/home/pico/.mdedit-resolved}
+    fingerprint=$(sha256sum "$manifest")
+    fingerprint=${fingerprint%% *}
+    cached_manifest=
+    cached_fingerprint=
+    source=
+    rom=
+    if [ -f "$cache" ]; then
+        {
+            IFS= read -r cached_manifest || true
+            IFS= read -r cached_fingerprint || true
+            IFS= read -r source || true
+            IFS= read -r rom || true
+        } < "$cache"
+    fi
+    if [ "$cached_manifest" != "$manifest" ] ||
+       [ "$cached_fingerprint" != "$fingerprint" ] ||
+       [ -z "$source" ] || [ -z "$rom" ]; then
+        cache_tmp="$cache.tmp.$$"
+        trap 'rm -f "$cache_tmp"' EXIT HUP INT TERM
+        node -e '
+            const fs=require("fs"), path=require("path");
+            const f=process.argv[1];
+            const fingerprint=process.argv[2];
+            const c=JSON.parse(fs.readFileSync(f,"utf8"));
+            console.log(f);
+            console.log(fingerprint);
+            console.log(path.resolve(path.dirname(f), c.entry || "main.lua"));
+            console.log(path.resolve(path.dirname(f), c.out || "game.bin"));
+        ' "$manifest" "$fingerprint" > "$cache_tmp"
+        mv "$cache_tmp" "$cache"
+        trap - EXIT HUP INT TERM
+        {
+            IFS= read -r cached_manifest
+            IFS= read -r cached_fingerprint
+            IFS= read -r source
+            IFS= read -r rom
+        } < "$cache"
+    fi
     manifest_build=1
 else
     source="$project/main.lua"
@@ -54,6 +81,9 @@ else
 fi
 
 case "$action" in
+    info)
+        printf 'Source: %s\nROM: %s\nManifest: %s\n' "$source" "$rom" "$manifest"
+        ;;
     edit)
         if [ ! -f "$source" ]; then
             echo "Source not found: $source" >&2

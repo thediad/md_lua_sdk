@@ -1,0 +1,26 @@
+set minibar
+set nohelp
+set constantshow
+set tabsize 2
+set tabstospaces
+set autoindent
+set smarthome
+unset breaklonglines
+unset softwrap
+unset linenumbers
+unset mouse
+syntax lua "\.lua$"
+comment "--"
+color white "."
+color brightmagenta "\<(and|break|do|else|elseif|end|for|function|if|in|local|not|or|repeat|return|then|until|while|true|false|nil)\>"
+color brightcyan "\<[0-9]+(\.[0-9]*)?\>"
+color brightgreen "\<(btn|btnp|cls|spr|sspr|print|pal|palt|map|mget|mset|fget|fset|sfx|music|sin|cos|flr|min|max|mid|abs|rnd|srand)\>"
+color brightwhite "\<(_init|_update|_update60|_draw)\>"
+color brightyellow "\"([^\"\\]|\\.)*\"|'([^'\\]|\\.)*'"
+color magenta "--.*"
+color magenta start="--\[\[" end="\]\]"
+bind F5 "{savefile}{suspend}" main
+# API lookup: suspend, run mdapi/mdlookup in Bash, then fg.
+bind F6 suspend main
+# Fast validation: save, show the check log, then return to this buffer.
+bind F7 "{savefile}{execute}/data/genesis-dev/dev/native-toolchain-experiment/mdedit-check.sh{enter}{refresh}" main

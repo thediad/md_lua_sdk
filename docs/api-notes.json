@@ -1,0 +1,1066 @@
+{
+  "spr": {
+    "category": "graphics",
+    "names": [
+      "id",
+      "x",
+      "y",
+      "w",
+      "h",
+      "flip_x",
+      "flip_y"
+    ],
+    "description": "Draw a hardware sprite from the sprite sheet. Width and height are in 8-pixel cells, 1 through 4.",
+    "example": "spr(0,32,48,2,2)",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "Hardware sprites are submitted each frame. Sheet/variant IDs depend on project assets. See docs/PRESCALED_SPRITES.md for scaling limits.",
+    "parameterDocs": {
+      "id": "Sheet cell ID; built-in fallback has cells 0-3.",
+      "w": "Width in 8-pixel cells, 1-4; default 1.",
+      "h": "Height in 8-pixel cells, 1-4; default 1.",
+      "flip_x": "Horizontal flip; default false.",
+      "flip_y": "Vertical flip; default false."
+    }
+  },
+  "spr8": {
+    "category": "graphics",
+    "names": [
+      "tile",
+      "x",
+      "y",
+      "flip"
+    ],
+    "description": "Draw one 8x8 hardware sprite from a sheet-relative tile index.",
+    "example": "spr8(0,32,48)",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "Hardware sprites are submitted each frame. Sheet/variant IDs depend on project assets. See docs/PRESCALED_SPRITES.md for scaling limits."
+  },
+  "sspr": {
+    "category": "graphics",
+    "names": [
+      "sx",
+      "sy",
+      "sw",
+      "sh",
+      "dx",
+      "dy",
+      "dw",
+      "dh",
+      "flip_x",
+      "flip_y"
+    ],
+    "description": "Draw a sheet rectangle; unscaled coordinates must align to tiles. Scaled sizes must be declared as build-time sprite variants.",
+    "example": "sspr(0,0,8,8,32,48)",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "Hardware sprites are submitted each frame. Sheet/variant IDs depend on project assets. See docs/PRESCALED_SPRITES.md for scaling limits."
+  },
+  "ssprv": {
+    "category": "graphics",
+    "names": [
+      "id",
+      "x",
+      "y",
+      "flip_x",
+      "flip_y"
+    ],
+    "description": "Draw a declared pre-scaled sprite variant. False means invalid, offscreen, or sprite list full.",
+    "example": "-- Requires declared variant 0\nssprv(0,32,48)",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "Hardware sprites are submitted each frame. Sheet/variant IDs depend on project assets. See docs/PRESCALED_SPRITES.md for scaling limits."
+  },
+  "spr_pal": {
+    "category": "graphics",
+    "names": [
+      "bank"
+    ],
+    "description": "Select palette line 0-3 for subsequent sprites this frame; default 1.",
+    "example": "spr_pal(1)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "spr_prio": {
+    "category": "graphics",
+    "names": [
+      "priority"
+    ],
+    "description": "Select priority for subsequent sprites: 1 in front of high-priority tiles, 0 behind.",
+    "example": "spr_prio(1)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "cls": {
+    "category": "graphics",
+    "names": [
+      "color"
+    ],
+    "description": "Clear the current drawing mode and reset the text cursor. Preserve the bitmap clip.",
+    "example": "cls(1)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "camera": {
+    "category": "graphics",
+    "names": [
+      "x",
+      "y"
+    ],
+    "description": "Set camera position for hardware scrolling and sprite coordinates; no arguments resets to zero.",
+    "example": "camera(0,0)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "color": {
+    "category": "graphics",
+    "names": [
+      "color"
+    ],
+    "description": "Set the default drawing color, a PICO-style palette index 0-15.",
+    "example": "color(7)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "pset": {
+    "category": "graphics",
+    "names": [
+      "x",
+      "y",
+      "color"
+    ],
+    "description": "Set a bitmap pixel. Activates the 256x160 bitmap engine if needed.",
+    "example": "pset(20,20,11)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "pget": {
+    "category": "graphics",
+    "names": [
+      "x",
+      "y"
+    ],
+    "description": "Read a bitmap pixel; return zero if outside bounds or bitmap mode is inactive.",
+    "example": "local c=pget(20,20)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "rect": {
+    "category": "graphics",
+    "names": [
+      "x0",
+      "y0",
+      "x1",
+      "y1",
+      "color"
+    ],
+    "description": "Draw a bitmap rectangle outline with inclusive corners.",
+    "example": "rect(8,8,40,30,7)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "rectfill": {
+    "category": "graphics",
+    "names": [
+      "x0",
+      "y0",
+      "x1",
+      "y1",
+      "color"
+    ],
+    "description": "Draw a filled bitmap rectangle with inclusive corners.",
+    "example": "rectfill(8,8,40,30,11)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "line": {
+    "category": "graphics",
+    "names": [
+      "x0",
+      "y0",
+      "x1",
+      "y1",
+      "color"
+    ],
+    "description": "Draw a clipped bitmap line.",
+    "example": "line(8,8,40,30,7)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "circ": {
+    "category": "graphics",
+    "names": [
+      "x",
+      "y",
+      "radius",
+      "color"
+    ],
+    "description": "Draw a bitmap circle outline.",
+    "example": "circ(32,32,12,7)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "circfill": {
+    "category": "graphics",
+    "names": [
+      "x",
+      "y",
+      "radius",
+      "color"
+    ],
+    "description": "Draw a filled bitmap circle.",
+    "example": "circfill(32,32,12,11)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "clip": {
+    "category": "graphics",
+    "names": [
+      "x",
+      "y",
+      "w",
+      "h",
+      "previous"
+    ],
+    "description": "Restrict bitmap drawing to a rectangle; previous=true intersects the current clip. clip() resets it.",
+    "example": "clip(8,8,64,48)",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "The current runtime preserves clip across cls. A stale builtins.js comment says otherwise; see docs/PICO_RUNTIME.md and bitmap_clear regression."
+  },
+  "backdrop": {
+    "category": "graphics",
+    "names": [
+      "color"
+    ],
+    "description": "Select the backdrop CRAM entry, 0-63; entries 0-15 use the PICO-style line.",
+    "example": "backdrop(1)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "screen_off": {
+    "category": "graphics",
+    "names": [],
+    "description": "Blank the display; pair with screen_on after a controlled update.",
+    "example": "screen_off() screen_on()",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "screen_on": {
+    "category": "graphics",
+    "names": [],
+    "description": "Unblank the display.",
+    "example": "screen_on()",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "pal": {
+    "category": "graphics",
+    "names": [
+      "from",
+      "to"
+    ],
+    "description": "Remap a PICO-style color to another color in Genesis CRAM. pal() resets all 16.",
+    "example": "pal(8,12)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "hud": {
+    "category": "graphics",
+    "names": [
+      "rows"
+    ],
+    "description": "Reserve top tile rows, 0-27, for an unscrolled window-plane HUD. hud(0) releases it.",
+    "example": "hud(2)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "shade_mode": {
+    "category": "graphics",
+    "names": [
+      "on"
+    ],
+    "description": "Enable or disable Genesis shadow/highlight mode.",
+    "example": "shade_mode(true)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "fade": {
+    "category": "graphics",
+    "names": [
+      "amount",
+      "to_white"
+    ],
+    "description": "Scale the palette toward black or white. Amount is 0-1; fade(0) restores it.",
+    "example": "fade(0.5)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "hscroll": {
+    "category": "graphics",
+    "names": [
+      "scanline",
+      "offset"
+    ],
+    "description": "Set plane B horizontal scroll for one scanline, 0-223.",
+    "example": "hscroll(32,8)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "map_show": {
+    "category": "map",
+    "names": [
+      "layer"
+    ],
+    "description": "Display the build-bundled PNG tilemap on plane B, usually once in _init.",
+    "example": "map_show(0)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "layer_show": {
+    "category": "map",
+    "names": [
+      "layer",
+      "on"
+    ],
+    "description": "Unsupported on Genesis: compilation deliberately fails. Do not use this as a plane visibility API.",
+    "example": "",
+    "reference": "docs/CHEATSHEET.md",
+    "status": "unsupported"
+  },
+  "layer_pri": {
+    "category": "map",
+    "names": [
+      "layer",
+      "priority"
+    ],
+    "description": "Unsupported on Genesis: compilation deliberately fails. Set priority through tile attributes instead.",
+    "example": "",
+    "reference": "docs/CHEATSHEET.md",
+    "status": "unsupported"
+  },
+  "layer_scroll": {
+    "category": "map",
+    "names": [
+      "layer",
+      "x",
+      "y"
+    ],
+    "description": "Scroll a hardware plane. Layer 1 is plane A; plane B is owned by camera/hscroll.",
+    "example": "layer_scroll(1,0,8)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "tget": {
+    "category": "map",
+    "names": [
+      "layer",
+      "col",
+      "row"
+    ],
+    "description": "Read a hardware tilemap cell in the shown plane area; separate from PICO map RAM.",
+    "example": "local tile=tget(0,1,1)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "tset": {
+    "category": "map",
+    "names": [
+      "layer",
+      "col",
+      "row",
+      "tile"
+    ],
+    "description": "Write a hardware tilemap cell; separate from PICO map RAM.",
+    "example": "tset(0,1,1,0)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "map": {
+    "category": "map",
+    "names": [
+      "cx",
+      "cy",
+      "sx",
+      "sy",
+      "cw",
+      "ch",
+      "mask"
+    ],
+    "description": "Stamp PICO map RAM cells onto plane B. Defaults: 0,0,0,0,128,64,unfiltered. A supplied flag mask matches any set bit.",
+    "example": "map(0,0,0,0,4,1)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "mget": {
+    "category": "map",
+    "names": [
+      "x",
+      "y"
+    ],
+    "description": "Read a tile from 128x64 PICO map RAM; out-of-bounds reads return zero.",
+    "example": "local tile=mget(0,0)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "mset": {
+    "category": "map",
+    "names": [
+      "x",
+      "y",
+      "tile"
+    ],
+    "description": "Write a byte tile ID to PICO map RAM; out-of-bounds writes do nothing.",
+    "example": "mset(0,0,1)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "fget": {
+    "category": "map",
+    "names": [
+      "sprite",
+      "bit"
+    ],
+    "description": "Read a sprite flag byte, or one bit as 0/1. Sprite range 0-255; bit range 0-7.",
+    "example": "local flags=fget(1)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "fset": {
+    "category": "map",
+    "names": [
+      "sprite",
+      "flags_or_bit",
+      "on"
+    ],
+    "description": "With two arguments replace a flag byte; with three, change one bit.",
+    "example": "fset(1,0,true)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "anim": {
+    "category": "graphics",
+    "names": [
+      "slot",
+      "first",
+      "last",
+      "fps"
+    ],
+    "description": "Return a looping animation frame in the inclusive range first..last. Slot range 0-31.",
+    "example": "spr(anim(0,0,3,8),32,48)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "anim_once": {
+    "category": "graphics",
+    "names": [
+      "slot",
+      "first",
+      "last",
+      "fps"
+    ],
+    "description": "Play an animation once and hold its final frame.",
+    "example": "local frame=anim_once(0,0,3,8)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "anim_pingpong": {
+    "category": "graphics",
+    "names": [
+      "slot",
+      "first",
+      "last",
+      "fps"
+    ],
+    "description": "Return a frame from a back-and-forth animation cycle.",
+    "example": "local frame=anim_pingpong(0,0,3,8)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "anim_reset": {
+    "category": "graphics",
+    "names": [
+      "slot"
+    ],
+    "description": "Restart an animation slot.",
+    "example": "anim_reset(0)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "anim_done": {
+    "category": "graphics",
+    "names": [
+      "slot"
+    ],
+    "description": "Return 1 when a once-animation has finished, otherwise 0.",
+    "example": "local done=anim_done(0)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "btn": {
+    "category": "input",
+    "names": [
+      "button",
+      "player"
+    ],
+    "description": "Return whether a controller button is held.",
+    "example": "if btn(1) then print(\"right\",8,8,7) end",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "Buttons: 0 left, 1 right, 2 up, 3 down, 4 B/O, 5 C/X, 6 A, 7 Start, 8 X, 9 Y, 10 Z, 11 Mode. Player defaults to 0; valid players are 0 and 1. Extra buttons need a six-button pad. Invalid inputs return false.",
+    "parameterDocs": {
+      "button": "Controller button ID; see mapping below.",
+      "player": "Controller port 0 or 1; default 0."
+    }
+  },
+  "btnp": {
+    "category": "input",
+    "names": [
+      "button",
+      "player"
+    ],
+    "description": "Return whether a controller button was newly pressed this game loop. No auto-repeat.",
+    "example": "if btnp(4) then print(\"B\",8,8,7) end",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "Buttons: 0 left, 1 right, 2 up, 3 down, 4 B/O, 5 C/X, 6 A, 7 Start, 8 X, 9 Y, 10 Z, 11 Mode. Player defaults to 0; valid players are 0 and 1. Extra buttons need a six-button pad. Invalid inputs return false.",
+    "parameterDocs": {
+      "button": "Controller button ID; see mapping below.",
+      "player": "Controller port 0 or 1; default 0."
+    }
+  },
+  "music": {
+    "category": "audio",
+    "names": [
+      "song",
+      "loop"
+    ],
+    "description": "Play an XGM2 song bank entry; loop defaults true. music(-1) stops. Without a bank, use the built-in demo tune.",
+    "example": "music(0)",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "WAV/song banks come from mdlua.json sfx/music arrays. XGM2 and standalone PCM share the Z80; switching drivers replaces the active driver. Physical PicoCalc audio is separate: the current player defaults to dummy audio."
+  },
+  "sfx": {
+    "category": "audio",
+    "names": [
+      "sample",
+      "channel"
+    ],
+    "description": "Play a WAV-bank effect through XGM2; without a sample bank use a PSG blip. Channels 2, 3 and 4 are supported.",
+    "example": "sfx(0,2)",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "WAV/song banks come from mdlua.json sfx/music arrays. XGM2 and standalone PCM share the Z80; switching drivers replaces the active driver. Physical PicoCalc audio is separate: the current player defaults to dummy audio."
+  },
+  "pcm_sample": {
+    "category": "audio",
+    "names": [
+      "sample"
+    ],
+    "description": "Return an opaque ROM pointer to a WAV-bank PCM sample, for standalone SGDK PCM calls.",
+    "example": "local sample=pcm_sample(0)",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "WAV/song banks come from mdlua.json sfx/music arrays. XGM2 and standalone PCM share the Z80; switching drivers replaces the active driver. Physical PicoCalc audio is separate: the current player defaults to dummy audio."
+  },
+  "pcm_len": {
+    "category": "audio",
+    "names": [
+      "sample"
+    ],
+    "description": "Return the sample byte length for a WAV-bank entry.",
+    "example": "local length=pcm_len(0)",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "WAV/song banks come from mdlua.json sfx/music arrays. XGM2 and standalone PCM share the Z80; switching drivers replaces the active driver. Physical PicoCalc audio is separate: the current player defaults to dummy audio."
+  },
+  "pcm_driver": {
+    "category": "audio",
+    "names": [],
+    "description": "Load the standalone Z80 PCM driver.",
+    "example": "pcm_driver()",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "WAV/song banks come from mdlua.json sfx/music arrays. XGM2 and standalone PCM share the Z80; switching drivers replaces the active driver. Physical PicoCalc audio is separate: the current player defaults to dummy audio."
+  },
+  "pcm_play": {
+    "category": "audio",
+    "names": [
+      "sample",
+      "rate",
+      "loop"
+    ],
+    "description": "Play a WAV-bank sample through the standalone PCM driver. Pass rate and loop explicitly, for example 3,false.",
+    "example": "pcm_play(0,3,false)",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "WAV/song banks come from mdlua.json sfx/music arrays. XGM2 and standalone PCM share the Z80; switching drivers replaces the active driver. Physical PicoCalc audio is separate: the current player defaults to dummy audio. Descriptor marks rate/loop optional, but current generic emitter supplies -1 for omitted values. A missing loop therefore becomes true in the runtime; do not rely on inferred defaults."
+  },
+  "demo_sprite": {
+    "category": "graphics",
+    "names": [],
+    "description": "Return the bundled two-frame SpriteDefinition handle for the SGDK sprite engine.",
+    "example": "function _init()\n  SPR_init()\n  local s=SPR_addSprite(\n    demo_sprite(),100,100,0)\nend",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "Hardware sprites are submitted each frame. Sheet/variant IDs depend on project assets. See docs/PRESCALED_SPRITES.md for scaling limits."
+  },
+  "realframes": {
+    "category": "system",
+    "names": [],
+    "description": "Return the video interrupt count, independent of slow game-loop drawing.",
+    "example": "local frames=realframes()",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "realsecs": {
+    "category": "system",
+    "names": [],
+    "description": "Return elapsed real seconds using nominal 60 Hz NTSC or 50 Hz PAL interrupts.",
+    "example": "local seconds=realsecs()",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "t": {
+    "category": "system",
+    "names": [],
+    "description": "Alias of time: game-loop time in 16.16 seconds, advancing by 1/60 per loop.",
+    "example": "local seconds=t()",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "time": {
+    "category": "system",
+    "names": [],
+    "description": "Return game-loop time in 16.16 seconds, advancing by 1/60 per loop, even in PAL.",
+    "example": "local seconds=time()",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "run": {
+    "category": "system",
+    "names": [],
+    "description": "Restart the cartridge from reset, restoring initial globals and runtime state; does not return.",
+    "example": "run()",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "reset": {
+    "category": "system",
+    "names": [],
+    "description": "Alias of run: restart the cartridge from reset; does not return.",
+    "example": "reset()",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "save": {
+    "category": "storage",
+    "names": [
+      "slot",
+      "data",
+      "count"
+    ],
+    "description": "Save up to 254 bytes from an array8 to SRAM slot 0-127, bounded by array capacity.",
+    "example": "local data=array8(2,0)\nfunction _init()\n  data[1]=11 data[2]=22\n  save(0,data,2)\nend",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "load": {
+    "category": "storage",
+    "names": [
+      "slot",
+      "data",
+      "count"
+    ],
+    "description": "Load SRAM bytes into an array8; return byte count read, or zero for an unwritten/invalid slot.",
+    "example": "local data=array8(2,0)\nfunction _init()\n  local n=load(0,data,2)\nend",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "array": {
+    "category": "data",
+    "names": [
+      "capacity",
+      "value"
+    ],
+    "description": "Declare a fixed-capacity numeric array at top level. Public indexing is 1-based; optional initial value is constant.",
+    "example": "local data=array(8,0)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "array8": {
+    "category": "data",
+    "names": [
+      "capacity",
+      "value"
+    ],
+    "description": "Declare a fixed-capacity byte array at top level; values are 0-255 and public indexing is 1-based.",
+    "example": "local data=array8(8,0)",
+    "reference": "docs/CHEATSHEET.md",
+    "notes": "One byte per element; ordinary numeric arrays use four-byte int/long elements on this M68K ABI. An older cheatsheet says half the RAM; compiler/emit.js emits unsigned char versus int/long arrays."
+  },
+  "pool": {
+    "category": "data",
+    "names": [
+      "capacity"
+    ],
+    "description": "Declare a fixed-capacity struct pool at top level. Use add, all and del for entities.",
+    "example": "local entities=pool(8)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "count": {
+    "category": "data",
+    "names": [
+      "container"
+    ],
+    "description": "Return array capacity or live entity count for a top-level array/pool.",
+    "example": "local data=array(8)\nfunction _init()\n  print(count(data),8,8,7)\nend",
+    "reference": "docs/CHEATSHEET.md",
+    "specialOptional": [
+      false
+    ]
+  },
+  "add": {
+    "category": "data",
+    "names": [
+      "container",
+      "fields"
+    ],
+    "description": "Add a table-literal entity to a fixed-capacity pool; this is a statement, not a returned entity.",
+    "example": "local entities=pool(8)\nfunction _init()\n  add(entities,{x=1,y=2})\nend",
+    "reference": "docs/CHEATSHEET.md",
+    "specialOptional": [
+      false,
+      false
+    ]
+  },
+  "del": {
+    "category": "data",
+    "names": [
+      "container",
+      "element"
+    ],
+    "description": "Remove the current all-loop entity from its pool.",
+    "example": "local entities=pool(8)\nfunction _update60()\n  for e in all(entities) do\n    del(entities,e)\n  end\nend",
+    "reference": "docs/CHEATSHEET.md",
+    "specialOptional": [
+      false,
+      false
+    ]
+  },
+  "ord": {
+    "category": "string",
+    "names": [
+      "text",
+      "index"
+    ],
+    "description": "Return one byte code from a compile-time string. Index defaults 1 and must be in bounds.",
+    "example": "local code=ord(\"A\")",
+    "reference": "docs/CHEATSHEET.md",
+    "specialOptional": [
+      false,
+      true
+    ]
+  },
+  "chr": {
+    "category": "string",
+    "names": [
+      "byte",
+      "..."
+    ],
+    "description": "Create a compile-time string from one or more constant byte values 0-255.",
+    "example": "print(chr(65),8,8,7)",
+    "reference": "docs/CHEATSHEET.md",
+    "specialOptional": [
+      false,
+      true
+    ]
+  },
+  "sub": {
+    "category": "string",
+    "names": [
+      "text",
+      "first",
+      "last"
+    ],
+    "description": "Extract a compile-time substring with constant 1-based positions; omitted last means end of string.",
+    "example": "print(sub(\"hello\",2,4),8,8,7)",
+    "reference": "docs/CHEATSHEET.md",
+    "specialOptional": [
+      false,
+      false,
+      true
+    ]
+  },
+  "tonum": {
+    "category": "string",
+    "names": [
+      "value"
+    ],
+    "description": "Convert a static decimal string or constant number to a number; not a general runtime parser.",
+    "example": "local n=tonum(\"12.5\")",
+    "reference": "docs/CHEATSHEET.md",
+    "specialOptional": [
+      false
+    ]
+  },
+  "tostr": {
+    "category": "string",
+    "names": [
+      "value"
+    ],
+    "description": "Convert a compile-time value to a static string; runtime string allocation is not supported.",
+    "example": "print(tostr(12),8,8,7)",
+    "reference": "docs/CHEATSHEET.md",
+    "specialOptional": [
+      false
+    ]
+  },
+  "type": {
+    "category": "string",
+    "names": [
+      "value"
+    ],
+    "description": "Return a statically known type name. Runtime calls cannot be folded away inside type.",
+    "example": "print(type(12),8,8,7)",
+    "reference": "docs/CHEATSHEET.md",
+    "specialOptional": [
+      false
+    ]
+  },
+  "split": {
+    "category": "string",
+    "names": [
+      "text",
+      "separator",
+      "convert"
+    ],
+    "description": "Declare a top-level static numeric array from a literal separated string; not a dynamic string-list API.",
+    "example": "local values=split(\"1,2,3\")",
+    "reference": "docs/CHEATSHEET.md",
+    "specialOptional": [
+      false,
+      true,
+      true
+    ],
+    "notes": "Separator may be a static string or positive integer chunk length. Numeric conversion defaults true and cannot be disabled; top-level declaration only."
+  },
+  "print": {
+    "category": "graphics",
+    "names": [
+      "value",
+      "x",
+      "y",
+      "color"
+    ],
+    "description": "Draw a string or number using positioned or cursor form.",
+    "example": "print(\"hello\",8,8,7)",
+    "reference": "docs/CHEATSHEET.md",
+    "specialOptional": [
+      false,
+      true,
+      true,
+      true
+    ],
+    "overloads": [
+      "print(value [, color])",
+      "print(value, x, y [, color])"
+    ],
+    "returns": "No usable return: runtime C functions return void, although the compiler descriptor says int. Use print as a statement.",
+    "notes": "Descriptor/runtime return mismatch is reported here, not corrected by this browser."
+  },
+  "flr": {
+    "category": "math",
+    "names": [
+      "value"
+    ],
+    "description": "Round toward negative infinity and return an integer.",
+    "example": "local n=flr(-1.25)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "ceil": {
+    "category": "math",
+    "names": [
+      "value"
+    ],
+    "description": "Round toward positive infinity and return an integer.",
+    "example": "local n=ceil(1.25)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "abs": {
+    "category": "math",
+    "names": [
+      "value"
+    ],
+    "description": "Return absolute value, subject to the SDK numeric limits.",
+    "example": "local n=abs(-2)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "sgn": {
+    "category": "math",
+    "names": [
+      "value"
+    ],
+    "description": "Return -1, 0 or 1 according to the sign; sgn(0) is zero.",
+    "example": "local n=sgn(0)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "min": {
+    "category": "math",
+    "names": [
+      "a",
+      "b"
+    ],
+    "description": "Return the smaller of two numbers; also accepts a constant numeric list as one argument.",
+    "example": "local n=min(2,3)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "max": {
+    "category": "math",
+    "names": [
+      "a",
+      "b"
+    ],
+    "description": "Return the larger of two numbers; also accepts a constant numeric list as one argument.",
+    "example": "local n=max(2,3)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "mid": {
+    "category": "math",
+    "names": [
+      "a",
+      "b",
+      "c"
+    ],
+    "description": "Return the middle of three values; useful for clamping.",
+    "example": "local n=mid(0,12,10)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "sqrt": {
+    "category": "math",
+    "names": [
+      "value"
+    ],
+    "description": "Return the fixed-point square root.",
+    "example": "local n=sqrt(4)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "sin": {
+    "category": "math",
+    "names": [
+      "turns"
+    ],
+    "description": "Sine using turns (1 is a full circle); PICO-style screen-inverted sign.",
+    "example": "local n=sin(0.25)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "cos": {
+    "category": "math",
+    "names": [
+      "turns"
+    ],
+    "description": "Cosine using turns (1 is a full circle).",
+    "example": "local n=cos(0.25)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "atan2": {
+    "category": "math",
+    "names": [
+      "dx",
+      "dy"
+    ],
+    "description": "Return a PICO-style direction angle in turns.",
+    "example": "local angle=atan2(1,0)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "rnd": {
+    "category": "math",
+    "names": [
+      "limit"
+    ],
+    "description": "Return a random number below limit (default 1), or choose from a constant list.",
+    "example": "local n=flr(rnd(6))",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "srand": {
+    "category": "math",
+    "names": [
+      "seed"
+    ],
+    "description": "Seed the deterministic random generator.",
+    "example": "srand(123)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "band": {
+    "category": "math",
+    "names": [
+      "a",
+      "b"
+    ],
+    "description": "Bitwise AND; same compiler operation as the bitwise operator.",
+    "example": "local n=band(3,1)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "bor": {
+    "category": "math",
+    "names": [
+      "a",
+      "b"
+    ],
+    "description": "Bitwise OR.",
+    "example": "local n=bor(2,1)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "bxor": {
+    "category": "math",
+    "names": [
+      "a",
+      "b"
+    ],
+    "description": "Bitwise exclusive OR.",
+    "example": "local n=bxor(3,1)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "bnot": {
+    "category": "math",
+    "names": [
+      "value"
+    ],
+    "description": "Bitwise complement.",
+    "example": "local n=bnot(0)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "shl": {
+    "category": "math",
+    "names": [
+      "value",
+      "bits"
+    ],
+    "description": "Shift bits left.",
+    "example": "local n=shl(1,2)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "shr": {
+    "category": "math",
+    "names": [
+      "value",
+      "bits"
+    ],
+    "description": "Arithmetic right shift, preserving the sign.",
+    "example": "local n=shr(8,1)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "lshr": {
+    "category": "math",
+    "names": [
+      "value",
+      "bits"
+    ],
+    "description": "Logical right shift, inserting zero bits.",
+    "example": "local n=lshr(8,1)",
+    "reference": "docs/CHEATSHEET.md"
+  },
+  "all": {
+    "category": "data",
+    "names": [
+      "container"
+    ],
+    "specialOptional": [
+      false
+    ],
+    "description": "Compiler loop form: iterate live entities in a top-level pool. Not an ordinary callable function.",
+    "example": "local entities=pool(8)\nfunction _update60()\n  for e in all(entities) do\n    del(entities,e)\n  end\nend",
+    "reference": "luacretro/compiler/parser.js",
+    "kind": "syntax"
+  },
+  "hexdata": {
+    "category": "data",
+    "names": [
+      "hex"
+    ],
+    "specialOptional": [
+      false
+    ],
+    "description": "Declare a compile-time byte blob from an even-length hexadecimal string at top level. Name it __p8map to initialize PICO map RAM.",
+    "example": "local __p8map=hexdata(\"010203\")",
+    "reference": "luacretro/compiler/check.js",
+    "kind": "syntax"
+  },
+  "_init": {
+    "category": "lifecycle",
+    "names": [],
+    "description": "Runs once at cartridge startup. Define it; do not call it yourself.",
+    "example": "function _init()\nend",
+    "reference": "compiler/builtins.js",
+    "kind": "callback"
+  },
+  "_update60": {
+    "category": "lifecycle",
+    "names": [],
+    "description": "Game update callback, once per loop; slow drawing reduces rate. Define it; do not call it yourself.",
+    "example": "function _update60()\nend",
+    "reference": "compiler/builtins.js",
+    "kind": "callback"
+  },
+  "_update": {
+    "category": "lifecycle",
+    "names": [],
+    "description": "Alternative update callback, every other game loop. Define it; do not call it yourself.",
+    "example": "function _update()\nend",
+    "reference": "compiler/builtins.js",
+    "kind": "callback"
+  },
+  "_draw": {
+    "category": "lifecycle",
+    "names": [],
+    "description": "Drawing callback, once per game loop. Define it; do not call it yourself.",
+    "example": "function _draw()\nend",
+    "reference": "compiler/builtins.js",
+    "kind": "callback"
+  }
+}

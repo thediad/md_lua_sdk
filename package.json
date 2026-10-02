@@ -41,7 +41,9 @@
     "url": "https://github.com/monteslu/md_lua_sdk/issues"
   },
   "bin": {
-    "mdlua": "bin/mdlua-launch.mjs"
+    "mdlua": "bin/mdlua-launch.mjs",
+    "mdapi": "bin/mdapi.mjs",
+    "mdlookup": "bin/mdapi-browser.mjs"
   },
   "files": [
     "bin",
@@ -84,6 +86,8 @@
     "romdev-xgm2": "0.1.0"
   },
   "scripts": {
+    "api:generate": "node tools/generate-api.mjs",
+    "api:check": "node tools/generate-api.mjs --check",
     "release:check": "node tools/release-preflight.mjs",
     "build": "node bin/mdlua-launch.mjs build",
     "test": "node --import ./bin/windows-paths.mjs --test \"test/**/*.test.js\"",

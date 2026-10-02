@@ -8,7 +8,7 @@ import {BUILTINS,CALLBACKS} from '../compiler/builtins.js';
 import {compile} from '../compiler/index.js';
 import {variantEmitter} from '../compiler/sprite-variants.mjs';
 import {buildApi,validateApi} from '../tools/generate-api.mjs';
-import {run,formatEntry} from '../bin/mdapi.mjs';
+import {run,formatEntry,sourceHelp} from '../bin/mdapi.mjs';
 const sdk=path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const api=JSON.parse(fs.readFileSync(path.join(sdk,'docs/api.json'),'utf8'));
 const names=new Set([...Object.keys(BUILTINS),...CALLBACKS,'all','hexdata']);
@@ -66,4 +66,17 @@ test('CLI runs from another working directory and rejects stale tables',()=>{
  const r=spawnSync(process.execPath,[cli,'spr'],{cwd:path.dirname(sdk),encoding:'utf8'});
  assert.equal(r.status,0,r.stderr);assert.match(r.stdout,/spr\(/);
  // The generator equality test above detects stale metadata without altering sources.
+});
+test('source-aware lookup selects calls by line and nearest column',()=>{
+ const source='function _draw()\n  cls(1) spr(0,32,48)\nend\n';
+ const read=()=>source;
+ const line=sourceHelp(['--at','main.lua:2'],api,40,read);assert.equal(line.code,0);assert.match(line.text,/cls\(/);assert.match(line.text,/spr\(/);
+ const nearest=sourceHelp(['--at','main.lua:2:12'],api,40,read);assert.equal(nearest.code,0);assert.match(nearest.text,/spr\(id/);assert.doesNotMatch(nearest.text,/cls\(\[color/);
+ assert.equal(sourceHelp(['--at','main.lua:99'],api,40,read).code,2);
+ assert.equal(sourceHelp(['--at','bad'],api,40,read).code,2);
+});
+test('source inventory lists each used API once',()=>{
+ const source='function _draw() cls(1) spr(0,1,2) spr(1,3,4) end';
+ const result=sourceHelp(['--used','main.lua'],api,40,()=>source);assert.equal(result.code,0);assert.match(result.text,/3 APIs used/);assert.match(result.text,/_draw/);assert.match(result.text,/cls/);assert.match(result.text,/spr/);
+ assert.equal(sourceHelp(['--used','empty.lua'],api,40,()=> 'local x=1').code,1);
 });

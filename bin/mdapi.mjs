@@ -14,6 +14,8 @@ const HELP=`mdapi: offline Genesis Lua API lookup
   mdapi --index      category index
   mdapi --category graphics
   mdapi --category input button
+  mdapi --at main.lua:42:10
+  mdapi --used main.lua
   mdapi --help
 
 Categories: graphics, input, audio,
@@ -31,6 +33,36 @@ SGDK entries describe compiler bindings,
 not a promise of runtime compatibility.
 Exit: 0 found, 1 no match, 2 usage/data.
 `;
+function sourceCalls(source,entries){
+ const byName=new Map(entries.map(e=>[e.name,e]));
+ const found=[];
+ for(const match of source.matchAll(/\b([A-Za-z_]\w*)\s*\(/g))if(byName.has(match[1]))found.push({entry:byName.get(match[1]),index:match.index,length:match[1].length});
+ return found;
+}
+function readSource(spec,readFile){
+ try{return readFile(spec,'utf8');}catch(e){throw new Error(`Cannot read source file: ${spec}`);}
+}
+export function sourceHelp(args,api,width=40,readFile=fs.readFileSync){
+ if(args[0]==='--used'){
+  if(args.length!==2)return {code:2,text:'Usage: mdapi --used FILE\n'};
+  let source;try{source=readSource(args[1],readFile);}catch(e){return {code:2,text:e.message+'\n'};}
+  const unique=[...new Map(sourceCalls(source,api.entries).map(hit=>[hit.entry.name,hit.entry])).values()].sort((a,b)=>a.name.localeCompare(b.name,'en'));
+  if(!unique.length)return {code:1,text:wrap(`No known API calls found in ${args[1]}.`,width)+'\n'};
+  return {code:0,text:wrap(`${unique.length} APIs used in ${args[1]}:\n`+unique.map(e=>`${e.name} [${e.category}] - ${e.description}`).join('\n'),width)+'\n'};
+ }
+ if(args[0]==='--at'){
+  if(args.length!==2)return {code:2,text:'Usage: mdapi --at FILE:LINE[:COLUMN]\n'};
+  const match=args[1].match(/^(.*?):(\d+)(?::(\d+))?$/);if(!match)return {code:2,text:'Use FILE:LINE or FILE:LINE:COLUMN after --at.\n'};
+  const [,file,lineText,columnText]=match;let source;try{source=readSource(file,readFile);}catch(e){return {code:2,text:e.message+'\n'};}
+  const lineNumber=Number(lineText),lines=source.split(/\r?\n/);if(lineNumber<1||lineNumber>lines.length)return {code:2,text:`Line ${lineNumber} is outside ${file}.\n`};
+  const line=lines[lineNumber-1],calls=sourceCalls(line,api.entries);if(!calls.length)return {code:1,text:`No known API call on ${file}:${lineNumber}.\n`};
+  let selected=calls;
+  if(columnText){const column=Math.max(0,Number(columnText)-1);selected=[calls.reduce((best,hit)=>{const distance=column<hit.index?hit.index-column:column>hit.index+hit.length?column-(hit.index+hit.length):0;return !best||distance<best.distance?{...hit,distance}:best;},null)];}
+  if(selected.length===1)return {code:0,text:formatEntry(selected[0].entry,width)};
+  return {code:0,text:wrap(`API calls on ${file}:${lineNumber}:\n`+selected.map(hit=>hit.entry.signature).join('\n')+'\n\nAdd :COLUMN to select the nearest call.',width)+'\n'};
+ }
+ return null;
+}
 export function wrap(text,width=40){
  return String(text).split('\n').map(line=>{
   const words=line.trim().split(/\s+/);let out=[],current='';
@@ -64,7 +96,8 @@ export function formatEntry(e,width=40){
  out.push('Source:\n'+e.source,'Reference:\n'+e.reference);
  return out.map(section=>wrap(section,width)).join('\n\n')+'\n';
 }
-export function run(args,api,width=40){
+export function run(args,api,width=40,readFile=fs.readFileSync){
+ const contextual=sourceHelp(args,api,width,readFile);if(contextual)return contextual;
  if(args.length===1&&args[0]==='--index'){
   const available=api.entries.filter(e=>e.status!=='unsupported');
   const categories=[...new Set(available.map(e=>e.category))].sort();

@@ -63,20 +63,9 @@ async function buildAssetsHeader(opts) {
 
 }
 
-// (wavToXgm2Pcm and the bank C generators live in audio-assets.mjs — the
-// BROWSER-SAFE module both this CLI and the web IDE pipeline import, so the
-// generated C is identical on every host.)
-
-export async function buildMd(entryLua, outPath, opts = {}) {
-  const inputs = [entryLua, opts.sheetPath, opts.mapPath, opts.gffPath,
-    opts.spriteVariantsPath, ...(opts.sfxPaths ?? []), ...(opts.musicPaths ?? [])];
-  await assertOutputDistinct(outPath, inputs);
+async function analyzeProject(entryLua, opts = {}) {
   const src = await readFile(entryLua, "utf8");
   const assets = await buildAssetsHeader(opts);
-  // num8 (8.8): emit supports it; the RUNTIME does not yet (16.16 sin table,
-  // time, print_num). Wire the flag only when md_math grows -DMD_NUM8 paths -
-  // shipping it now would be silently wrong math. (68000 is 16-bit-native, so
-  // num8 is worth measuring in the Phase-3 perf pass.)
   const variants = assets.scaling.variants;
   const res = compile(src, path.basename(entryLua), { target: "md", builtins: {
     ...BUILTINS,
@@ -93,6 +82,45 @@ export async function buildMd(entryLua, outPath, opts = {}) {
     const errs = diagnostics.filter((d) => d.severity === "error");
     throw new Error("mdlua: compile failed\n" + formatDiagnostics(errs));
   }
+  return { res, assets };
+}
+
+/** Validate source and configured assets without invoking the M68K toolchain. */
+export async function checkMd(entryLua, opts = {}) {
+  const { res, assets } = await analyzeProject(entryLua, opts);
+  for (const p of opts.sfxPaths ?? []) wavToXgm2Pcm(new Uint8Array(await readFile(p)));
+  for (const p of opts.musicPaths ?? []) {
+    let bytes = new Uint8Array(await readFile(p));
+    if (isGzip(bytes)) {
+      const { gunzipSync } = await import("node:zlib");
+      bytes = new Uint8Array(gunzipSync(bytes));
+    }
+    songToXgm2(bytes);
+  }
+  return {
+    ok: true,
+    entry: path.resolve(entryLua),
+    graphics: assets.graphics,
+    spriteVariants: assets.scaling,
+    audio: { music: opts.musicPaths?.length ?? 0, sfx: opts.sfxPaths?.length ?? 0 },
+    generatedBytes: Buffer.byteLength(res.c, "utf8"),
+  };
+}
+
+// (wavToXgm2Pcm and the bank C generators live in audio-assets.mjs — the
+// BROWSER-SAFE module both this CLI and the web IDE pipeline import, so the
+// generated C is identical on every host.)
+
+export async function buildMd(entryLua, outPath, opts = {}) {
+  const inputs = [entryLua, opts.sheetPath, opts.mapPath, opts.gffPath,
+    opts.spriteVariantsPath, ...(opts.sfxPaths ?? []), ...(opts.musicPaths ?? [])];
+  await assertOutputDistinct(outPath, inputs);
+  const { res, assets } = await analyzeProject(entryLua, opts);
+  // num8 (8.8): emit supports it; the RUNTIME does not yet (16.16 sin table,
+  // time, print_num). Wire the flag only when md_math grows -DMD_NUM8 paths -
+  // shipping it now would be silently wrong math. (68000 is 16-bit-native, so
+  // num8 is worth measuring in the Phase-3 perf pass.)
+  const variants = assets.scaling.variants;
 
   const rd = (f) => readFile(path.join(SDK_DIR, f), "utf8");
   const sources = {

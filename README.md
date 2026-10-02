@@ -10,6 +10,8 @@ readiness. This branch is local development work; the npm badge below does not
 mean these changes are in the published package.
 
 From this SDK checkout: `npm.cmd run build -- examples/hello/main.lua`.
+Use `node bin/mdlua-launch.mjs check examples/hello/main.lua` for a faster
+source and asset validation pass that does not compile or write a ROM.
 For a project, put source/output/assets in `mdlua.json`; a linked CLI can then
 build it with `mdlua.cmd build`. The prepared workstation starter also has a
 one-command `build.cmd`. No manual Windows preload setup is needed with these

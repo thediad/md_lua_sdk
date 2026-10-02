@@ -13,7 +13,7 @@ const run=(args,cwd)=>promisify(execFile)(process.execPath,[launcher,...args],{c
 test("CLI help succeeds without loading a project or creating files",async()=>{
   const cwd=await mkdtemp(path.join(tmpdir(),"mdlua-help-"));
   await writeFile(path.join(cwd,"mdlua.json"),"invalid config");
-  for(const args of [[],["--help"],["-h"],["help"],["help","build"],["build","--help"],["run","-h"],["init","--help"],["c","--help"]]) {
+  for(const args of [[],["--help"],["-h"],["help"],["help","build"],["build","--help"],["check","--help"],["run","-h"],["init","--help"],["c","--help"]]) {
     const {stdout,stderr}=await run(args,cwd);
     assert.match(stdout,/Usage: mdlua/);
     assert.equal(stderr,"");
@@ -21,6 +21,22 @@ test("CLI help succeeds without loading a project or creating files",async()=>{
   assert.deepEqual(await readdir(cwd),["mdlua.json"]);
   await assert.rejects(run(["help","missing"],cwd),e=>e.code===1 && /unknown help topic/.test(e.stderr));
   await assert.rejects(run(["missing"],cwd),e=>e.code===1 && /unknown command/.test(e.stderr));
+});
+
+test("check validates source without writing a ROM",async()=>{
+  const cwd=await mkdtemp(path.join(tmpdir(),"mdlua-check-"));
+  const source=path.join(cwd,"main.lua");
+  await writeFile(source,"function _draw() spr(0,8,8) end\n");
+  const {stdout,stderr}=await run(["check",source],cwd);
+  assert.match(stdout,/^OK: /);
+  assert.match(stdout,/Graphics tiles: 4\/1424 used/);
+  assert.match(stdout,/Audio assets: 0 music, 0 sfx/);
+  assert.equal(stderr,"");
+  assert.deepEqual(await readdir(cwd),["main.lua"]);
+
+  await writeFile(source,"function _draw() spr() end\n");
+  await assert.rejects(run(["check",source],cwd),e=>e.code===1 && /main\.lua:1:/.test(e.stderr));
+  assert.deepEqual(await readdir(cwd),["main.lua"]);
 });
 
 test("generated-C command separates output and readable diagnostics",async()=>{

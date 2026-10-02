@@ -27,6 +27,9 @@ test("CLI starter builds and supports movement and reset in the emulator", async
   const directory = path.join(cwd, "my game");
   assert.deepEqual((await readdir(directory)).sort(), [".gitignore", ".vscode", "README.md", "main.lua", "mdlua.json"]);
   const config=JSON.parse(await readFile(path.join(directory,".vscode/tasks.json"),"utf8"));
+  const check=config.tasks.find(task=>task.label==="Genesis Lua: check");
+  assert.equal(check.args[1],"check");
+  assert.equal(check.group,undefined);
   const build=config.tasks.find(task=>task.label==="Genesis Lua: build");
   assert.equal(build.type,"process");
   assert.deepEqual(build.group,{kind:"build",isDefault:true});

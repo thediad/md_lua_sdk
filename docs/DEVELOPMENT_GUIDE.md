@@ -49,11 +49,22 @@ npm.cmd run build -- --project C:\dev\genesis-sync-runtime\tutorial\mdlua.json
 npm.cmd test
 ```
 
+For a quick validation pass without the M68K compiler, linker, or ROM output:
+
+```powershell
+node bin/mdlua-launch.mjs check examples/hello/main.lua
+```
+
+With the global command linked, `mdlua.cmd check` reads the same `mdlua.json`,
+validates Lua and configured graphics/audio assets, reports the graphics budget,
+and leaves the existing ROM untouched.
+
 For an optional global command, run `npm.cmd link` once from the SDK directory.
 Then, from your game's directory:
 
 ```powershell
 mdlua.cmd build
+mdlua.cmd check
 mdlua.cmd run build/game.bin
 ```
 

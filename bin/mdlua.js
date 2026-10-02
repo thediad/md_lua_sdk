@@ -4,7 +4,7 @@
 //   mdlua c <main.lua>          print the generated C (debugging)
 import path from "node:path";
 import { readFile } from "node:fs/promises";
-import { buildMd } from "../compiler/build-md.mjs";
+import { buildMd, checkMd } from "../compiler/build-md.mjs";
 import { compile, formatDiagnostics } from "../compiler/index.js";
 import { prepareRun } from "../compiler/run-project.mjs";
 import { resolveBuild } from "../compiler/project.mjs";
@@ -40,6 +40,15 @@ if (cmd === undefined || ["help", "--help", "-h"].includes(cmd)) {
       console.log(`Pre-scaled sprites: ${r.spriteVariants.bytes} graphics bytes in ROM and VRAM; base sheet ${r.spriteVariants.sheetBytes} bytes; one hardware sprite per draw.`);
       for (const v of r.spriteVariants.variants) console.log(`  ${v.id}: ${v.source.join(",")} -> ${v.size.join("x")}: ${v.bytes} bytes`);
     }
+  } catch (e) { fail(String(e.message ?? e)); }
+} else if (cmd === "check") {
+  try {
+    const { entry, assets } = await resolveBuild(rest);
+    const r = await checkMd(entry, assets);
+    const g = r.graphics;
+    console.log(`OK: ${r.entry}`);
+    console.log(`Graphics tiles: ${g.totalTiles}/${g.capacityTiles} used, ${g.freeTiles} free (${g.bytes} bytes used).`);
+    console.log(`Audio assets: ${r.audio.music} music, ${r.audio.sfx} sfx. Generated C: ${r.generatedBytes} bytes.`);
   } catch (e) { fail(String(e.message ?? e)); }
 } else if (cmd === "run") {
   try {

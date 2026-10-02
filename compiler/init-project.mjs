@@ -41,7 +41,7 @@ export async function initProject(args, cwd = process.cwd()) {
     throw error;
   }
   const launcher = fileURLToPath(new URL("../bin/mdlua-launch.mjs", import.meta.url));
-  const tasks = ["build", "run"].map(command => ({
+  const tasks = ["check", "build", "run"].map(command => ({
     label: `Genesis Lua: ${command}`, type: "process", command: process.execPath,
     args: [launcher, command, "--project", "${workspaceFolder}/mdlua.json"],
     options: { cwd: "${workspaceFolder}" },
@@ -61,6 +61,8 @@ export async function initProject(args, cwd = process.cwd()) {
 
 Open this folder in VS Code, save your Lua changes, then press **Ctrl+Shift+B**
 to build. Lua errors and warnings appear in the Problems panel with source locations.
+Use **Terminal > Run Task > Genesis Lua: check** for a fast source and asset
+validation pass that does not invoke the M68K toolchain or write a ROM.
 Use **Terminal > Run Task > Genesis Lua: run** to build and open the
 optional emulator. These tasks use the Node and SDK paths found when the project
 was created; no global command is required. If you move the SDK or reinstall
@@ -70,6 +72,7 @@ With the SDK command installed, you can also run from this directory:
 
 \x60\x60\x60powershell
 mdlua.cmd build
+mdlua.cmd check
 mdlua.cmd run
 \x60\x60\x60
 

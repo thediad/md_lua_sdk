@@ -21,6 +21,12 @@ Build a Genesis ROM. Without an entry, use the project entry or main.lua.
 Print graphics tile usage after a successful build.
 
 ${buildOptions}`,
+  check: `Usage: mdlua check [main.lua] [options]
+
+Validate Lua, project settings, and configured assets without compiling or
+writing a ROM. Uses the same options and checks as build.
+
+${buildOptions}`,
   run: `Usage: mdlua run [main.lua] [build options]
        mdlua run game.bin
 
@@ -45,6 +51,7 @@ export function helpText(topic) {
 Usage: mdlua <command> [options]
 
   init <directory>   Create a new game and VS Code tasks
+  check [main.lua]   Validate source and assets without writing a ROM
   build [main.lua]   Build a ROM using mdlua.json or explicit options
   run [main.lua]     Build and launch; run game.bin launches an existing ROM
   c <main.lua>       Print generated C for debugging

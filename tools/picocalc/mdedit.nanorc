@@ -20,7 +20,10 @@ color brightyellow "\"([^\"\\]|\\.)*\"|'([^'\\]|\\.)*'"
 color magenta "--.*"
 color magenta start="--\[\[" end="\]\]"
 bind F5 "{savefile}{suspend}" main
-# API lookup: suspend, run mdapi/mdlookup in Bash, then fg.
-bind F6 suspend main
+# Context help: select the current identifier, preserve it through the pipe,
+# undo the transient filter operation, and redraw.
+bind F6 "{savefile}{prevword}{mark}{nextword}{execute}| /data/genesis-dev/dev/native-toolchain-experiment/mdedit-help.sh{enter}{undo}{refresh}" main
 # Fast validation: save, show the check log, then return to this buffer.
 bind F7 "{savefile}{execute}/data/genesis-dev/dev/native-toolchain-experiment/mdedit-check.sh{enter}{refresh}" main
+# Full API browser: suspend, run mdapi/mdlookup in Bash, then fg.
+bind F8 suspend main

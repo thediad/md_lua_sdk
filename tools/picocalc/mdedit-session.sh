@@ -7,7 +7,7 @@ case "${1:-}" in
         echo 'Usage: mdedit [--basic] [PROJECT_NAME_OR_ABSOLUTE_DIRECTORY]'
         echo '       mdedit --new NAME'
         echo 'F5 saves and suspends Nano; run mdrun to build and play.'
-        echo 'F6 suspends for mdapi/mdlookup. F7 saves and checks in-place.'
+        echo 'F6 shows API help. F7 checks. F8 suspends for mdapi/mdlookup.'
         echo 'Ctrl+X exits Nano. --basic opens plain Nano without shortcuts.'
         exit 0 ;;
     --basic) export MDEDIT_BASIC=1; shift ;;

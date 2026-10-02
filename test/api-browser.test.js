@@ -9,6 +9,7 @@ import {compile} from '../compiler/index.js';
 import {variantEmitter} from '../compiler/sprite-variants.mjs';
 import {buildApi,validateApi} from '../tools/generate-api.mjs';
 import {run,formatEntry,sourceHelp} from '../bin/mdapi.mjs';
+import {renderHelpCache} from '../tools/picocalc/build-help-cache.mjs';
 const sdk=path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const api=JSON.parse(fs.readFileSync(path.join(sdk,'docs/api.json'),'utf8'));
 const names=new Set([...Object.keys(BUILTINS),...CALLBACKS,'all','hexdata']);
@@ -79,4 +80,17 @@ test('source inventory lists each used API once',()=>{
  const source='function _draw() cls(1) spr(0,1,2) spr(1,3,4) end';
  const result=sourceHelp(['--used','main.lua'],api,40,()=>source);assert.equal(result.code,0);assert.match(result.text,/3 APIs used/);assert.match(result.text,/_draw/);assert.match(result.text,/cls/);assert.match(result.text,/spr/);
  assert.equal(sourceHelp(['--used','empty.lua'],api,40,()=> 'local x=1').code,1);
+});
+
+test('PicoCalc exact-help cache is safe, narrow and complete',()=>{
+ const files=renderHelpCache(api,38);
+ assert.match(files.get('spr.txt'),/^spr\(/);
+ assert.doesNotMatch(files.get('spr.txt'),/Parameters:/);
+ assert.ok(files.get('spr.txt').split('\n').length<=18);
+ assert.equal(files.get('time.txt'),files.get('t.txt'));
+ assert.ok(files.size>800);
+ for(const [name,text] of files){
+  assert.match(name,/^[a-z_][a-z0-9_]*\.txt$/);
+  assert.ok(text.split('\n').every(line=>line.length<=38),`${name} exceeds 38 columns`);
+ }
 });

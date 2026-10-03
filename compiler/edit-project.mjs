@@ -50,14 +50,26 @@ async function assetPath(manifest, key, value, extensions, cwd) {
   return relative && !path.isAbsolute(relative) ? relative.replaceAll("\\", "/") : absolute.replaceAll("\\", "/");
 }
 
-async function saveManifest(file, config) {
+export async function validateProjectManifest(file) {
+  const [{ resolveBuild }, { checkMd }] = await Promise.all([
+    import("./project.mjs"), import("./build-md.mjs"),
+  ]);
+  const { entry, assets } = await resolveBuild(["--project", file], path.dirname(file));
+  return checkMd(entry, assets);
+}
+
+async function saveManifest(file, config, validate) {
   const temporary = path.join(path.dirname(file), `.mdlua-project-${randomUUID()}.tmp`);
   await writeFile(temporary, JSON.stringify(config, null, 2) + "\n", { flag: "wx" });
-  try { await rename(temporary, file); }
+  try {
+    const validation = await validate(temporary);
+    await rename(temporary, file);
+    return validation;
+  }
   finally { await unlink(temporary).catch(error => { if (error.code !== "ENOENT") throw error; }); }
 }
 
-export async function editProject(args, cwd = process.cwd()) {
+export async function editProject(args, cwd = process.cwd(), validate = validateProjectManifest) {
   const { manifest, remaining } = parseArgs(args, cwd);
   const action = remaining.shift() ?? "show";
   const config = await loadManifest(manifest);
@@ -89,17 +101,23 @@ export async function editProject(args, cwd = process.cwd()) {
     current.splice(index, 1);
     if (!current.length) delete config[key];
   } else throw new Error(`unknown project action: ${action}`);
-  await saveManifest(manifest, config);
-  return { manifest, config, changed: true };
+  const validation = await saveManifest(manifest, config, validate);
+  return { manifest, config, changed: true, validation };
 }
 
-export function formatProject({ manifest, config }) {
+export function formatProject({ manifest, config, validation }) {
   const lines = [`Project: ${manifest}`, `  entry: ${config.entry ?? "main.lua"}`, `  out: ${config.out ?? "game.bin"}`];
   for (const key of singles.keys()) lines.push(`  ${key}: ${config[key] ?? "(none)"}`);
   for (const key of lists.keys()) {
     const values = config[key] ?? [];
     lines.push(`  ${key}: ${values.length ? "" : "(none)"}`);
     values.forEach((value, index) => lines.push(`    ${index + 1}. ${value}`));
+  }
+  if (validation) {
+    const graphics = validation.graphics;
+    lines.push("Validation: OK");
+    lines.push(`  Graphics tiles: ${graphics.totalTiles}/${graphics.capacityTiles} used, ${graphics.freeTiles} free`);
+    lines.push(`  Audio assets: ${validation.audio.music} music, ${validation.audio.sfx} sfx`);
   }
   return lines.join("\n");
 }

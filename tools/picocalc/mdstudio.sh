@@ -68,6 +68,10 @@ project_command() {
     (cd "$(dirname "$manifest")" && node "$sdk/bin/mdlua.js" project "$@" --project "$manifest")
 }
 
+inspect_command() {
+    (cd "$(dirname "$manifest")" && node "$sdk/bin/mdlua.js" inspect "$1" --project "$manifest")
+}
+
 asset_menu() {
     while true; do
         clear
@@ -80,6 +84,8 @@ asset_menu() {
             '5  Remove music by number' \
             '6  Add SFX file' \
             '7  Remove SFX by number' \
+            '8  Inspect sprite sheet' \
+            '9  Inspect tile map' \
             'B  Back'
         printf '\nChoice: '
         IFS= read -r asset_choice || return
@@ -110,6 +116,8 @@ asset_menu() {
                 IFS= read -r asset_number || return
                 project_command remove "$asset_type" "$asset_number"
                 pause_for_key ;;
+            8) inspect_command sheet; pause_for_key ;;
+            9) inspect_command map; pause_for_key ;;
             b|B|0) return ;;
             *) printf '\nUnknown choice.\n'; pause_for_key ;;
         esac

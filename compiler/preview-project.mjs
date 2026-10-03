@@ -2,7 +2,7 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { resolveBuild } from "./project.mjs";
-import { pngToSheet } from "./png-tiles.mjs";
+import { pngToSheet, pngToTilemap } from "./png-tiles.mjs";
 import { buildMd } from "./build-md.mjs";
 
 export function sheetPreviewPlan(sheet) {
@@ -62,9 +62,55 @@ end
 `;
 }
 
+export function mapPreviewSource(map) {
+  const maxX = Math.max(0, map.cols * 8 - 320);
+  const maxY = Math.max(0, map.rows * 8 - 224);
+  return `-- Generated MDStudio map inspector. Do not edit.
+local view_x=0
+local view_y=0
+local max_x=${maxX}
+local max_y=${maxY}
+
+function _init()
+  map_show(0)
+  hud(3)
+  cls(0)
+  print("map preview - d-pad pans",8,8,7)
+end
+
+function _update()
+  if btn(0) then view_x-=2 end
+  if btn(1) then view_x+=2 end
+  if btn(2) then view_y-=2 end
+  if btn(3) then view_y+=2 end
+  view_x=mid(0,view_x,max_x)
+  view_y=mid(0,view_y,max_y)
+  camera(view_x,view_y)
+end
+
+function _draw()
+end
+`;
+}
+
 export async function previewProject(args, cwd = process.cwd()) {
-  if (args[0] !== "sheet") throw new Error("usage: mdlua preview sheet [--project FILE]");
+  const kind = args[0];
+  if (kind !== "sheet" && kind !== "map") throw new Error("usage: mdlua preview <sheet|map> [--project FILE]");
   const { out, assets } = await resolveBuild(args.slice(1), cwd);
+  if (kind === "map") {
+    if (!assets.mapPath) throw new Error("project has no registered map");
+    const map = pngToTilemap(await readFile(assets.mapPath));
+    const output = path.join(path.dirname(out), "mdstudio-map-preview.bin");
+    await mkdir(path.dirname(output), { recursive: true });
+    const source = path.join(path.dirname(output), `.mdstudio-map-preview-${randomUUID()}.lua`);
+    await writeFile(source, mapPreviewSource(map), { flag: "wx" });
+    try {
+      await buildMd(source, output, { mapPath: assets.mapPath });
+      return output;
+    } finally {
+      await unlink(source).catch(error => { if (error.code !== "ENOENT") throw error; });
+    }
+  }
   if (!assets.sheetPath) throw new Error("project has no registered sheet");
   const sheet = pngToSheet(await readFile(assets.sheetPath));
   const plan = sheetPreviewPlan(sheet);

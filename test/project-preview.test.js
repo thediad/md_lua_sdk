@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { pngToSheet } from "../compiler/png-tiles.mjs";
-import { sheetPreviewPlan, sheetPreviewSource } from "../compiler/preview-project.mjs";
+import { mapPreviewSource, sheetPreviewPlan, sheetPreviewSource } from "../compiler/preview-project.mjs";
 import { compile } from "../compiler/index.js";
 import { BUILTINS } from "../compiler/builtins.js";
 import { spriteVariants, variantEmitter } from "../compiler/sprite-variants.mjs";
@@ -28,5 +28,17 @@ test("sheet preview uses hardware-scaled variants and compiles as an interactive
   const result = compile(source, "mdstudio-sheet-preview.lua", { target: "md", builtins: {
     ...BUILTINS, ssprv: { ...BUILTINS.ssprv, emit: variantEmitter(generated.variants) },
   } });
+  assert.equal(result.ok, true, result.diagnostics.map(item => item.message).join("\n"));
+});
+
+test("map preview uses the hardware tile plane with bounded D-pad panning", async () => {
+  const source = mapPreviewSource({ cols: 64, rows: 40 });
+  assert.match(source, /local max_x=192/);
+  assert.match(source, /local max_y=96/);
+  assert.match(source, /map_show\(0\)/);
+  assert.match(source, /hud\(3\)/);
+  assert.match(source, /camera\(view_x,view_y\)/);
+  assert.doesNotMatch(source, /rectfill|hexdata/);
+  const result = compile(source, "mdstudio-map-preview.lua", { target: "md" });
   assert.equal(result.ok, true, result.diagnostics.map(item => item.message).join("\n"));
 });

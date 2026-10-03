@@ -106,6 +106,17 @@ case "$action" in
         fi
         exec sh "$native/build-native.sh" "$source" -o "$rom"
         ;;
+    check)
+        if [ ! -f "$source" ]; then
+            echo "Source not found: $source" >&2
+            exit 2
+        fi
+        cd "$sdk"
+        if [ "$manifest_build" -eq 1 ]; then
+            exec node bin/mdlua.js check --project "$manifest"
+        fi
+        exec node bin/mdlua.js check "$source"
+        ;;
     play) exec sh "$base/picodrive-native/run.sh" "$rom" ;;
     *) echo 'Unknown Genesis action.' >&2; exit 2 ;;
 esac

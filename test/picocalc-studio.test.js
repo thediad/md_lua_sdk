@@ -1,0 +1,26 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import test from "node:test";
+
+test("MDStudio unifies the existing PicoCalc project workflow", () => {
+  const studio = fs.readFileSync(path.resolve("tools/picocalc/mdstudio.sh"), "utf8");
+  const step = fs.readFileSync(path.resolve("tools/picocalc/genesis-step.sh"), "utf8");
+  assert.match(studio, /^#!\/bin\/bash/);
+  assert.match(studio, /Mega Drive Lua Studio/);
+  assert.match(studio, /1  Edit code \(Ctrl\+X returns\)/);
+  assert.match(studio, /2  Check project/);
+  assert.match(studio, /4  Build and run/);
+  assert.match(studio, /5  API help/);
+  assert.match(studio, /7  Project information/);
+  assert.match(studio, /PIPESTATUS\[0\]/);
+  assert.match(studio, /native PicoCalc toolchain/);
+  assert.match(studio, /if ! IFS= read -r choice; then/);
+  assert.match(studio, /project_args=\(\)/);
+  assert.match(studio, /check "\$\{project_args\[@\]\}"/);
+  assert.match(studio, /mdapi-browser\.mjs/);
+  assert.match(studio, /genesis-step\.sh/);
+  assert.match(studio, /mdedit-session\.sh/);
+  assert.match(step, /check\)/);
+  assert.match(step, /node bin\/mdlua\.js check --project/);
+});

@@ -24,6 +24,16 @@ import { wavToXgm2Pcm, songToXgm2, songsBankC, sfxBankC, isGzip } from "./audio-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SDK_DIR = path.resolve(__dirname, "..", "md-sdk");
 
+async function selectedToolchainEnvironment() {
+  const toolchainRoot = process.env.MDLUA_NATIVE_TOOLCHAIN;
+  if (!toolchainRoot) return undefined;
+  const workRoot = process.env.MDLUA_NATIVE_WORKDIR;
+  if (!workRoot) throw new Error("MDLUA_NATIVE_WORKDIR is required with MDLUA_NATIVE_TOOLCHAIN");
+  const packageRoot = path.resolve(__dirname, "..", "node_modules", "romdev-toolchain-m68k-gcc");
+  const { nativeEnvironment } = await import("./native-toolchain.mjs");
+  return nativeEnvironment({ packageRoot, toolchainRoot, workRoot });
+}
+
 /**
  * Build a mdlua game to a Genesis .bin.
  * @param {string} entryLua  path to main.lua
@@ -168,7 +178,8 @@ export async function buildMd(entryLua, outPath, opts = {}) {
   }
   sources["md_sfx_data.c"] = sfxBankC(sfxBlobs);
 
-  const r = await buildGenesisC({ sources, headers, sgdk: true });
+  const env = await selectedToolchainEnvironment();
+  const r = await buildGenesisC({ sources, headers, sgdk: true, env });
   if (!r.ok) {
     const errors = parseBuildLog(r.log).filter((issue) => issue.severity === "error");
     const detail = errors.map((e) => `${e.file ?? r.stage}${e.line ? `:${e.line}` : ""}: ${e.message}`).join("\n") || r.log.slice(-2000);

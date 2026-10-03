@@ -17,6 +17,10 @@ test("MDStudio unifies the existing PicoCalc project workflow", () => {
   assert.match(studio, /N  New project/);
   assert.match(studio, /O  Open project/);
   assert.match(studio, /IFS= read -e -r open_name/);
+  assert.match(studio, /IFS= read -e -r asset_path/);
+  assert.match(studio, /cd "\$project_directory"/);
+  assert.match(studio, /read_asset_path 'Existing asset path: '/);
+  assert.match(studio, /read_asset_path "Existing \$asset_type path: "/);
   assert.match(studio, /open_name=\$\{open_name%\/\}/);
   assert.match(studio, /node "\$sdk\/bin\/mdlua\.js" init "\$new_name"/);
   assert.match(studio, /\[ ! -f "\$projects_root\/\$open_name\/mdlua\.json" \]/);

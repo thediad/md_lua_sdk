@@ -162,6 +162,20 @@ valid_project_name() {
     esac
 }
 
+read_asset_path() {
+    local prompt=$1
+    local previous_directory=$PWD
+    printf '%s' "$prompt"
+    if ! cd "$project_directory"; then
+        printf '\nUnable to open the project directory.\n'
+        return 1
+    fi
+    IFS= read -e -r asset_path
+    local read_status=$?
+    cd "$previous_directory" || return 1
+    [ "$read_status" -eq 0 ] && [ -n "$asset_path" ]
+}
+
 open_project() {
     local previous_directory=$PWD
     list_projects
@@ -234,8 +248,7 @@ asset_menu() {
             2)
                 printf 'Type (sheet/map/gff/spriteVariants): '
                 IFS= read -r asset_type || return
-                printf 'Existing asset path: '
-                IFS= read -r asset_path || return
+                read_asset_path 'Existing asset path: ' || return
                 project_command set "$asset_type" "$asset_path"
                 pause_for_key ;;
             3)
@@ -245,8 +258,7 @@ asset_menu() {
                 pause_for_key ;;
             4|6)
                 [ "$asset_choice" = 4 ] && asset_type=music || asset_type=sfx
-                printf 'Existing %s path: ' "$asset_type"
-                IFS= read -r asset_path || return
+                read_asset_path "Existing $asset_type path: " || return
                 project_command add "$asset_type" "$asset_path"
                 pause_for_key ;;
             5|7)

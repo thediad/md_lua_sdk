@@ -14,6 +14,14 @@ test("MDStudio unifies the existing PicoCalc project workflow", () => {
   assert.match(studio, /5  API help/);
   assert.match(studio, /7  Project information/);
   assert.match(studio, /9  Project assets/);
+  assert.match(studio, /N  New project/);
+  assert.match(studio, /O  Open project/);
+  assert.match(studio, /IFS= read -e -r open_name/);
+  assert.match(studio, /open_name=\$\{open_name%\/\}/);
+  assert.match(studio, /node "\$sdk\/bin\/mdlua\.js" init "\$new_name"/);
+  assert.match(studio, /\[ ! -f "\$projects_root\/\$open_name\/mdlua\.json" \]/);
+  assert.match(studio, /exec "\$0" "\$open_name"/);
+  assert.match(studio, /exec "\$0" "\$new_name"/);
   assert.match(studio, /project_command set/);
   assert.match(studio, /project_command unset/);
   assert.match(studio, /project_command add/);
@@ -24,11 +32,13 @@ test("MDStudio unifies the existing PicoCalc project workflow", () => {
   assert.match(studio, /inspect_command map/);
   assert.match(studio, /10 Visual sprite-sheet preview/);
   assert.match(studio, /11 Visual tile-map preview/);
+  assert.match(studio, /14 Audition music and SFX/);
   assert.match(studio, /12 Inspect audio assets/);
   assert.match(studio, /13 Inspect sprite variants/);
   assert.match(studio, /MDLUA_NATIVE_TOOLCHAIN/);
   assert.match(studio, /mdlua\.js" preview sheet/);
   assert.match(studio, /mdlua\.js" preview map/);
+  assert.match(studio, /mdlua\.js" preview audio/);
   assert.match(studio, /picodrive-native\/run\.sh/);
   assert.match(studio, /cd "\$\(dirname "\$manifest"\)"/);
   assert.match(studio, /PIPESTATUS\[0\]/);

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { pngToSheet } from "../compiler/png-tiles.mjs";
-import { mapPreviewSource, sheetPreviewPlan, sheetPreviewSource } from "../compiler/preview-project.mjs";
+import { audioPreviewSource, mapPreviewSource, sheetPreviewPlan, sheetPreviewSource } from "../compiler/preview-project.mjs";
 import { compile } from "../compiler/index.js";
 import { BUILTINS } from "../compiler/builtins.js";
 import { spriteVariants, variantEmitter } from "../compiler/sprite-variants.mjs";
@@ -40,5 +40,15 @@ test("map preview uses the hardware tile plane with bounded D-pad panning", asyn
   assert.match(source, /camera\(view_x,view_y\)/);
   assert.doesNotMatch(source, /rectfill|hexdata/);
   const result = compile(source, "mdstudio-map-preview.lua", { target: "md" });
+  assert.equal(result.ok, true, result.diagnostics.map(item => item.message).join("\n"));
+});
+
+test("audio preview selects and auditions registered music and SFX", () => {
+  const source = audioPreviewSource(2, 3);
+  assert.match(source, /local music_total=2/);
+  assert.match(source, /local sfx_total=3/);
+  assert.match(source, /if kind==0 then music\(selected\) else sfx\(selected\) end/);
+  assert.match(source, /if btnp\(5\) then music\(-1\) end/);
+  const result = compile(source, "mdstudio-audio-preview.lua", { target: "md" });
   assert.equal(result.ok, true, result.diagnostics.map(item => item.message).join("\n"));
 });

@@ -93,10 +93,74 @@ end
 `;
 }
 
+export function audioPreviewSource(musicCount, sfxCount) {
+  return `-- Generated MDStudio audio inspector. Do not edit.
+local kind=0
+local selected=0
+local music_total=${musicCount}
+local sfx_total=${sfxCount}
+
+function _init()
+  cls(0)
+end
+
+function _update()
+  if btnp(2) or btnp(3) then
+    kind=1-kind
+    selected=0
+  end
+  local total=music_total
+  if kind==1 then total=sfx_total end
+  if btnp(0) then selected-=1 end
+  if btnp(1) then selected+=1 end
+  selected=mid(0,selected,max(0,total-1))
+  if btnp(4) and total>0 then
+    if kind==0 then music(selected) else sfx(selected) end
+  end
+  if btnp(5) then music(-1) end
+end
+
+function _draw()
+  cls(0)
+  print("audio preview",8,8,7)
+  if kind==0 then
+    print("music",8,40,10)
+    print(selected,72,40,10)
+    print("of",104,40,7)
+    print(music_total,128,40,7)
+  else
+    print("sfx",8,40,11)
+    print(selected,72,40,11)
+    print("of",104,40,7)
+    print(sfx_total,128,40,7)
+  end
+  print("up/down: bank",8,96,7)
+  print("left/right: select",8,112,7)
+  print("a: play",8,144,7)
+  print("b: stop music",8,160,7)
+end
+`;
+}
+
 export async function previewProject(args, cwd = process.cwd()) {
   const kind = args[0];
-  if (kind !== "sheet" && kind !== "map") throw new Error("usage: mdlua preview <sheet|map> [--project FILE]");
+  if (kind !== "sheet" && kind !== "map" && kind !== "audio") throw new Error("usage: mdlua preview <sheet|map|audio> [--project FILE]");
   const { out, assets } = await resolveBuild(args.slice(1), cwd);
+  if (kind === "audio") {
+    const musicPaths = assets.musicPaths ?? [];
+    const sfxPaths = assets.sfxPaths ?? [];
+    if (!musicPaths.length && !sfxPaths.length) throw new Error("project has no registered music or SFX");
+    const output = path.join(path.dirname(out), "mdstudio-audio-preview.bin");
+    await mkdir(path.dirname(output), { recursive: true });
+    const source = path.join(path.dirname(output), `.mdstudio-audio-preview-${randomUUID()}.lua`);
+    await writeFile(source, audioPreviewSource(musicPaths.length, sfxPaths.length), { flag: "wx" });
+    try {
+      await buildMd(source, output, { musicPaths, sfxPaths });
+      return output;
+    } finally {
+      await unlink(source).catch(error => { if (error.code !== "ENOENT") throw error; });
+    }
+  }
   if (kind === "map") {
     if (!assets.mapPath) throw new Error("project has no registered map");
     const map = pngToTilemap(await readFile(assets.mapPath));

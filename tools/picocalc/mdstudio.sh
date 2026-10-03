@@ -8,6 +8,7 @@ step=$native/genesis-step.sh
 editor=$native/mdedit-session.sh
 build_log=${MDRUN_LOG:-/home/pico/.mdrun-last.log}
 check_log=${MDCHECK_LOG:-/home/pico/.mdcheck-last.log}
+projects_root=$base/projects
 if [ "$#" -gt 1 ]; then
     echo 'Usage: mdstudio [project-name-or-absolute-directory]' >&2
     exit 2
@@ -108,6 +109,90 @@ preview_map() {
     sh "$base/picodrive-native/run.sh" "$preview_rom"
 }
 
+preview_audio() {
+    local preview_log=/home/pico/.mdpreview-last.log
+    printf '\nBuilding audio audition ROM...\n'
+    (cd "$(dirname "$manifest")" && \
+        MDLUA_NATIVE_TOOLCHAIN="$native/m68k-elf-armhf" \
+        MDLUA_NATIVE_WORKDIR="$native" \
+        node "$sdk/bin/mdlua.js" preview audio --project "$manifest") 2>&1 | tee "$preview_log"
+    local rc=${PIPESTATUS[0]}
+    if [ "$rc" -ne 0 ]; then return "$rc"; fi
+    local preview_rom
+    preview_rom=$(sed -n 's/^Preview ROM: //p' "$preview_log" | tail -n 1)
+    if [ -z "$preview_rom" ] || [ ! -f "$preview_rom" ]; then
+        echo 'Preview ROM path was not produced.' >&2
+        return 1
+    fi
+    sh "$base/picodrive-native/run.sh" "$preview_rom"
+}
+
+list_projects() {
+    local found=0
+    local project_manifest
+    printf '\nAvailable projects:\n'
+    for project_manifest in "$projects_root"/*/mdlua.json; do
+        [ -f "$project_manifest" ] || continue
+        found=1
+        printf '  %s\n' "$(basename "$(dirname "$project_manifest")")"
+    done
+    if [ "$found" -eq 0 ]; then
+        printf '  (none)\n'
+    fi
+}
+
+valid_project_name() {
+    case "$1" in
+        *[!a-zA-Z0-9_-]*|'') return 1 ;;
+        *) return 0 ;;
+    esac
+}
+
+open_project() {
+    local previous_directory=$PWD
+    list_projects
+    printf '\nProject name (blank cancels): '
+    if ! cd "$projects_root"; then
+        printf '\nUnable to open the projects directory.\n'
+        pause_for_key
+        return
+    fi
+    IFS= read -e -r open_name
+    local read_status=$?
+    cd "$previous_directory" || return
+    [ "$read_status" -eq 0 ] || return
+    open_name=${open_name%/}
+    [ -n "$open_name" ] || return
+    if ! valid_project_name "$open_name"; then
+        printf '\nUse letters, numbers, underscore, or hyphen only.\n'
+        pause_for_key
+        return
+    fi
+    if [ ! -f "$projects_root/$open_name/mdlua.json" ]; then
+        printf '\nProject not found: %s\n' "$open_name"
+        pause_for_key
+        return
+    fi
+    exec "$0" "$open_name"
+}
+
+new_project() {
+    printf '\nNew project name (blank cancels): '
+    IFS= read -r new_name || return
+    [ -n "$new_name" ] || return
+    if ! valid_project_name "$new_name"; then
+        printf '\nUse letters, numbers, underscore, or hyphen only.\n'
+        pause_for_key
+        return
+    fi
+    mkdir -p "$projects_root"
+    if (cd "$projects_root" && node "$sdk/bin/mdlua.js" init "$new_name"); then
+        printf '\nProject created: %s\n' "$projects_root/$new_name"
+        exec "$0" "$new_name"
+    fi
+    pause_for_key
+}
+
 asset_menu() {
     while true; do
         clear
@@ -126,6 +211,7 @@ asset_menu() {
             '11 Visual tile-map preview' \
             '12 Inspect audio assets' \
             '13 Inspect sprite variants' \
+            '14 Audition music and SFX' \
             'B  Back'
         printf '\nChoice: '
         IFS= read -r asset_choice || return
@@ -162,6 +248,7 @@ asset_menu() {
             11) preview_map || pause_for_key ;;
             12) inspect_command audio; pause_for_key ;;
             13) inspect_command variants; pause_for_key ;;
+            14) preview_audio || pause_for_key ;;
             b|B|0) return ;;
             *) printf '\nUnknown choice.\n'; pause_for_key ;;
         esac
@@ -182,6 +269,8 @@ while true; do
         '7  Project information' \
         '8  Last check log' \
         '9  Project assets' \
+        'N  New project' \
+        'O  Open project' \
         'Q  Quit'
     printf '\nChoice: '
     if ! IFS= read -r choice; then
@@ -202,6 +291,8 @@ while true; do
         7|p|P) sh "$step" info "${project_args[@]}"; pause_for_key ;;
         8) show_log "$check_log" check ;;
         9|a|A) asset_menu ;;
+        n|N) new_project ;;
+        o|O) open_project ;;
         q|Q|0) exit 0 ;;
         *) printf '\nUnknown choice.\n'; pause_for_key ;;
     esac

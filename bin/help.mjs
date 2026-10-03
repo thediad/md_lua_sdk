@@ -29,10 +29,11 @@ overwritten. Music and SFX numbers are shown by the project show command.`,
 Inspect registered Genesis graphics using the same PNG decoder as the build.
 Reports graphics layout, palettes, VRAM use, converted audio sizes, or declared
 sprite-variant costs without writing a ROM or changing the project.`,
-  preview: `Usage: mdlua preview <sheet|map> [--project FILE]
+  preview: `Usage: mdlua preview <sheet|map|audio> [--project FILE]
 
 Build a temporary visual graphics inspector ROM. Sheet previews select real
-row-major tile IDs; map previews pan the hardware tile plane with the D-pad.
+row-major tile IDs; map previews pan the hardware tile plane with the D-pad;
+audio previews audition registered music and SFX banks.
 Project source and assets are never modified.`,
   build: `Usage: mdlua build [main.lua] [options]
 
@@ -72,7 +73,7 @@ Usage: mdlua <command> [options]
   init <directory>   Create a new game and VS Code tasks
   project ...        Safely inspect or update project assets
   inspect ...        Report registered sheet or map layout
-  preview ...        Build a visual sheet or map inspector ROM
+  preview ...        Build a sheet, map, or audio inspector ROM
   check [main.lua]   Validate source and assets without writing a ROM
   build [main.lua]   Build a ROM using mdlua.json or explicit options
   run [main.lua]     Build and launch; run game.bin launches an existing ROM

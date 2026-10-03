@@ -22,6 +22,10 @@ test("MDStudio unifies the existing PicoCalc project workflow", () => {
   assert.match(studio, /9  Inspect tile map/);
   assert.match(studio, /inspect_command sheet/);
   assert.match(studio, /inspect_command map/);
+  assert.match(studio, /10 Visual sprite-sheet preview/);
+  assert.match(studio, /MDLUA_NATIVE_TOOLCHAIN/);
+  assert.match(studio, /mdlua\.js" preview sheet/);
+  assert.match(studio, /picodrive-native\/run\.sh/);
   assert.match(studio, /cd "\$\(dirname "\$manifest"\)"/);
   assert.match(studio, /PIPESTATUS\[0\]/);
   assert.match(studio, /native PicoCalc toolchain/);

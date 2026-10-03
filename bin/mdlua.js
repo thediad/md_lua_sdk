@@ -12,6 +12,7 @@ import { helpText } from "./help.mjs";
 import { initProject } from "../compiler/init-project.mjs";
 import { editProject, formatProject } from "../compiler/edit-project.mjs";
 import { inspectProject } from "../compiler/inspect-project.mjs";
+import { previewProject } from "../compiler/preview-project.mjs";
 
 const [cmd, ...rest] = process.argv.slice(2);
 const fail = (m) => { console.error(m); process.exit(1); };
@@ -34,6 +35,9 @@ if (cmd === undefined || ["help", "--help", "-h"].includes(cmd)) {
   catch (e) { fail(String(e.message ?? e)); }
 } else if (cmd === "inspect") {
   try { console.log(await inspectProject(rest)); }
+  catch (e) { fail(String(e.message ?? e)); }
+} else if (cmd === "preview") {
+  try { console.log(`Preview ROM: ${await previewProject(rest)}`); }
   catch (e) { fail(String(e.message ?? e)); }
 } else if (cmd === "build") {
   try {

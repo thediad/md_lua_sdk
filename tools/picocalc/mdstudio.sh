@@ -72,6 +72,24 @@ inspect_command() {
     (cd "$(dirname "$manifest")" && node "$sdk/bin/mdlua.js" inspect "$1" --project "$manifest")
 }
 
+preview_sheet() {
+    local preview_log=/home/pico/.mdpreview-last.log
+    printf '\nBuilding visual sheet inspector...\n'
+    (cd "$(dirname "$manifest")" && \
+        MDLUA_NATIVE_TOOLCHAIN="$native/m68k-elf-armhf" \
+        MDLUA_NATIVE_WORKDIR="$native" \
+        node "$sdk/bin/mdlua.js" preview sheet --project "$manifest") 2>&1 | tee "$preview_log"
+    local rc=${PIPESTATUS[0]}
+    if [ "$rc" -ne 0 ]; then return "$rc"; fi
+    local preview_rom
+    preview_rom=$(sed -n 's/^Preview ROM: //p' "$preview_log" | tail -n 1)
+    if [ -z "$preview_rom" ] || [ ! -f "$preview_rom" ]; then
+        echo 'Preview ROM path was not produced.' >&2
+        return 1
+    fi
+    sh "$base/picodrive-native/run.sh" "$preview_rom"
+}
+
 asset_menu() {
     while true; do
         clear
@@ -86,6 +104,7 @@ asset_menu() {
             '7  Remove SFX by number' \
             '8  Inspect sprite sheet' \
             '9  Inspect tile map' \
+            '10 Visual sprite-sheet preview' \
             'B  Back'
         printf '\nChoice: '
         IFS= read -r asset_choice || return
@@ -118,6 +137,7 @@ asset_menu() {
                 pause_for_key ;;
             8) inspect_command sheet; pause_for_key ;;
             9) inspect_command map; pause_for_key ;;
+            10) preview_sheet || pause_for_key ;;
             b|B|0) return ;;
             *) printf '\nUnknown choice.\n'; pause_for_key ;;
         esac

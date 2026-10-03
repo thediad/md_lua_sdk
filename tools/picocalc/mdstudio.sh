@@ -124,6 +124,8 @@ asset_menu() {
             '9  Inspect tile map' \
             '10 Visual sprite-sheet preview' \
             '11 Visual tile-map preview' \
+            '12 Inspect audio assets' \
+            '13 Inspect sprite variants' \
             'B  Back'
         printf '\nChoice: '
         IFS= read -r asset_choice || return
@@ -158,6 +160,8 @@ asset_menu() {
             9) inspect_command map; pause_for_key ;;
             10) preview_sheet || pause_for_key ;;
             11) preview_map || pause_for_key ;;
+            12) inspect_command audio; pause_for_key ;;
+            13) inspect_command variants; pause_for_key ;;
             b|B|0) return ;;
             *) printf '\nUnknown choice.\n'; pause_for_key ;;
         esac

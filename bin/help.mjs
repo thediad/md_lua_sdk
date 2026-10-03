@@ -24,11 +24,11 @@ The parent directory must exist; an existing destination is never replaced.`,
 Safely inspect or update asset paths in mdlua.json. Existing single assets must
 be removed before replacement. Asset files are referenced, never copied or
 overwritten. Music and SFX numbers are shown by the project show command.`,
-  inspect: `Usage: mdlua inspect <sheet|map> [--project FILE]
+  inspect: `Usage: mdlua inspect <sheet|map|audio|variants> [--project FILE]
 
 Inspect registered Genesis graphics using the same PNG decoder as the build.
-Reports dimensions, tile layout, palette line and VRAM usage without writing a
-ROM or changing the project.`,
+Reports graphics layout, palettes, VRAM use, converted audio sizes, or declared
+sprite-variant costs without writing a ROM or changing the project.`,
   preview: `Usage: mdlua preview <sheet|map> [--project FILE]
 
 Build a temporary visual graphics inspector ROM. Sheet previews select real

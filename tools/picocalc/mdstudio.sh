@@ -9,6 +9,7 @@ editor=$native/mdedit-session.sh
 build_log=${MDRUN_LOG:-/home/pico/.mdrun-last.log}
 check_log=${MDCHECK_LOG:-/home/pico/.mdcheck-last.log}
 projects_root=$base/projects
+last_project_file=${MDSTUDIO_LAST_PROJECT:-/home/pico/.mdstudio-last-project}
 if [ "$#" -gt 1 ]; then
     echo 'Usage: mdstudio [project-name-or-absolute-directory]' >&2
     exit 2
@@ -17,6 +18,12 @@ project_label=${1:-hello}
 project_args=()
 if [ "$#" -eq 1 ]; then
     project_args=("$1")
+elif [ -r "$last_project_file" ]; then
+    IFS= read -r remembered_project < "$last_project_file" || remembered_project=
+    if [ -n "$remembered_project" ] && [ -f "$remembered_project/mdlua.json" ]; then
+        project_args=("$remembered_project")
+        project_label=$(basename "$remembered_project")
+    fi
 fi
 if [ ! -r "$sdk/bin/mdlua.js" ] || [ ! -r "$step" ] || [ ! -r "$editor" ]; then
     echo 'Genesis development volume or MDStudio helpers are unavailable.' >&2
@@ -26,6 +33,13 @@ manifest=$(sh "$step" info "${project_args[@]}" | sed -n 's/^Manifest: //p')
 if [ -z "$manifest" ]; then
     echo 'Unable to resolve the project manifest.' >&2
     exit 2
+fi
+project_directory=$(dirname "$manifest")
+last_project_tmp="$last_project_file.tmp.$$"
+if printf '%s\n' "$project_directory" > "$last_project_tmp"; then
+    mv "$last_project_tmp" "$last_project_file"
+else
+    rm -f "$last_project_tmp"
 fi
 
 pause_for_key() {

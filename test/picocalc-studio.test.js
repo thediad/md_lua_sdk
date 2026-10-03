@@ -45,6 +45,10 @@ test("MDStudio unifies the existing PicoCalc project workflow", () => {
   assert.match(studio, /native PicoCalc toolchain/);
   assert.match(studio, /if ! IFS= read -r choice; then/);
   assert.match(studio, /project_args=\(\)/);
+  assert.match(studio, /MDSTUDIO_LAST_PROJECT:-\/home\/pico\/\.mdstudio-last-project/);
+  assert.match(studio, /\[ -f "\$remembered_project\/mdlua\.json" \]/);
+  assert.match(studio, /project_label=\$\(basename "\$remembered_project"\)/);
+  assert.match(studio, /mv "\$last_project_tmp" "\$last_project_file"/);
   assert.match(studio, /check "\$\{project_args\[@\]\}"/);
   assert.match(studio, /mdapi-browser\.mjs/);
   assert.match(studio, /genesis-step\.sh/);

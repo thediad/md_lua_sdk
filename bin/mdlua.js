@@ -10,6 +10,7 @@ import { prepareRun } from "../compiler/run-project.mjs";
 import { resolveBuild } from "../compiler/project.mjs";
 import { helpText } from "./help.mjs";
 import { initProject } from "../compiler/init-project.mjs";
+import { editProject, formatProject } from "../compiler/edit-project.mjs";
 
 const [cmd, ...rest] = process.argv.slice(2);
 const fail = (m) => { console.error(m); process.exit(1); };
@@ -27,6 +28,9 @@ if (cmd === undefined || ["help", "--help", "-h"].includes(cmd)) {
     const directory = await initProject(rest);
     console.log(`Created ${directory}\nOpen its README.md for build and run instructions.`);
   } catch (e) { fail(String(e.message ?? e)); }
+} else if (cmd === "project") {
+  try { console.log(formatProject(await editProject(rest))); }
+  catch (e) { fail(String(e.message ?? e)); }
 } else if (cmd === "build") {
   try {
     const { entry, out, assets } = await resolveBuild(rest);

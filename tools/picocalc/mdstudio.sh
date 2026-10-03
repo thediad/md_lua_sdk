@@ -21,6 +21,11 @@ if [ ! -r "$sdk/bin/mdlua.js" ] || [ ! -r "$step" ] || [ ! -r "$editor" ]; then
     echo 'Genesis development volume or MDStudio helpers are unavailable.' >&2
     exit 2
 fi
+manifest=$(sh "$step" info "${project_args[@]}" | sed -n 's/^Manifest: //p')
+if [ -z "$manifest" ]; then
+    echo 'Unable to resolve the project manifest.' >&2
+    exit 2
+fi
 
 pause_for_key() {
     printf '\nPress Enter to return to MDStudio...'
@@ -59,6 +64,58 @@ run_build() {
     return "$rc"
 }
 
+project_command() {
+    (cd "$(dirname "$manifest")" && node "$sdk/bin/mdlua.js" project "$@" --project "$manifest")
+}
+
+asset_menu() {
+    while true; do
+        clear
+        printf '%s\n' 'Project assets' '--------------'
+        printf '%s\n' \
+            '1  Show registered assets' \
+            '2  Register one sheet/map/gff/spriteVariants file' \
+            '3  Remove one sheet/map/gff/spriteVariants entry' \
+            '4  Add music file' \
+            '5  Remove music by number' \
+            '6  Add SFX file' \
+            '7  Remove SFX by number' \
+            'B  Back'
+        printf '\nChoice: '
+        IFS= read -r asset_choice || return
+        case "$asset_choice" in
+            1) project_command show; pause_for_key ;;
+            2)
+                printf 'Type (sheet/map/gff/spriteVariants): '
+                IFS= read -r asset_type || return
+                printf 'Existing asset path: '
+                IFS= read -r asset_path || return
+                project_command set "$asset_type" "$asset_path"
+                pause_for_key ;;
+            3)
+                printf 'Type (sheet/map/gff/spriteVariants): '
+                IFS= read -r asset_type || return
+                project_command unset "$asset_type"
+                pause_for_key ;;
+            4|6)
+                [ "$asset_choice" = 4 ] && asset_type=music || asset_type=sfx
+                printf 'Existing %s path: ' "$asset_type"
+                IFS= read -r asset_path || return
+                project_command add "$asset_type" "$asset_path"
+                pause_for_key ;;
+            5|7)
+                [ "$asset_choice" = 5 ] && asset_type=music || asset_type=sfx
+                project_command show
+                printf '\n%s number to remove: ' "$asset_type"
+                IFS= read -r asset_number || return
+                project_command remove "$asset_type" "$asset_number"
+                pause_for_key ;;
+            b|B|0) return ;;
+            *) printf '\nUnknown choice.\n'; pause_for_key ;;
+        esac
+    done
+}
+
 while true; do
     clear
     printf '%s\n' 'Mega Drive Lua Studio' '---------------------'
@@ -72,6 +129,7 @@ while true; do
         '6  Last build log' \
         '7  Project information' \
         '8  Last check log' \
+        '9  Project assets' \
         'Q  Quit'
     printf '\nChoice: '
     if ! IFS= read -r choice; then
@@ -91,6 +149,7 @@ while true; do
         6|l|L) show_log "$build_log" build ;;
         7|p|P) sh "$step" info "${project_args[@]}"; pause_for_key ;;
         8) show_log "$check_log" check ;;
+        9|a|A) asset_menu ;;
         q|Q|0) exit 0 ;;
         *) printf '\nUnknown choice.\n'; pause_for_key ;;
     esac

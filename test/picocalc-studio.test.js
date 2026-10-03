@@ -13,6 +13,12 @@ test("MDStudio unifies the existing PicoCalc project workflow", () => {
   assert.match(studio, /4  Build and run/);
   assert.match(studio, /5  API help/);
   assert.match(studio, /7  Project information/);
+  assert.match(studio, /9  Project assets/);
+  assert.match(studio, /project_command set/);
+  assert.match(studio, /project_command unset/);
+  assert.match(studio, /project_command add/);
+  assert.match(studio, /project_command remove/);
+  assert.match(studio, /cd "\$\(dirname "\$manifest"\)"/);
   assert.match(studio, /PIPESTATUS\[0\]/);
   assert.match(studio, /native PicoCalc toolchain/);
   assert.match(studio, /if ! IFS= read -r choice; then/);

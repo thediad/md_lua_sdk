@@ -15,6 +15,15 @@ const topics = {
 
 Create a playable starter with mdlua.json and VS Code build/run tasks.
 The parent directory must exist; an existing destination is never replaced.`,
+  project: `Usage: mdlua project show [--project FILE]
+       mdlua project set <sheet|map|gff|spriteVariants> <file> [--project FILE]
+       mdlua project unset <sheet|map|gff|spriteVariants> [--project FILE]
+       mdlua project add <music|sfx> <file> [--project FILE]
+       mdlua project remove <music|sfx> <number> [--project FILE]
+
+Safely inspect or update asset paths in mdlua.json. Existing single assets must
+be removed before replacement. Asset files are referenced, never copied or
+overwritten. Music and SFX numbers are shown by the project show command.`,
   build: `Usage: mdlua build [main.lua] [options]
 
 Build a Genesis ROM. Without an entry, use the project entry or main.lua.
@@ -51,6 +60,7 @@ export function helpText(topic) {
 Usage: mdlua <command> [options]
 
   init <directory>   Create a new game and VS Code tasks
+  project ...        Safely inspect or update project assets
   check [main.lua]   Validate source and assets without writing a ROM
   build [main.lua]   Build a ROM using mdlua.json or explicit options
   run [main.lua]     Build and launch; run game.bin launches an existing ROM
